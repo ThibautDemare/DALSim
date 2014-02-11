@@ -39,6 +39,26 @@ species FinalDestinationManager parent: Role{
 			self.stocks <- s;
 			myself.building <- self;
 		}
+		
+		if(use_gs){
+			// Add new node/edge events for corresponding sender
+			if(use_r1){
+				gs_add_node gs_sender_id:"actor" gs_node_id:name;
+				gs_add_edge gs_sender_id:"actor" gs_edge_id:(name + logisticProvider.name) gs_node_id_from:name gs_node_id_to:logisticProvider.name gs_is_directed:false;
+			}
+			if(use_r2){
+				gs_add_node gs_sender_id:"neighborhood_all" gs_node_id:name;
+			}
+			if(use_r4){
+				gs_add_node gs_sender_id:"neighborhood_final_destination" gs_node_id:name;
+			}
+			if(use_r6){
+				gs_add_node gs_sender_id:"neighborhood_warehouse_final" gs_node_id:name;
+			}
+			if(use_r7){
+				gs_add_node gs_sender_id:"neighborhood_logistic_final" gs_node_id:name;
+			}
+		}
 	}
 	
 	/*

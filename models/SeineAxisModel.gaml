@@ -44,14 +44,27 @@ global {
 	// A non realistic list of product and their quantity
 	map<int, float> products <- [1::1000, 2::10000, 3::40000, 5::30000, 6::15000, 7::20000, 8::50000, 9::40000, 10::25000, 11::60000, 12::55000, 13::32000, 14::80000, 15::70000, 16::90000, 17::85000, 18::95000, 19::50000];
 	
+	bool use_gs <- true;
+	bool use_r1 <- false;
+	bool use_r2 <- false;
+	bool use_r3 <- false;
+	bool use_r4 <- false;
+	bool use_r5 <- false;
+	bool use_r6 <- false;
+	bool use_r7 <- true;
+	
+	float neighborhood_dist <- 5°km;
+	
 	init {
+		if(use_gs){
+			// Init senders in order to create nodes/edges when we create agent
+			do init_senders;
+		}
+		
 		// Road network creation
 		create Road from: roads_shapefile with: [speed::read("speed") as float];
 		//map<Road,float> move_weights <- Road as_map (each::(each.speed*each.length));
 		road_network <- as_edge_graph(Road);// with_weights move_weights;
-		
-		// Final destinations
-		create FinalDestinationManager from: destination_shapefile with: [huffValue::read("huff") as float];
 		
 		// Warehouses
 		create Warehouse from: warehouse_shapefile_small returns: ws with: [huffValue::read("huff") as float, surface::read("surface") as float];
@@ -60,6 +73,9 @@ global {
 		
 		//  Logistic providers
 		create LogisticProvider from: commissionaire_shapefile;
+		
+		// Final destinations
+		create FinalDestinationManager from: destination_shapefile with: [huffValue::read("huff") as float];
 		
 		// Add warehouse to logistic provider
 			// Small warehouse case
@@ -101,6 +117,144 @@ global {
 		
 		// Creation of a SuperProvider
 		create Provider from: provider_shapefile;
+		
+	}
+	
+	reflex init_edges when: cycle = 1 {
+		if(use_gs){
+			do init_neighborhood_networks;
+		}
+	}
+	
+	action init_senders {
+		gs_clear_senders;
+		
+		if(use_r1){
+			// In order to build a network of interaction between final destination manager and logistic manager
+			gs_add_sender gs_host:"localhost" gs_port:2001 gs_sender_id:"actor";
+		}
+		
+		if(use_r2){
+			// In order to build a neighborhood network between all agent
+			gs_add_sender gs_host:"localhost" gs_port:2002 gs_sender_id:"neighborhood_all";
+		}
+		
+		if(use_r3){
+			// In order to build a neighborhood network between warehouse
+			gs_add_sender gs_host:"localhost" gs_port:2003 gs_sender_id:"neighborhood_warehouse";
+		}
+		
+		if(use_r4){
+			// In order to build a neighborhood network between final destination
+			gs_add_sender gs_host:"localhost" gs_port:2004 gs_sender_id:"neighborhood_final_destination";
+		}
+		
+		if(use_r5){
+			// In order to build a neighborhood network between logistic provider
+			gs_add_sender gs_host:"localhost" gs_port:2005 gs_sender_id:"neighborhood_logistic_provider";
+		}
+		
+		if(use_r6){
+			// In order to build a neighborhood network between warehouse and final destination
+			gs_add_sender gs_host:"localhost" gs_port:2006 gs_sender_id:"neighborhood_warehouse_final";
+		}
+		
+		if(use_r7){
+			// In order to build a neighborhood network between logistic provider and final destination
+			gs_add_sender gs_host:"localhost" gs_port:2007 gs_sender_id:"neighborhood_logistic_final";
+		}
+	}
+	
+	action init_neighborhood_networks{
+		if(use_r2){
+			do init_neighborhood_all;
+		}
+		
+		if(use_r3){
+			do init_neighborhood_warehouse;
+		}
+		
+		if(use_r4){
+			do init_neighborhood_final_destination;
+		}
+		
+		if(use_r5){
+			do init_neighborhood_logistic_provider;
+		}
+		
+		if(use_r6){
+			do init_neighborhood_warehouse_final;
+		}
+		
+		if(use_r7){
+			do init_neighborhood_logistic_final;
+		}
+	}
+	
+	action init_neighborhood_all {
+		ask Warehouse {
+			ask (Warehouse at_distance(neighborhood_dist)) {
+				gs_add_edge gs_sender_id:"neighborhood_all" gs_edge_id:(myself.name + self.name) gs_node_id_from:myself.name gs_node_id_to:self.name gs_is_directed:false;
+			}
+			ask (FinalDestinationManager at_distance(neighborhood_dist)) {
+				gs_add_edge gs_sender_id:"neighborhood_all" gs_edge_id:(myself.name + self.name) gs_node_id_from:myself.name gs_node_id_to:self.name gs_is_directed:false;
+			}
+			ask LogisticProvider at_distance(neighborhood_dist) {
+				gs_add_edge gs_sender_id:"neighborhood_all" gs_edge_id:(myself.name + self.name) gs_node_id_from:myself.name gs_node_id_to:self.name gs_is_directed:false;
+			}
+		}
+		
+		ask FinalDestinationManager {
+			ask LogisticProvider at_distance(neighborhood_dist) {
+				gs_add_edge gs_sender_id:"neighborhood_all" gs_edge_id:(myself.name + self.name) gs_node_id_from:myself.name gs_node_id_to:self.name gs_is_directed:false;
+			}
+		}
+	}
+	
+	action init_neighborhood_warehouse {
+		ask Warehouse {
+			ask (Warehouse at_distance(neighborhood_dist)) {
+				gs_add_edge gs_sender_id:"neighborhood_warehouse" gs_edge_id:(myself.name + self.name) gs_node_id_from:myself.name gs_node_id_to:self.name gs_is_directed:false;
+			}
+		}
+	}
+	
+	action init_neighborhood_final_destination {
+		ask FinalDestinationManager {
+			ask FinalDestinationManager at_distance(neighborhood_dist) {
+				gs_add_edge gs_sender_id:"neighborhood_final_destination" gs_edge_id:(myself.name + self.name) gs_node_id_from:myself.name gs_node_id_to:self.name gs_is_directed:false;
+			}
+		}
+	}
+	
+	action init_neighborhood_logistic_provider {
+		ask LogisticProvider {
+			ask LogisticProvider at_distance(neighborhood_dist) {
+				gs_add_edge gs_sender_id:"neighborhood_logistic_provider" gs_edge_id:(myself.name + self.name) gs_node_id_from:myself.name gs_node_id_to:self.name gs_is_directed:false;
+			}
+		}
+	}
+	
+	action init_neighborhood_warehouse_final {
+		ask Warehouse {
+			ask (Warehouse at_distance(neighborhood_dist)) {
+				gs_add_edge gs_sender_id:"neighborhood_warehouse_final" gs_edge_id:(myself.name + self.name) gs_node_id_from:myself.name gs_node_id_to:self.name gs_is_directed:false;
+			}
+			ask (FinalDestinationManager at_distance(neighborhood_dist)) {
+				gs_add_edge gs_sender_id:"neighborhood_warehouse_final" gs_edge_id:(myself.name + self.name) gs_node_id_from:myself.name gs_node_id_to:self.name gs_is_directed:false;
+			}
+		}
+	}
+	
+	action init_neighborhood_logistic_final {
+		ask FinalDestinationManager {
+			ask (FinalDestinationManager at_distance(neighborhood_dist)) {
+				gs_add_edge gs_sender_id:"neighborhood_logistic_final" gs_edge_id:(myself.name + self.name) gs_node_id_from:myself.name gs_node_id_to:self.name gs_is_directed:false;
+			}
+			ask LogisticProvider at_distance(neighborhood_dist) {
+				gs_add_edge gs_sender_id:"neighborhood_logistic_final" gs_edge_id:(myself.name + self.name) gs_node_id_from:myself.name gs_node_id_to:self.name gs_is_directed:false;
+			}
+		}
 	}
 }
 
