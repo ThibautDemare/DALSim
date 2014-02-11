@@ -1,0 +1,19 @@
+add supply chain mechanism inside batches (they must follow a supply chain) : done
+debug the unmoving batches : done 
+debug path took by batches : apparently gone with the debug of unmoving batches
+Compute number of a customer according to the Huff's formula : done BUT : does it need to change values of parametrs?
+Compute huff probability of warehouses : done?
+LogisticProvider need to choose warehouses according huff value : done
+
+add time of break bulk (?? => rupture de charge) : done BUT to be upgraded
+improve the behavior of logistic provider : must be more close to the reality.
+Add a mechanism of stock's evolution according to the number of customer.
+add supply chain mechanism in other agents (they must choose a supply chain)
+adjust step and model speed : needed?
+Add type of goods
+Add river network
+add rail network
+
+Faire une fenêtre zoomée sur l'ile de france
+
+demkays@yahoo.com
