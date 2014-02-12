@@ -1,19 +1,19 @@
-add supply chain mechanism inside batches (they must follow a supply chain) : done
-debug the unmoving batches : done 
-debug path took by batches : apparently gone with the debug of unmoving batches
-Compute number of a customer according to the Huff's formula : done BUT : does it need to change values of parametrs?
-Compute huff probability of warehouses : done?
-LogisticProvider need to choose warehouses according huff value : done
+number of customer (according to Huff model) affect the decreasing of stock
 
-add time of break bulk (?? => rupture de charge) : done BUT to be upgraded
-improve the behavior of logistic provider : must be more close to the reality.
-Add a mechanism of stock's evolution according to the number of customer.
-add supply chain mechanism in other agents (they must choose a supply chain)
-adjust step and model speed : needed?
-Add type of goods
+The logistic provider equilibrate stock of warehouse :
+	A batch does not follow a supply chain as now but go from a point to another and that's it.
+	When a customer ask for a restock, the goods need to be already in a local warehouse.
+	
+Improve the behavior of logistic provider :
+	They choose warehouse (purchasing or renting) according to their customer location. 
+	They can choose :
+		- the large warehouse according to his size and not necessarily his location in space
+		- the local warehouse according to his location and not necessarily his size
+		- the average warehouse according to this formulae :Let ->AB the vector between the local warehouse and the average one.
+			Let ->CB the vector between the large warehouse and the average one.
+			We try to find B which minimize ||(->AB) + (->CB)||.
+Size of building affect break bulk time
 Add river network
 add rail network
-
-Faire une fenêtre zoomée sur l'ile de france
-
-demkays@yahoo.com
+Add a zoomed window of "ile de france"
+Add type of goods
