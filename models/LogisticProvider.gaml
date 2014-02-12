@@ -25,6 +25,7 @@ species LogisticProvider parent: Role {
 			// Add a new node event for corresponding sender
 			if(use_r1){
 				gs_add_node gs_sender_id:"actor" gs_node_id:name;
+				gs_add_node_attribute gs_sender_id:"actor" gs_node_id:name gs_attribute_name:"ui.style" gs_attribute_value:"fill-color:red;";
 			}
 			if(use_r2){
 				gs_add_node gs_sender_id:"neighborhood_all" gs_node_id:name;

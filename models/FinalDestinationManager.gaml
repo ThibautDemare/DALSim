@@ -18,10 +18,14 @@ species FinalDestinationManager parent: Role{
 	LogisticProvider logisticProvider;
 	Building building;
 	float huffValue;// number of customer according to huff model => this value cant be used like this because the Huff model does not take care of time.
+	int currentInertia;
+	int maxInertia;
 	
 	init {
-		logisticProvider <- one_of(LogisticProvider);
-
+		logisticProvider <- chooseLogisticProvider();
+		currentInertia <- 0;
+		maxInertia <- rnd(24)+12;
+		
 		create Building number: 1 returns: buildings {
 			location <- myself.location;
 		}
@@ -44,6 +48,7 @@ species FinalDestinationManager parent: Role{
 			// Add new node/edge events for corresponding sender
 			if(use_r1){
 				gs_add_node gs_sender_id:"actor" gs_node_id:name;
+				gs_add_node_attribute gs_sender_id:"actor" gs_node_id:name gs_attribute_name:"ui.style" gs_attribute_value:"fill-color:blue;";
 				gs_add_edge gs_sender_id:"actor" gs_edge_id:(name + logisticProvider.name) gs_node_id_from:name gs_node_id_to:logisticProvider.name gs_is_directed:false;
 			}
 			if(use_r2){
@@ -64,9 +69,28 @@ species FinalDestinationManager parent: Role{
 	/*
 	 * Basic consumption of the stock (it could be more complex if it is based on the size of the neighbor's population)
 	 */
-	reflex consumption  when: (cycle mod 20) = 0 {//the stock decrease one time by day (60minutes*24hours)
+	reflex consumption  when: (cycle mod 24) = 0 {//the stock decrease one time by day (one cycle = 60min)
 		loop stock over: building.stocks {
 			stock.quantity <- stock.quantity - (1+rnd(1));
+		}
+	}
+	
+	reflex updateCurrentInertia when: ((time/3600.0) mod 720.0) = 0.0 { // One time by month. 720 = number of hours in one month 
+		currentInertia <- currentInertia + 1;
+	}
+	
+	reflex wantToChangeLogisticProvider when: (currentInertia > maxInertia) {
+		if(flip((currentInertia - maxInertia)/1000)){
+			logisticProvider <- chooseLogisticProvider();
+			currentInertia <- 0;
+			if(use_gs){
+				// Add new node/edge events for corresponding sender
+				if(use_r1){
+					// We don't remove the old edge. The actor network can be seen as a cumulative network.
+					// Is it a problem? Do we need to remove this edge?
+					gs_add_edge gs_sender_id:"actor" gs_edge_id:(name + logisticProvider.name) gs_node_id_from:name gs_node_id_to:logisticProvider.name gs_is_directed:false;
+				}
+			}
 		}
 	}
 	
@@ -74,7 +98,7 @@ species FinalDestinationManager parent: Role{
 	 * Check for all product if it needs to be restock
 	 * If yes, an order is made to the logistic provider
 	 */
-	reflex order when: (cycle mod 200) = 0 { //A order is possible one time by day (60minutes*24hours)
+	reflex order when: ((time/3600.0) mod 24.0) = 0.0 { //A order is possible one time by day. 
 		loop stock over: building.stocks {
 			if stock.quantity < 0.05*stock.maxQuantity and stock.ordered=false {
 				stock.ordered <- true;
@@ -102,7 +126,7 @@ species FinalDestinationManager parent: Role{
 		list<Batch> entering_batch <- (Batch inside self) where (each.target = nil);
 		if not (empty (entering_batch)) {
 			ask entering_batch {
-				if (self.breakBulk = 0) {
+				if (self.breakBulk = 0) {					
 					loop stock over: myself.building.stocks {
 						if stock.product = self.product {
 							stock.ordered <- false;
@@ -115,6 +139,12 @@ species FinalDestinationManager parent: Role{
 				}
 			}
 		}
+	}
+	
+	LogisticProvider chooseLogisticProvider {
+		list<LogisticProvider> llp <- LogisticProvider sort_by (self distance_to each);
+		int f <- ((rnd(10000)/10000)^6)*(length(llp)-1);
+		return llp[f];
 	}
 	
 	aspect base { 

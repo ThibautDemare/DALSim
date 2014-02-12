@@ -18,7 +18,7 @@ import "./Role.gaml"
  * Init global variables and agents
  */
 global {
-	float step <- 1 °mn;//one minute per step
+	float step <- 60 °mn;//60 minutes per step
 	
 	//This data comes from "EuroRegionalMap" (EuroGeographics)
 	file roads_shapefile <- file("../../../BD_SIG/Routes/From_Europe/roads_speed_length.shp");
@@ -44,14 +44,14 @@ global {
 	// A non realistic list of product and their quantity
 	map<int, float> products <- [1::1000, 2::10000, 3::40000, 5::30000, 6::15000, 7::20000, 8::50000, 9::40000, 10::25000, 11::60000, 12::55000, 13::32000, 14::80000, 15::70000, 16::90000, 17::85000, 18::95000, 19::50000];
 	
-	bool use_gs <- true;
-	bool use_r1 <- false;
-	bool use_r2 <- false;
-	bool use_r3 <- false;
-	bool use_r4 <- false;
-	bool use_r5 <- false;
-	bool use_r6 <- false;
-	bool use_r7 <- true;
+	bool use_gs <- false;
+	bool use_r1 <- true;//actor
+	bool use_r2 <- false;//init_neighborhood_all
+	bool use_r3 <- false;//init_neighborhood_warehouse
+	bool use_r4 <- false;//init_neighborhood_final_destination
+	bool use_r5 <- false;//init_neighborhood_logistic_provider
+	bool use_r6 <- false;//init_neighborhood_warehouse_final
+	bool use_r7 <- false;//init_neighborhood_logistic_final
 	
 	float neighborhood_dist <- 5°km;
 	
