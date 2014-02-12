@@ -71,7 +71,7 @@ species FinalDestinationManager parent: Role{
 	 */
 	reflex consumption  when: (cycle mod 24) = 0 {//the stock decrease one time by day (one cycle = 60min)
 		loop stock over: building.stocks {
-			stock.quantity <- stock.quantity - (1+rnd(1));
+			stock.quantity <- stock.quantity - (rnd(stock.maxQuantity/8));
 		}
 	}
 	
