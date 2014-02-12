@@ -11,7 +11,6 @@ import "./LogisticProvider.gaml"
 import "./Batch.gaml"
 
 species Provider parent: Role{
-	
 	/*
 	 * Receive order from logistic provider
 	 */
@@ -25,12 +24,6 @@ species Provider parent: Role{
 			target <- first(order.supplyChain).location;
 			location <- myself.location;
 		}
-		
-		/* Is it possible to delete the order when the Batch is created? It seems it is not because there is some errors
-		ask order {
-			do die;
-		}
-		*/
 	}
 	
 	aspect base { 
