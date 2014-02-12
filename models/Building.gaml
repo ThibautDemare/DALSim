@@ -20,10 +20,9 @@ species Building {
 		list<Batch> entering_batch <- (Batch inside self);
 		if not (empty (entering_batch)) {
 			ask entering_batch {
-				
 				//If the batch is at the right adress
-				if first(supplyChain) = myself {
-					self.breakBulk <- rnd(50)+25;
+				if first(supplyChain) = myself and target != nil{
+					self.breakBulk <- rnd(22)+2;// A break bulk can take between 2 and 24 hours.
 					// If there is others step 
 					if length(supplyChain) >= 2 {
 						remove first(supplyChain) from: supplyChain;
