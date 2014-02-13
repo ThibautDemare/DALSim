@@ -20,7 +20,7 @@ species FinalDestinationManager parent: Role{
 	float huffValue;// number of customer according to huff model => this value cant be used like this because the Huff model does not take care of time.
 	int currentInertia;
 	int maxInertia;
-	int decreasingConsumption;
+	int decreasingRateOfStocks;
 	
 	init {
 		logisticProvider <- chooseLogisticProvider();
@@ -77,12 +77,14 @@ species FinalDestinationManager parent: Role{
 	}
 	
 	/*
-	 * Basic consumption of the stock (it could be more complex if it is based on the size of the neighbor's population)
+	 * The consumption is between 0 and 1/decreasingRateOfStocks of the maximum stock.
 	 */
-	reflex consumption  when: (cycle mod 24) = 0 {//the stock decrease one time by day (one cycle = 60min)
+	reflex decreasingStocks  when: (cycle mod 24) = 0 {//the stock decrease one time by day (one cycle = 60min)
 		loop stock over: building.stocks {
-			decreasingConsumption <- stock.maxQuantity/8;
-			stock.quantity <- stock.quantity - (rnd(decreasingConsumption));
+			stock.quantity <- stock.quantity - (rnd(stock.maxQuantity/decreasingRateOfStocks));
+			if(stock.quantity < 0){
+				stock.quantity <-  0.0;
+			}
 		}
 	}
 	

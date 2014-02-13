@@ -44,7 +44,7 @@ global {
 	// A non realistic list of product and their quantity
 	map<int, float> products <- [1::1000, 2::10000, 3::40000, 5::30000, 6::15000, 7::20000, 8::50000, 9::40000, 10::25000, 11::60000, 12::55000, 13::32000, 14::80000, 15::70000, 16::90000, 17::85000, 18::95000, 19::50000];
 	
-	bool use_gs <- false;
+	bool use_gs <- true;
 	bool use_r1 <- true;//actor
 	bool use_r2 <- false;//init_neighborhood_all
 	bool use_r3 <- false;//init_neighborhood_warehouse
@@ -53,7 +53,7 @@ global {
 	bool use_r6 <- false;//init_neighborhood_warehouse_final
 	bool use_r7 <- false;//init_neighborhood_logistic_final
 	
-	float neighborhood_dist <- 5°km;
+	float neighborhood_dist <- 0.5°km;
 	
 	init {
 		if(use_gs){
@@ -74,11 +74,62 @@ global {
 		//  Logistic providers
 		create LogisticProvider from: commissionaire_shapefile;
 		
+		// Add warehouse to logistic provider
+		do init_small_warehouses(ws);
+		do init_average_warehouses(wa);
+		do init_large_warehouses(wl);
+		
 		// Final destinations
 		create FinalDestinationManager from: destination_shapefile with: [huffValue::read("huff") as float];
 		
-		// Add warehouse to logistic provider
-			// Small warehouse case
+		// Init the decreasing rate of consumption
+		do init_decreasingRateOfStocks;
+		
+		// Creation of a SuperProvider
+		create Provider from: provider_shapefile;
+		
+	}
+	
+	/**
+	 * 
+	 */
+	reflex init_edges when: cycle = 1 {
+		if(use_gs){
+			do init_neighborhood_networks;
+		}
+	}
+	
+	/**
+	 * The final destinations are separated in 4 ordered sets. To each final destinations of these sets, we associate a decreasing rate of 
+	 * stocks according to the number of customer computed by the Huff model. The more the customers there are, the more the decreasing 
+	 * rate allows a large consumption.
+	 */
+	action init_decreasingRateOfStocks {
+		list<FinalDestinationManager> dests <- FinalDestinationManager sort_by each.huffValue;
+		int i <- 0;
+		int ld <- length(dests);
+		loop while: i < ld {
+			FinalDestinationManager fdm <- dests[i];
+			if(i<length(dests)/4){
+				fdm.decreasingRateOfStocks <- 9;
+			}
+			else if(i<length(dests)*2/4){
+				fdm.decreasingRateOfStocks <- 7;
+			}
+			else if(i<length(dests)*3/4){
+				fdm.decreasingRateOfStocks <- 5;
+			}
+			else {
+				fdm.decreasingRateOfStocks <- 3;
+			}
+			i <- i + 1;
+		}
+	}
+	
+	/**
+	 * Add small warehouses to logistic provider
+	 */
+	action init_small_warehouses(list<Warehouse> ws) {
 		ws <- ws sort_by each.huffValue;
 		loop while: not empty(ws) {
 			ask LogisticProvider {
@@ -89,8 +140,12 @@ global {
 				}
 			}
 		}
-		
-			// Average warehouse case
+	}
+	
+	/**
+	 * Add average warehouses to logistic provider
+	 */
+	action init_average_warehouses(list<Warehouse> wa) {
 		wa <- wa sort_by each.huffValue;
 		loop while: not empty(wa) {
 			ask LogisticProvider {
@@ -102,8 +157,13 @@ global {
 				}
 			}
 		}
-		
-			// Large warehouse case
+	}
+	
+	
+	/**
+	 * Add large warehouses to logistic provider
+	 */
+	action init_large_warehouses(list<Warehouse> wl) {
 		wl <- wl sort_by each.huffValue;
 		loop while: not empty(wl) {
 			ask LogisticProvider {
@@ -113,16 +173,6 @@ global {
 					remove index: (length(wl)-1) from: wl;
 				}
 			}
-		}
-		
-		// Creation of a SuperProvider
-		create Provider from: provider_shapefile;
-		
-	}
-	
-	reflex init_edges when: cycle = 1 {
-		if(use_gs){
-			do init_neighborhood_networks;
 		}
 	}
 	
