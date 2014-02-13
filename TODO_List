@@ -1,5 +1,7 @@
 number of customer (according to Huff model) affect the decreasing of stock
 
+Add something (a color for instance) to locate the node in graphstream
+
 Size of building affect break bulk time
 
 The speed and length of must be considered to compute shortest path. But The maximum speed on a road must also affect the speed of the batch agent.
