@@ -25,15 +25,15 @@ global {
 	graph road_network;
 	
 	// Logistic provider
-	file commissionaire_shapefile <- file("../../../BD_SIG/commissionnaire_transport/commissionnaire_de_transport.shp");
+	file commissionaire_shapefile <- file("../../../BD_SIG/commissionnaire_transport/LogisticProvider.shp");
 	
 	// Warehouses classified by their size
-	file warehouse_shapefile_small <- file("../../../BD_SIG/Warehouses/Huff/warehouses_small.shp");
-	file warehouse_shapefile_average <- file("../../../BD_SIG/Warehouses/Huff/warehouses_average.shp");
-	file warehouse_shapefile_large <- file("../../../BD_SIG/Warehouses/Huff/warehouses_large.shp");
+	file warehouse_shapefile_small <- file("../../../BD_SIG/Warehouses/HuffColor/warehouses_small.shp");
+	file warehouse_shapefile_average <- file("../../../BD_SIG/Warehouses/HuffColor/warehouses_average.shp");
+	file warehouse_shapefile_large <- file("../../../BD_SIG/Warehouses/HuffColor/warehouses_large.shp");
 	
 	// Final destination (for instance : shop)
-	file destination_shapefile <- file("../../../BD_SIG/FinalDestination/final_dest.shp");
+	file destination_shapefile <- file("../../../BD_SIG/FinalDestination/FinalDestinationManager.shp");
 	
 	// A unique provider
 	file provider_shapefile <- file("../../../BD_SIG/Provider/Provider.shp");
@@ -45,15 +45,15 @@ global {
 	map<int, float> products <- [1::1000, 2::10000, 3::40000, 5::30000, 6::15000, 7::20000, 8::50000, 9::40000, 10::25000, 11::60000, 12::55000, 13::32000, 14::80000, 15::70000, 16::90000, 17::85000, 18::95000, 19::50000];
 	
 	bool use_gs <- true;
-	bool use_r1 <- true;//actor
-	bool use_r2 <- false;//init_neighborhood_all
+	bool use_r1 <- false;//actor
+	bool use_r2 <- true;//init_neighborhood_all
 	bool use_r3 <- false;//init_neighborhood_warehouse
 	bool use_r4 <- false;//init_neighborhood_final_destination
 	bool use_r5 <- false;//init_neighborhood_logistic_provider
 	bool use_r6 <- false;//init_neighborhood_warehouse_final
 	bool use_r7 <- false;//init_neighborhood_logistic_final
 	
-	float neighborhood_dist <- 0.5°km;
+	float neighborhood_dist <- 1°km;
 	
 	init {
 		if(use_gs){
@@ -67,9 +67,9 @@ global {
 		road_network <- as_edge_graph(Road);// with_weights move_weights;
 		
 		// Warehouses
-		create Warehouse from: warehouse_shapefile_small returns: ws with: [huffValue::read("huff") as float, surface::read("surface") as float];
-		create Warehouse from: warehouse_shapefile_average returns: wa with: [huffValue::read("huff") as float, surface::read("surface") as float];
-		create Warehouse from: warehouse_shapefile_large returns: wl with: [huffValue::read("huff") as float, surface::read("surface") as float];
+		create Warehouse from: warehouse_shapefile_small returns: ws with: [huffValue::read("huff") as float, surface::read("surface") as float, color::read("color") as string];
+		create Warehouse from: warehouse_shapefile_average returns: wa with: [huffValue::read("huff") as float, surface::read("surface") as float, color::read("color") as string];
+		create Warehouse from: warehouse_shapefile_large returns: wl with: [huffValue::read("huff") as float, surface::read("surface") as float, color::read("color") as string];
 		
 		//  Logistic providers
 		create LogisticProvider from: commissionaire_shapefile;
@@ -80,7 +80,7 @@ global {
 		do init_large_warehouses(wl);
 		
 		// Final destinations
-		create FinalDestinationManager from: destination_shapefile with: [huffValue::read("huff") as float];
+		create FinalDestinationManager from: destination_shapefile with: [huffValue::read("huff") as float, surface::read("surface") as float, color::read("color") as string];
 		
 		// Init the decreasing rate of consumption
 		do init_decreasingRateOfStocks;

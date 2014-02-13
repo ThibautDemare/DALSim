@@ -21,6 +21,8 @@ species FinalDestinationManager parent: Role{
 	int currentInertia;
 	int maxInertia;
 	int decreasingRateOfStocks;
+	string color;
+	float surface;
 	
 	init {
 		logisticProvider <- chooseLogisticProvider();
@@ -58,20 +60,24 @@ species FinalDestinationManager parent: Role{
 			// Add new node/edge events for corresponding sender
 			if(use_r1){
 				gs_add_node gs_sender_id:"actor" gs_node_id:name;
-				gs_add_node_attribute gs_sender_id:"actor" gs_node_id:name gs_attribute_name:"ui.style" gs_attribute_value:"fill-color:blue;";
+				gs_add_node_attribute gs_sender_id:"actor" gs_node_id:name gs_attribute_name:"ui.style" gs_attribute_value:"fill-color:"+color+"; stroke-mode:plain; stroke-width:3px; stroke-color:blue;";
 				gs_add_edge gs_sender_id:"actor" gs_edge_id:(name + logisticProvider.name) gs_node_id_from:name gs_node_id_to:logisticProvider.name gs_is_directed:false;
 			}
 			if(use_r2){
 				gs_add_node gs_sender_id:"neighborhood_all" gs_node_id:name;
+				gs_add_node_attribute gs_sender_id:"neighborhood_all" gs_node_id:name gs_attribute_name:"ui.style" gs_attribute_value:"fill-color:"+color+";";
 			}
 			if(use_r4){
 				gs_add_node gs_sender_id:"neighborhood_final_destination" gs_node_id:name;
+				gs_add_node_attribute gs_sender_id:"neighborhood_final_destination" gs_node_id:name gs_attribute_name:"ui.style" gs_attribute_value:"fill-color:"+color+";";
 			}
 			if(use_r6){
 				gs_add_node gs_sender_id:"neighborhood_warehouse_final" gs_node_id:name;
+				gs_add_node_attribute gs_sender_id:"neighborhood_warehouse_final" gs_node_id:name gs_attribute_name:"ui.style" gs_attribute_value:"fill-color:"+color+";";
 			}
 			if(use_r7){
 				gs_add_node gs_sender_id:"neighborhood_logistic_final" gs_node_id:name;
+				gs_add_node_attribute gs_sender_id:"neighborhood_logistic_final" gs_node_id:name gs_attribute_name:"ui.style" gs_attribute_value:"fill-color:"+color+";";
 			}
 		}
 	}
