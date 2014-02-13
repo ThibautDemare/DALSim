@@ -20,11 +20,20 @@ species FinalDestinationManager parent: Role{
 	float huffValue;// number of customer according to huff model => this value cant be used like this because the Huff model does not take care of time.
 	int currentInertia;
 	int maxInertia;
+	int decreasingConsumption;
 	
 	init {
 		logisticProvider <- chooseLogisticProvider();
+		
+		// Init the inertia mechanism
 		currentInertia <- 0;
-		maxInertia <- rnd(24)+12;
+		// There is one chance on 10 to never change of logistic provider
+		if(flip(0.9)){
+			maxInertia <- rnd(24)+12;// Between one year and 3 years
+		}
+		else{
+			maxInertia <- -1;
+		}
 		
 		create Building number: 1 returns: buildings {
 			location <- myself.location;
@@ -44,6 +53,7 @@ species FinalDestinationManager parent: Role{
 			myself.building <- self;
 		}
 		
+		//Connection to graphstream
 		if(use_gs){
 			// Add new node/edge events for corresponding sender
 			if(use_r1){
@@ -71,7 +81,8 @@ species FinalDestinationManager parent: Role{
 	 */
 	reflex consumption  when: (cycle mod 24) = 0 {//the stock decrease one time by day (one cycle = 60min)
 		loop stock over: building.stocks {
-			stock.quantity <- stock.quantity - (rnd(stock.maxQuantity/8));
+			decreasingConsumption <- stock.maxQuantity/8;
+			stock.quantity <- stock.quantity - (rnd(decreasingConsumption));
 		}
 	}
 	
