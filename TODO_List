@@ -1,5 +1,9 @@
 number of customer (according to Huff model) affect the decreasing of stock
 
+Size of building affect break bulk time
+
+The speed and length of must be considered to compute shortest path. But The maximum speed on a road must also affect the speed of the batch agent.
+ 
 The logistic provider equilibrate stock of warehouse :
 	A batch does not follow a supply chain as now but go from a point to another and that's it.
 	When a customer ask for a restock, the goods need to be already in a local warehouse.
@@ -12,7 +16,7 @@ Improve the behavior of logistic provider :
 		- the average warehouse according to this formulae :Let ->AB the vector between the local warehouse and the average one.
 			Let ->CB the vector between the large warehouse and the average one.
 			We try to find B which minimize ||(->AB) + (->CB)||.
-Size of building affect break bulk time
+			
 Add river network
 add rail network
 Add a zoomed window of "ile de france"
