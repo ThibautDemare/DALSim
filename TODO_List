@@ -18,8 +18,13 @@ Improve the behavior of logistic provider :
 		- the average warehouse according to this formulae :Let ->AB the vector between the local warehouse and the average one.
 			Let ->CB the vector between the large warehouse and the average one.
 			We try to find B which minimize ||(->AB) + (->CB)||.
-			
+
+The road network could be send to Graphstream. So the batch could let a trace of their path and we could analyze the flows on Graphstream.
+
+The probability to change the logistic provider must depend on his performance.
+		
 Add river network
 add rail network
 Add a zoomed window of "ile de france"
 Add type of goods
+
