@@ -94,11 +94,17 @@ species FinalDestinationManager parent: Role{
 		}
 	}
 	
+	/*
+	 * Increment the currentInertia value one time by month
+	 */
 	reflex updateCurrentInertia when: ((time/3600.0) mod 720.0) = 0.0 { // One time by month. 720 = number of hours in one month 
 		currentInertia <- currentInertia + 1;
 	}
 	
-	reflex wantToChangeLogisticProvider when: (currentInertia > maxInertia) {
+	/*
+	 * If the agent can change his logistic provider, the agent must take a decision (a probability) if he really changes or not. The more the time goes, the more the agent has a chance.
+	 */
+	reflex wantToChangeLogisticProvider when: (currentInertia > maxInertia and maxInertia >= 0) {
 		if(flip((currentInertia - maxInertia)/1000)){
 			logisticProvider <- chooseLogisticProvider();
 			currentInertia <- 0;
@@ -160,6 +166,9 @@ species FinalDestinationManager parent: Role{
 		}
 	}
 	
+	/*
+	 * The more the logistic provider is close, the more he has a chance to be selected.
+	 */
 	LogisticProvider chooseLogisticProvider {
 		list<LogisticProvider> llp <- LogisticProvider sort_by (self distance_to each);
 		int f <- ((rnd(10000)/10000)^6)*(length(llp)-1);
