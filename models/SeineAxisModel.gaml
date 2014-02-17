@@ -46,12 +46,13 @@ global {
 	
 	bool use_gs <- true;
 	bool use_r1 <- false;//actor
-	bool use_r2 <- true;//init_neighborhood_all
+	bool use_r2 <- false;//init_neighborhood_all
 	bool use_r3 <- false;//init_neighborhood_warehouse
 	bool use_r4 <- false;//init_neighborhood_final_destination
 	bool use_r5 <- false;//init_neighborhood_logistic_provider
 	bool use_r6 <- false;//init_neighborhood_warehouse_final
 	bool use_r7 <- false;//init_neighborhood_logistic_final
+	bool use_r8 <- true;//init_use_road_network
 	
 	float neighborhood_dist <- 1°km;
 	
@@ -65,6 +66,9 @@ global {
 		create Road from: roads_shapefile with: [speed::read("speed") as float];
 		//map<Road,float> move_weights <- Road as_map (each::(each.speed*each.length));
 		road_network <- as_edge_graph(Road);// with_weights move_weights;
+		
+		// Send the road network to Graphstream
+		do init_use_road_network;
 		
 		// Warehouses
 		create Warehouse from: warehouse_shapefile_small returns: ws with: [huffValue::read("huff") as float, surface::read("surface") as float, color::read("color") as string];
@@ -213,6 +217,11 @@ global {
 			// In order to build a neighborhood network between logistic provider and final destination
 			gs_add_sender gs_host:"localhost" gs_port:2007 gs_sender_id:"neighborhood_logistic_final";
 		}
+		
+		if(use_r8){
+			// In order to build the road network
+			gs_add_sender gs_host:"localhost" gs_port:2008 gs_sender_id:"road_network";
+		}
 	}
 	
 	action init_neighborhood_networks{
@@ -304,6 +313,40 @@ global {
 			ask LogisticProvider at_distance(neighborhood_dist) {
 				gs_add_edge gs_sender_id:"neighborhood_logistic_final" gs_edge_id:(myself.name + self.name) gs_node_id_from:myself.name gs_node_id_to:self.name gs_is_directed:false;
 			}
+		}
+	}
+	
+	action init_use_road_network {
+		if(use_r8){
+			ask road_network.edges {
+				// Get the source node
+				point p_source <- (road_network source_of self);
+				// Make a list with coordinate in order to send it
+				list l_source <- [];
+				l_source <- l_source + p_source.x;
+				l_source <- l_source + p_source.y;
+				// Create the node
+				gs_add_node gs_sender_id:"road_network" gs_node_id:""+p_source.x+"_"+p_source.y;
+				// Send the coordinate
+				gs_add_node_attribute gs_sender_id:"road_network" gs_node_id:""+p_source.x+"_"+p_source.y gs_attribute_name:"xy" gs_attribute_value:l_source;
+				
+				// Get the target node
+				point p_target<- (road_network target_of self);
+				// Make a list with coordinate in order to send it
+				list l_target <- [];
+				l_target <- l_target + p_target.x;
+				l_target <- l_target + p_target.y;
+				// Create the node
+				gs_add_node gs_sender_id:"road_network" gs_node_id:""+p_target.x+"_"+p_target.y;
+				// Send the coordinate
+				gs_add_node_attribute gs_sender_id:"road_network" gs_node_id:""+p_target.x+"_"+p_target.y gs_attribute_name:"xy" gs_attribute_value:l_target;
+				
+				// Create an undirected edge between these two nodes
+				gs_add_edge gs_sender_id:"road_network" gs_edge_id:(""+p_source.x+"_"+p_source.y+p_target.x+"_"+p_target.y) gs_node_id_from:""+p_source.x+"_"+p_source.y gs_node_id_to:""+p_target.x+"_"+p_target.y gs_is_directed:false;
+			}
+			
+			// Send a step event to Graphstream to indicate that the graph has been built
+			gs_step gs_sender_id:"road_network" gs_step_number:1;
 		}
 	}
 }
