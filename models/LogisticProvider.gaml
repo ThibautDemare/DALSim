@@ -43,7 +43,7 @@ species LogisticProvider parent: Role {
 		}
 	}
 	/*
-	 * Receive order from the FinalDestinationManager
+	 * Receive order from the FinalDestinationManager and send it to the Provider
 	 */
 	action receive_order(Order order){
 		if(length(warehouses_small) > 0){ 
@@ -56,14 +56,6 @@ species LogisticProvider parent: Role {
 		if(length(warehouses_large) > 0){
 			order.supplyChain <- (one_of(warehouses_large) as list) + order.supplyChain;
 		}
-		/*Warehouse sw <- one_of(warehouses_small);
-		loop while: length(sw.stocks)>sw.stockMax {
-			sw <- one_of(warehouses_small);
-		}
-		order.supplyChain <- (one_of(warehouses_small) as list) + order.supplyChain;
-		order.supplyChain <- (one_of(warehouses_average) as list) + order.supplyChain;
-		order.supplyChain <- (one_of(warehouses_large) as list) + order.supplyChain;
-		*/
 		if(length(warehouses_small) > 0 or length(warehouses_small) > 0 or length(warehouses_small) > 0){
 			ask Provider {
 				do receive_order(order);
@@ -74,24 +66,6 @@ species LogisticProvider parent: Role {
 			do die;
 		}
 	}
-	
-	/*
-	 * Send order(s) to Provider according to orders received from FinalDestinationManager
-	 */
-	/*reflex order {
-		if not (empty (orders)) {
-			loop order over: orders {
-				/***************************************************************************************************************************************
-				 * Test global stock => if it is good, just move stock from a warehouse to another.
-				 * But if not, order new stock to provider
-				 */
-				//if getGlobalStock(stock.product) < 0.05*7
-				
-				
-	/*		}
-			remove all:Order from: orders;
-		}
-	}*/
 	
 	aspect base { 
 		draw square(1.5°km) color: rgb("green") ;
