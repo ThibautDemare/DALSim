@@ -37,24 +37,47 @@ species FinalDestinationManager parent: Role{
 			maxInertia <- -1;
 		}
 		
+		// Associate a building to this manager
 		create Building number: 1 returns: buildings {
 			location <- myself.location;
-		}
-		
-		create Stock number: 5 returns: s;
-		ask s {
-			pair temp <- one_of(products.pairs);
-			product <- temp.key;
-			quantity <- rnd(temp.value as int) as float;
-			maxQuantity <- temp.value;			
-			building <- first(buildings);
+			totalSurface <- myself.surface;
+			occupiedSurface <- 0.0;
 		}
 		
 		ask buildings {
-			self.stocks <- s;
 			myself.building <- self;
 		}
-		
+		// Built his stock
+		float freeSurface <- (building.totalSurface - building.occupiedSurface);// The free surface of the building according to the max quantity
+		float maxOccupiedSurface <- 0.0;// the occupied surface if the stock are maximum.
+		list<Stock> ls <- [];
+		int i <- 0;// useful to add an id to products
+		loop while: freeSurface > 0 {
+			create Stock number: 1 returns: s;
+			ask s {
+				// The id of the product
+				product <- i;
+				i <- i + 1;
+				
+				// If the free surface is greater than 10 percent of the total surface,
+				// then we have : 10 percent of the free surface <= maxQuantity < freeSurface
+				if(freeSurface > myself.building.totalSurface*0.1){
+					maxQuantity <- rnd(freeSurface - freeSurface*0.1)+freeSurface*0.1;
+				}
+				else{
+					// else, the maxQuantity is the remaining surface
+					maxQuantity <- freeSurface;
+				}
+				quantity <- rnd(maxQuantity as int) as float;
+				building <- myself.building;
+				building.occupiedSurface <- building.occupiedSurface + quantity;
+				maxOccupiedSurface <- maxOccupiedSurface + maxQuantity;
+			}
+			ls <- ls + s;
+			freeSurface <- (building.totalSurface - maxOccupiedSurface);
+		}
+		building.stocks <- ls;
+
 		//Connection to graphstream
 		if(use_gs){
 			// Add new node/edge events for corresponding sender

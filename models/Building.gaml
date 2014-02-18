@@ -11,7 +11,8 @@ import "./Stock.gaml"
 		
 species Building {
 	list<Stock> stocks;
-	float surface;
+	float totalSurface;
+	float occupiedSurface;
 	
 	/*
 	 * Receive a batch
