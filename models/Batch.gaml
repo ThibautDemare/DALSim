@@ -12,7 +12,6 @@ import "./Building.gaml"
 species Batch skills:[moving]{
 	int product;
 	float quantity;
-	float unitVolume;
 	LogisticProvider logisticProvider;
 	list<Building> supplyChain;
 	point target;

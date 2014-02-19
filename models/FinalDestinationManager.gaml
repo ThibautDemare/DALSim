@@ -153,7 +153,6 @@ species FinalDestinationManager parent: Role{
 				create Order number: 1 returns: b {
 					self.product <- stock.product;
 					self.quantity <- stock.maxQuantity;
-					self.unitVolume <- stock.unitVolume;
 					self.supplyChain <- supplyChain + stock.building;
 					self.logisticProvider <- myself.logisticProvider;
 				}

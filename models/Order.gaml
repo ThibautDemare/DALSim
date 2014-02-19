@@ -12,7 +12,6 @@ import "./LogisticProvider.gaml"
 species Order {
 	int product;
 	float quantity;
-	float unitVolume;
 	LogisticProvider logisticProvider;
 	list<Building> supplyChain;
 }

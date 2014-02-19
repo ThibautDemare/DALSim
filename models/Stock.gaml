@@ -12,7 +12,6 @@ species Stock {
 	int product;
 	float quantity;
 	float maxQuantity;
-	float unitVolume;
 	bool ordered <- false;
 	Building building;
 }

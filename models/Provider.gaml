@@ -18,7 +18,6 @@ species Provider parent: Role{
 		create Batch number: 1 {
 			product <- order.product;
 			quantity <- order.quantity;
-			unitVolume <- order.unitVolume;
 			logisticProvider <- order.logisticProvider;
 			supplyChain <- order.supplyChain;
 			target <- first(order.supplyChain).location;
