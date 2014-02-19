@@ -56,6 +56,11 @@ global {
 	
 	float neighborhood_dist <- 1°km;
 	
+	// Obeservation value
+	int number_of_batch <- 0;
+	float stock_on_roads <- 0.0;
+	float stock_in_final_dest <- 0.0;
+	
 	init {
 		if(use_gs){
 			// Init senders in order to create nodes/edges when we create agent
@@ -98,6 +103,23 @@ global {
 	
 	/**
 	 * 
+	 */
+	reflex update_observation_value {
+		number_of_batch <- length(Batch);
+		stock_on_roads <- 0.0;
+		ask Batch {
+			stock_on_roads <- stock_on_roads + self.quantity;
+		}
+		stock_in_final_dest <- 0.0;
+		ask FinalDestinationManager {
+			ask self.building.stocks {
+				stock_in_final_dest <- stock_in_final_dest + self.quantity;
+			}
+		}
+	}
+	
+	/**
+	 * Send neighborhood graph to graphstream. Can't be done in init() so it is made in a reflex at the first cycle.
 	 */
 	reflex init_edges when: cycle = 1 {
 		if(use_gs){
@@ -379,6 +401,24 @@ experiment exp_graph type: gui {
 		display batch_road {
 			species Batch aspect: little_base;
 			species Road aspect: geom; 
+		}
+		
+		display chart_number_of_batch {
+			chart  "Number of batch" type: series {
+				data "Number of batch" value: number_of_batch color: rgb('blue') ;
+			}
+		}
+		
+		display chart_stock_on_roads {
+			chart "Stock quantity on road" type: series {
+				data "Stock quantity on road" value: stock_on_roads color: rgb('red') ;
+			}
+		}
+		
+		display chart_stock_in_final_dest {
+			chart  "Stock quantity in final destination" type: series {
+				data "Stock quantity in final destination" value: stock_in_final_dest color: rgb('green') ;
+			}
 		}
 	}
 }
