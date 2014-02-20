@@ -9,19 +9,32 @@ model Provider
 import "./SeineAxisModel.gaml"
 import "./LogisticProvider.gaml"
 import "./Batch.gaml"
+import "./Building.gaml"
 
 species Provider parent: Role{
+	Building building;
+	
+	init {
+		create Building number: 1 returns: buildings {
+			location <- myself.location;
+		}
+		
+		ask buildings {
+			myself.building <- self;
+		}
+	}
+		
 	/*
 	 * Receive order from logistic provider
 	 */
-	action receive_order(Order order){
+	action receiveOrder(Order order){
+		// We create a new batch which can move to this provider to another building
 		create Batch number: 1 {
-			product <- order.product;
-			quantity <- order.quantity;
-			logisticProvider <- order.logisticProvider;
-			supplyChain <- order.supplyChain;
-			target <- first(order.supplyChain).location;
-			location <- myself.location;
+			self.product <- order.product;
+			self.quantity <- order.quantity;		
+			self.target <- order.building.location;
+			self.location <- myself.location;
+			self.color <- "green";
 		}
 	}
 	

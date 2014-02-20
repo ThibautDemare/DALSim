@@ -25,8 +25,6 @@ species FinalDestinationManager parent: Role{
 	float surface;
 	
 	init {
-		logisticProvider <- chooseLogisticProvider();
-		
 		// Init the inertia mechanism
 		currentInertia <- 0;
 		// There is one chance on 10 to never change of logistic provider
@@ -47,7 +45,8 @@ species FinalDestinationManager parent: Role{
 		ask buildings {
 			myself.building <- self;
 		}
-		// Built his stock
+		
+		// Built its stocks
 		float freeSurface <- (building.totalSurface - building.occupiedSurface);// The free surface of the building according to the max quantity
 		float maxOccupiedSurface <- 0.0;// the occupied surface if the stock are maximum.
 		list<Stock> ls <- [];
@@ -68,6 +67,12 @@ species FinalDestinationManager parent: Role{
 					// else, the maxQuantity is the remaining surface
 					maxQuantity <- freeSurface;
 				}
+				
+				// If the remaining surface is very too tiny
+				if((freeSurface-maxQuantity) < myself.building.totalSurface*0.1){
+					maxQuantity <- freeSurface;
+				}
+				
 				quantity <- rnd(maxQuantity as int) as float;
 				building <- myself.building;
 				building.occupiedSurface <- building.occupiedSurface + quantity;
@@ -78,6 +83,10 @@ species FinalDestinationManager parent: Role{
 		}
 		building.stocks <- ls;
 
+		logisticProvider <- chooseLogisticProvider();
+		ask logisticProvider {
+			do addFinalDest(myself);
+		}
 		//Connection to graphstream
 		if(use_gs){
 			// Add new node/edge events for corresponding sender
@@ -105,7 +114,7 @@ species FinalDestinationManager parent: Role{
 		}
 	}
 	
-	/*
+	/**
 	 * The consumption is between 0 and 1/decreasingRateOfStocks of the maximum stock.
 	 */
 	reflex decreasingStocks  when: (cycle mod 24) = 0 {//the stock decrease one time by day (one cycle = 60min)
@@ -117,14 +126,14 @@ species FinalDestinationManager parent: Role{
 		}
 	}
 	
-	/*
+	/**
 	 * Increment the currentInertia value one time by month
 	 */
 	reflex updateCurrentInertia when: ((time/3600.0) mod 720.0) = 0.0 { // One time by month. 720 = number of hours in one month 
 		currentInertia <- currentInertia + 1;
 	}
 	
-	/*
+	/**
 	 * If the agent can change his logistic provider, the agent must take a decision (a probability) if he really changes or not. The more the time goes, the more the agent has a chance.
 	 */
 	reflex wantToChangeLogisticProvider when: (currentInertia > maxInertia and maxInertia >= 0) {
@@ -142,53 +151,30 @@ species FinalDestinationManager parent: Role{
 		}
 	}
 	
-	/*
-	 * Check for all product if it needs to be restock
+	/**
+	 * Check for all product if it needs to be restock.
 	 * If yes, an order is made to the logistic provider
 	 */
-	reflex order when: ((time/3600.0) mod 24.0) = 0.0 { //A order is possible one time by day. 
+	reflex testOrdersNeeded when: ((time/3600.0) mod 24.0) = 0.0 { //An order is possible one time by day. 
 		loop stock over: building.stocks {
 			if stock.quantity < 0.05*stock.maxQuantity and stock.ordered=false {
 				stock.ordered <- true;
 				create Order number: 1 returns: b {
 					self.product <- stock.product;
-					self.quantity <- stock.maxQuantity;
-					self.supplyChain <- supplyChain + stock.building;
+					self.quantity <- stock.maxQuantity-stock.quantity;
+					self.building <- myself.building;
 					self.logisticProvider <- myself.logisticProvider;
 				}
 				
 				ask logisticProvider {
-					do receive_order(first(b));
+					do receiveOrder(first(b));
 				}
 
 			}
 		}
 	}
 	
-	/*
-	 * Receive a batch of goods
-	 * We adjust the corresponding stock quantity
-	 */
-	reflex receive_batch {
-		list<Batch> entering_batch <- (Batch inside self) where (each.target = nil);
-		if not (empty (entering_batch)) {
-			ask entering_batch {
-				if (self.breakBulk = 0) {					
-					loop stock over: myself.building.stocks {
-						if stock.product = self.product {
-							stock.ordered <- false;
-							stock.quantity <- stock.quantity + self.quantity;
-						}
-					}
-					ask self {
-						do die;
-					}
-				}
-			}
-		}
-	}
-	
-	/*
+	/**
 	 * The more the logistic provider is close, the more he has a chance to be selected.
 	 */
 	LogisticProvider chooseLogisticProvider {

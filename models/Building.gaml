@@ -19,21 +19,24 @@ species Building {
 	 */
 	reflex receive_batch{
 		list<Batch> entering_batch <- (Batch inside self);
-		if not (empty (entering_batch)) {
+		if( !(empty (entering_batch))) {
 			ask entering_batch {
 				//If the batch is at the right adress
-				if first(supplyChain) = myself and target != nil{
+				if( self.target = myself.location ){
 					self.breakBulk <- rnd(22)+2;// A break bulk can take between 2 and 24 hours.
-					// If there is others step 
-					if length(supplyChain) >= 2 {
-						remove first(supplyChain) from: supplyChain;
-						self.target <- first(supplyChain).location;
+					target <- nil;
+				}
+				else if (target = nil and self.breakBulk = 0) {
+					loop stock over: myself.stocks {
+						if( stock.product = self.product ){
+							stock.ordered <- false;
+							stock.quantity <- stock.quantity + self.quantity;
+						}
 					}
-					else {
-						target <- nil;
+					ask self {
+						do die;
 					}
 				}
-				
 			}
  		}
 	}

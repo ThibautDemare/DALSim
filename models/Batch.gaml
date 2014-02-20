@@ -12,12 +12,10 @@ import "./Building.gaml"
 species Batch skills:[moving]{
 	int product;
 	float quantity;
-	LogisticProvider logisticProvider;
-	list<Building> supplyChain;
 	point target;
 	float speed <- 70.0 °km/°h;
 	int breakBulk <- 0;
-	
+	string color;
 	reflex move when: target != nil and breakBulk = 0 {
 		do goto target: target speed: speed on: road_network;
 	}
@@ -26,10 +24,10 @@ species Batch skills:[moving]{
 		breakBulk <- breakBulk - 1;
 	}
 	aspect base { 
-		draw circle(3.0°km) color: rgb("red") ;
+		draw circle(3.0°km) color: rgb(color) ;
 	}
 	
 	aspect little_base {
-		draw circle(1.0°km) color: rgb("red") ;
+		draw circle(1.0°km) color: rgb(color) ;
 	}
 }

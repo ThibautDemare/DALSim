@@ -41,9 +41,6 @@ global {
 	//Define the border of the environnement according to the road network
 	geometry shape <- envelope(roads_shapefile);
 	
-	// A non realistic list of product and their quantity
-	map<int, float> products <- [1::1000, 2::10000, 3::40000, 5::30000, 6::15000, 7::20000, 8::50000, 9::40000, 10::25000, 11::60000, 12::55000, 13::32000, 14::80000, 15::70000, 16::90000, 17::85000, 18::95000, 19::50000];
-	
 	bool use_gs <- false;
 	bool use_r1 <- false;//actor
 	bool use_r2 <- false;//init_neighborhood_all
@@ -56,10 +53,12 @@ global {
 	
 	float neighborhood_dist <- 1°km;
 	
-	// Obeservation value
-	int number_of_batch <- 0;
-	float stock_on_roads <- 0.0;
-	float stock_in_final_dest <- 0.0;
+	// The only one provider
+	Provider provider;
+	
+	list<Warehouse> small_warehouse;
+	list<Warehouse> average_warehouse;
+	list<Warehouse> large_warehouse;
 	
 	init {
 		if(use_gs){
@@ -77,18 +76,23 @@ global {
 			do init_use_road_network;
 		}
 		
+		
+		// Creation of a SuperProvider
+		create Provider from: provider_shapefile returns:p;
+		ask p {
+			provider <- self;
+		}
+		
 		// Warehouses
-		create Warehouse from: warehouse_shapefile_small returns: ws with: [huffValue::read("huff") as float, totalSurface::read("surface") as float, color::read("color") as string];
-		create Warehouse from: warehouse_shapefile_average returns: wa with: [huffValue::read("huff") as float, totalSurface::read("surface") as float, color::read("color") as string];
-		create Warehouse from: warehouse_shapefile_large returns: wl with: [huffValue::read("huff") as float, totalSurface::read("surface") as float, color::read("color") as string];
+		create Warehouse from: warehouse_shapefile_small returns: sw with: [huffValue::read("huff") as float, totalSurface::read("surface") as float, color::read("color") as string];
+		create Warehouse from: warehouse_shapefile_average returns: aw with: [huffValue::read("huff") as float, totalSurface::read("surface") as float, color::read("color") as string];
+		create Warehouse from: warehouse_shapefile_large returns: lw with: [huffValue::read("huff") as float, totalSurface::read("surface") as float, color::read("color") as string];
+		small_warehouse <- sw;
+		average_warehouse <- aw;
+		large_warehouse <- lw;
 		
 		//  Logistic providers
 		create LogisticProvider from: commissionaire_shapefile;
-		
-		// Add warehouse to logistic provider
-		do init_small_warehouses(ws);
-		do init_average_warehouses(wa);
-		do init_large_warehouses(wl);
 		
 		// Final destinations
 		create FinalDestinationManager from: destination_shapefile with: [huffValue::read("huff") as float, surface::read("surface") as float, color::read("color") as string];
@@ -96,26 +100,6 @@ global {
 		// Init the decreasing rate of consumption
 		do init_decreasingRateOfStocks;
 		
-		// Creation of a SuperProvider
-		create Provider from: provider_shapefile;
-		
-	}
-	
-	/**
-	 * 
-	 */
-	reflex update_observation_value {
-		number_of_batch <- length(Batch);
-		stock_on_roads <- 0.0;
-		ask Batch {
-			stock_on_roads <- stock_on_roads + self.quantity;
-		}
-		stock_in_final_dest <- 0.0;
-		ask FinalDestinationManager {
-			ask self.building.stocks {
-				stock_in_final_dest <- stock_in_final_dest + self.quantity;
-			}
-		}
 	}
 	
 	/**
@@ -151,56 +135,6 @@ global {
 				fdm.decreasingRateOfStocks <- 3;
 			}
 			i <- i + 1;
-		}
-	}
-	
-	/**
-	 * Add small warehouses to logistic provider
-	 */
-	action init_small_warehouses(list<Warehouse> ws) {
-		ws <- ws sort_by each.huffValue;
-		loop while: not empty(ws) {
-			ask LogisticProvider {
-				if((length(ws)) > 0){
-					self.warehouses_small <- self.warehouses_small + last(ws);
-					last(ws).logisticProvider <- self;
-					remove index: (length(ws)-1) from: ws;
-				}
-			}
-		}
-	}
-	
-	/**
-	 * Add average warehouses to logistic provider
-	 */
-	action init_average_warehouses(list<Warehouse> wa) {
-		wa <- wa sort_by each.huffValue;
-		loop while: not empty(wa) {
-			ask LogisticProvider {
-				if((length(wa)) > 0){
-					self.warehouses_average <- self.warehouses_average + last(wa);
-					last(wa).logisticProvider <- self;
-					remove index: (length(wa)-1) from: wa;
-					
-				}
-			}
-		}
-	}
-	
-	
-	/**
-	 * Add large warehouses to logistic provider
-	 */
-	action init_large_warehouses(list<Warehouse> wl) {
-		wl <- wl sort_by each.huffValue;
-		loop while: not empty(wl) {
-			ask LogisticProvider {
-				if((length(wl)) > 0){
-					self.warehouses_large <- self.warehouses_large + last(wl);
-					last(wl).logisticProvider <- self;
-					remove index: (length(wl)-1) from: wl;
-				}
-			}
 		}
 	}
 	
@@ -384,13 +318,6 @@ experiment exp_graph type: gui {
 			species Road aspect: geom; 			
 		}
 		
-		display display_LogisticProvider {
-			species Batch aspect: base;
-			species Provider aspect: base;
-			species LogisticProvider aspect: base;
-			species Road aspect: geom; 
-		}
-		
 		display display_Warehouse {
 			species Batch aspect: base;
 			species Provider aspect: base;
@@ -398,27 +325,17 @@ experiment exp_graph type: gui {
 			species Road aspect: geom; 
 		}
 		
+		display display_LogisticProvider {
+			species Batch aspect: base;
+			species Provider aspect: base;
+			species LogisticProvider aspect: base;
+			species Road aspect: geom; 
+		}
+		
 		display batch_road {
 			species Batch aspect: little_base;
 			species Road aspect: geom; 
 		}
-		
-		display chart_number_of_batch {
-			chart  "Number of batch" type: series {
-				data "Number of batch" value: number_of_batch color: rgb('blue') ;
-			}
-		}
-		
-		display chart_stock_on_roads {
-			chart "Stock quantity on road" type: series {
-				data "Stock quantity on road" value: stock_on_roads color: rgb('red') ;
-			}
-		}
-		
-		display chart_stock_in_final_dest {
-			chart  "Stock quantity in final destination" type: series {
-				data "Stock quantity in final destination" value: stock_in_final_dest color: rgb('green') ;
-			}
-		}
+	
 	}
 }
