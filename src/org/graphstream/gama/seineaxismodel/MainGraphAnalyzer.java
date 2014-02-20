@@ -38,6 +38,9 @@ public class MainGraphAnalyzer {
 		NetStreamReceiver receiver8 = new NetStreamReceiver(2008);
 		new SimpleSinkAdapter(receiver8);
 		
+		NetStreamReceiver receiver9 = new NetStreamReceiver(2009);
+		new SimpleSinkAdapter(receiver9);
+		
 		if(use_viewer){
 			new SimpleNetStreamViewer(receiver1, true);
 			new SimpleNetStreamViewer(receiver2, true);
@@ -47,6 +50,7 @@ public class MainGraphAnalyzer {
 			new SimpleNetStreamViewer(receiver6, true);
 			new SimpleNetStreamViewer(receiver7, true);
 			new SimpleNetStreamViewer(receiver8, false);
+			new SimpleNetStreamViewer(receiver9, true);
 		}
 		else{
 			// We don't use the viewer so the events are not pump. We need to do it manually.
@@ -59,6 +63,7 @@ public class MainGraphAnalyzer {
 				receiver6.getDefaultStream().pump();
 				receiver7.getDefaultStream().pump();
 				receiver8.getDefaultStream().pump();
+				receiver9.getDefaultStream().pump();
 				// A sleep to avoid an overload of the CPU
 				Thread.sleep(1000);
 			}
