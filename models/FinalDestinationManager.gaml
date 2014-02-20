@@ -184,6 +184,6 @@ species FinalDestinationManager parent: Role{
 	}
 	
 	aspect base { 
-		draw square(1.5°km) color: rgb("blue") ;
+		draw square(1.5°km) color: rgb("yellow") ;
 	} 
 }
