@@ -11,6 +11,8 @@ The surface of a building must affect the maximum quantity of a stock => done
 
 Add graphic with number of batch, quantity of goods on road (perhaps in warehouses and shops too) => done 
 
+Data of the graphic must be saved on a CSV file
+
 The logistic provider equilibrate stock of warehouse :
 	A batch does not follow a supply chain like now but go from a point to another and that's it.
 	When a customer ask for a restock, the goods need to be already in a local warehouse. => done
@@ -31,7 +33,9 @@ Improve the behavior of logistic provider :
 			Let ->CB be the vector between the large warehouse and the average one.
 			We try to find B which minimize ||(->AB) + (->CB)||.
 
-The road network could be send to Graphstream. So the batch could let a trace of their path and we could analyze the flows on Graphstream.
+The road network could be send to Graphstream. => done
+
+The batch could let a trace of their path and we could analyze the flows on Graphstream.
 
 The probability to change the logistic provider must depend on his performance.
 
