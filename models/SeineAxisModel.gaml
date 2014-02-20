@@ -506,13 +506,13 @@ experiment exp_graph type: gui {
 			}
 		}
 		
-		display chart_average_stock_in_warehouse {
+		display chart_average_stock_in_warehouse refresh_every: 24 {
 			chart  "Stock quantity in warehouses" type: series {
 				data "Average stock quantity in warehouses" value: stockInWarehouse color: rgb('orange') ;
 			}
 		}
 		
-		display chart_stock_in_warehouse refresh_every: 24 {
+		display chart_stock_in_warehouse {
 			chart  "Stock quantity in warehouses" type: series {
 				data "Stock quantity in warehouses" value: stockInWarehouseT2 color: rgb('orange') ;
 			}
