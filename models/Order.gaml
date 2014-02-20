@@ -13,4 +13,5 @@ species Order {
 	float quantity;
 	Building building;
 	LogisticProvider logisticProvider;
+	string color;
 }

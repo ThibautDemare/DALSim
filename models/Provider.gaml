@@ -34,7 +34,7 @@ species Provider parent: Role{
 			self.quantity <- order.quantity;		
 			self.target <- order.building.location;
 			self.location <- myself.location;
-			self.color <- "green";
+			self.color <- order.color;
 		}
 	}
 	

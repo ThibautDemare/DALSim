@@ -65,7 +65,7 @@ species Warehouse parent: Building{
 			self.quantity <- sendedQuantity;		
 			self.target <- order.building.location;
 			self.location <- myself.location;
-			self.color <- "blue";
+			self.color <- order.color;
 		}
 	}
 }

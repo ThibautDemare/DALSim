@@ -60,6 +60,35 @@ global {
 	list<Warehouse> average_warehouse;
 	list<Warehouse> large_warehouse;
 	
+	// Obeservation value
+		// Average  values
+	int totalNumberOfBatch <- 0;
+	int numberOfBatchProviderToLarge <- 0;
+	int numberOfBatchLargeToAverage <- 0;
+	int numberOfBatchAverageToSmall <- 0;
+	int numberOfBatchSmallToFinal <- 0;
+	float stockOnRoads <- 0.0;
+	float stockInFinalDest <- 0.0;
+	float stockInWarehouse <- 0.0;
+		// T1 values
+	int totalNumberOfBatchT1 <- 0;
+	int numberOfBatchProviderToLargeT1 <- 0;
+	int numberOfBatchLargeToAverageT1 <- 0;
+	int numberOfBatchAverageToSmallT1 <- 0;
+	int numberOfBatchSmallToFinalT1 <- 0;
+	float stockOnRoadsT1 <- 0.0;
+	float stockInFinalDestT1 <- 0.0;
+	float stockInWarehouseT1 <- 0.0;
+		// T2 values
+	int totalNumberOfBatchT2 <- 0;
+	int numberOfBatchProviderToLargeT2 <- 0;
+	int numberOfBatchLargeToAverageT2 <- 0;
+	int numberOfBatchAverageToSmallT2 <- 0;
+	int numberOfBatchSmallToFinalT2 <- 0;
+	float stockOnRoadsT2 <- 0.0;
+	float stockInFinalDestT2 <- 0.0;
+	float stockInWarehouseT2 <- 0.0;
+	
 	init {
 		if(use_gs){
 			// Init senders in order to create nodes/edges when we create agent
@@ -111,6 +140,102 @@ global {
 		}
 	}
 	
+	/**
+	 * 
+	 */
+	reflex updateObservationValueT1 when: ((time/3600.0) mod 23.0) = 0.0  {
+		totalNumberOfBatchT1 <- length(Batch);
+		stockOnRoadsT1 <- 0.0;
+		numberOfBatchProviderToLargeT1 <- 0;
+		numberOfBatchLargeToAverageT1 <- 0;
+		numberOfBatchAverageToSmallT1 <- 0;
+		numberOfBatchSmallToFinalT1 <- 0;
+		ask Batch {
+			if(self.color = "blue"){
+				numberOfBatchProviderToLargeT1 <- numberOfBatchProviderToLargeT1 + 1;
+			}
+			else if(self.color = "green"){
+				numberOfBatchLargeToAverageT1 <- numberOfBatchLargeToAverageT1 + 1;
+			}
+			else if(self.color = "orange"){
+				numberOfBatchAverageToSmallT1 <- numberOfBatchAverageToSmallT1 + 1;
+			}
+			else if(self.color = "red"){
+				numberOfBatchSmallToFinalT1 <- numberOfBatchSmallToFinalT1 + 1;
+			}
+			
+			stockOnRoadsT1 <- stockOnRoadsT1 + self.quantity;
+		}
+		stockInFinalDestT1 <- 0.0;
+		ask FinalDestinationManager {
+			ask self.building.stocks {
+				stockInFinalDestT1 <- stockInFinalDestT1 + self.quantity;
+			}
+		}
+		
+		stockInWarehouseT1 <- 0.0;
+		ask Warehouse {
+			ask self.stocks {
+				stockInWarehouseT1 <- stockInWarehouseT1 + self.quantity;
+			}
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	reflex updateObservationValueT2  {
+		totalNumberOfBatchT2 <- length(Batch);
+		stockOnRoadsT2 <- 0.0;
+		numberOfBatchProviderToLargeT2 <- 0;
+		numberOfBatchLargeToAverageT2 <- 0;
+		numberOfBatchAverageToSmallT2 <- 0;
+		numberOfBatchSmallToFinalT2 <- 0;
+		ask Batch {
+			if(self.color = "blue"){
+				numberOfBatchProviderToLargeT2 <- numberOfBatchProviderToLargeT2 + 1;
+			}
+			else if(self.color = "green"){
+				numberOfBatchLargeToAverageT2 <- numberOfBatchLargeToAverageT2 + 1;
+			}
+			else if(self.color = "orange"){
+				numberOfBatchAverageToSmallT2 <- numberOfBatchAverageToSmallT2 + 1;
+			}
+			else if(self.color = "red"){
+				numberOfBatchSmallToFinalT2 <- numberOfBatchSmallToFinalT2 + 1;
+			}
+			
+			stockOnRoadsT2 <- stockOnRoadsT2 + self.quantity;
+		}
+		stockInFinalDestT2 <- 0.0;
+		ask FinalDestinationManager {
+			ask self.building.stocks {
+				stockInFinalDestT2 <- stockInFinalDestT2 + self.quantity;
+			}
+		}
+		stockInWarehouseT2 <- 0.0;
+		ask Warehouse {
+			ask self.stocks {
+				stockInWarehouseT2 <- stockInWarehouseT2 + self.quantity;
+			}
+		}
+	}
+
+	/**
+	 * 
+	 */
+	reflex updateAverageObservationValue when: ((time/3600.0) mod 24.0) = 0.0  {
+		// Update mean values
+		totalNumberOfBatch <- (totalNumberOfBatchT2 + totalNumberOfBatchT1)/2;
+		numberOfBatchProviderToLarge <- (numberOfBatchProviderToLargeT2 + numberOfBatchProviderToLargeT1)/2;
+		numberOfBatchLargeToAverage <- (numberOfBatchLargeToAverageT2 + numberOfBatchLargeToAverageT1)/2;
+		numberOfBatchAverageToSmall <- (numberOfBatchAverageToSmallT2 + numberOfBatchAverageToSmallT1)/2;
+		numberOfBatchSmallToFinal <- (numberOfBatchSmallToFinalT2 + numberOfBatchSmallToFinalT1)/2;
+		stockOnRoads <- (stockOnRoadsT2 + stockOnRoadsT1)/2.0;
+		stockInFinalDest <- (stockInFinalDestT2 + stockInFinalDestT1)/2.0;
+		stockInWarehouse <- (stockInWarehouseT2 + stockInWarehouseT1)/2.0;
+	}
+
 	/**
 	 * The final destinations are separated in 4 ordered sets. To each final destinations of these sets, we associate a decreasing rate of 
 	 * stocks according to the number of customer computed by the Huff model. The more the customers there are, the more the decreasing 
@@ -337,5 +462,60 @@ experiment exp_graph type: gui {
 			species Road aspect: geom; 
 		}
 	
+		display chart_average_number_of_batch refresh_every: 24 {
+			chart  "Number of batch" type: series {
+				data "Average total number of batch" value: totalNumberOfBatch color: rgb('purple') ;
+				data "Average number of batch going from the provider to a large warehouse" value: numberOfBatchProviderToLarge color: rgb('blue') ;
+				data "Average number of batch going from a large warehouse to an average one" value: numberOfBatchLargeToAverage color: rgb('green') ;
+				data "Average number of batch going from a average warehouse to an small one" value: numberOfBatchAverageToSmall color: rgb('orange') ;
+				data "Average number of batch going from a small warehouse to a final destination" value: numberOfBatchSmallToFinal color: rgb('red') ;
+			}
+		}
+		
+		display chart_number_of_batch {
+			chart  "Number of batch" type: series {
+				data "Number of batch" value: totalNumberOfBatchT2 color: rgb('purple') ;
+				data "Number of batch going from the provider to a large warehouse" value: numberOfBatchProviderToLargeT2 color: rgb('blue') ;
+				data "Number of batch going from a large warehouse to an average one" value: numberOfBatchLargeToAverageT2 color: rgb('green') ;
+				data "Number of batch going from a average warehouse to an small one" value: numberOfBatchAverageToSmallT2 color: rgb('orange') ;
+				data "Number of batch going from a small warehouse to a final destination" value: numberOfBatchSmallToFinalT2 color: rgb('red') ;
+			}
+		}
+		
+		display chart_average_stock_on_roads refresh_every: 24 {
+			chart "Stock quantity on road" type: series {
+				data "Average stock quantity on road" value: stockOnRoads color: rgb('red') ;
+			}
+		}
+		
+		display chart_stock_on_roads {
+			chart "Stock quantity on road" type: series {
+				data "Stock quantity on road" value: stockOnRoadsT2 color: rgb('red') ;
+			}
+		}
+		
+		display chart_average_stock_in_final_dest refresh_every: 24 {
+			chart  "Stock quantity in final destinations" type: series {
+				data "Average stock quantity in final destinations" value: stockInFinalDest color: rgb('green') ;
+			}
+		}
+		
+		display chart_stock_in_final_dest {
+			chart  "Stock quantity in final destinations" type: series {
+				data "Stock quantity in final destinations" value: stockInFinalDestT2 color: rgb('green') ;
+			}
+		}
+		
+		display chart_average_stock_in_warehouse {
+			chart  "Stock quantity in warehouses" type: series {
+				data "Average stock quantity in warehouses" value: stockInWarehouse color: rgb('orange') ;
+			}
+		}
+		
+		display chart_stock_in_warehouse refresh_every: 24 {
+			chart  "Stock quantity in warehouses" type: series {
+				data "Stock quantity in warehouses" value: stockInWarehouseT2 color: rgb('orange') ;
+			}
+		}
 	}
 }

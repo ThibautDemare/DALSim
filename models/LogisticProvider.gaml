@@ -85,11 +85,21 @@ species LogisticProvider parent: Role {
 			i <- i + 1;
 		}	
 		if( j = 1){// The provider must send new stock
+			order.color <- "blue";
 			ask Provider {
 				do receiveOrder(order);
 			}
 		}
 		else{// A warehouse must send new stock
+			if( j = 2 ){
+				order.color <- "green";
+			}
+			else if ( j = 3 ){
+				order.color <- "orange";
+			}
+			else {
+				order.color <- "red";
+			}
 			ask (sender as Warehouse) {
 				do receiveRestockRequest(order);
 			}
