@@ -143,48 +143,18 @@ global {
 	/**
 	 * 
 	 */
-	reflex updateObservationValueT1 when: ((time/3600.0) mod 23.0) = 0.0  {
-		totalNumberOfBatchT1 <- length(Batch);
-		stockOnRoadsT1 <- 0.0;
-		numberOfBatchProviderToLargeT1 <- 0;
-		numberOfBatchLargeToAverageT1 <- 0;
-		numberOfBatchAverageToSmallT1 <- 0;
-		numberOfBatchSmallToFinalT1 <- 0;
-		ask Batch {
-			if(self.color = "blue"){
-				numberOfBatchProviderToLargeT1 <- numberOfBatchProviderToLargeT1 + 1;
-			}
-			else if(self.color = "green"){
-				numberOfBatchLargeToAverageT1 <- numberOfBatchLargeToAverageT1 + 1;
-			}
-			else if(self.color = "orange"){
-				numberOfBatchAverageToSmallT1 <- numberOfBatchAverageToSmallT1 + 1;
-			}
-			else if(self.color = "red"){
-				numberOfBatchSmallToFinalT1 <- numberOfBatchSmallToFinalT1 + 1;
-			}
-			
-			stockOnRoadsT1 <- stockOnRoadsT1 + self.quantity;
-		}
-		stockInFinalDestT1 <- 0.0;
-		ask FinalDestinationManager {
-			ask self.building.stocks {
-				stockInFinalDestT1 <- stockInFinalDestT1 + self.quantity;
-			}
-		}
+	reflex updateObservationValue {
+		// Keep old value in *T1
+		totalNumberOfBatchT1 <- totalNumberOfBatchT2;
+		numberOfBatchProviderToLargeT1 <- numberOfBatchProviderToLargeT2;
+		numberOfBatchLargeToAverageT1 <- numberOfBatchLargeToAverageT2;
+		numberOfBatchAverageToSmallT1 <- numberOfBatchAverageToSmallT2;
+		numberOfBatchSmallToFinalT1 <- numberOfBatchSmallToFinalT2;
+		stockOnRoadsT1 <- stockOnRoadsT2;
+		stockInFinalDestT1 <- stockInFinalDestT2;
+		stockInWarehouseT1 <- stockInWarehouseT2;
 		
-		stockInWarehouseT1 <- 0.0;
-		ask Warehouse {
-			ask self.stocks {
-				stockInWarehouseT1 <- stockInWarehouseT1 + self.quantity;
-			}
-		}
-	}
-	
-	/**
-	 * 
-	 */
-	reflex updateObservationValueT2  {
+		// Compute current value in *T2
 		totalNumberOfBatchT2 <- length(Batch);
 		stockOnRoadsT2 <- 0.0;
 		numberOfBatchProviderToLargeT2 <- 0;
