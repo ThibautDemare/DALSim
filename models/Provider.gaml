@@ -22,6 +22,13 @@ species Provider parent: Role{
 		ask buildings {
 			myself.building <- self;
 		}
+		
+		if(use_gs){
+			// Add a new node event for corresponding sender
+			if(use_r9){
+				gs_add_node gs_sender_id:"supply_chain" gs_node_id:building.name;
+			}
+		}
 	}
 		
 	/*

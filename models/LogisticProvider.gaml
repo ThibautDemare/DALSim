@@ -139,6 +139,16 @@ species LogisticProvider parent: Role {
 			buildings <- supplyChain;
 			myself.supplyChains <- myself.supplyChains + self;
 		}
+		
+		if(use_gs){
+			if(use_r9){
+				gs_add_edge gs_sender_id:"supply_chain" gs_edge_id:(provider.building.name + large.name) gs_node_id_from:provider.building.name gs_node_id_to:large.name gs_is_directed:false;
+				gs_add_edge gs_sender_id:"supply_chain" gs_edge_id:(large.name + average.name) gs_node_id_from:large.name gs_node_id_to:average.name gs_is_directed:false;
+				gs_add_edge gs_sender_id:"supply_chain" gs_edge_id:(average.name + small.name) gs_node_id_from:average.name gs_node_id_to:small.name gs_is_directed:false;
+				gs_add_edge gs_sender_id:"supply_chain" gs_edge_id:(small.name + fdm.building.name) gs_node_id_from:small.name gs_node_id_to:fdm.building.name gs_is_directed:false;
+				
+			}
+		}
 	}
 	
 	/**

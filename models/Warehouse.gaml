@@ -32,6 +32,10 @@ species Warehouse parent: Building{
 				gs_add_node gs_sender_id:"neighborhood_warehouse_final" gs_node_id:name;
 				gs_add_node_attribute gs_sender_id:"neighborhood_warehouse_final" gs_node_id:name gs_attribute_name:"ui.style" gs_attribute_value:"fill-color:"+color+";";
 			}
+			if(use_r9){
+				gs_add_node gs_sender_id:"supply_chain" gs_node_id:name;
+				gs_add_node_attribute gs_sender_id:"supply_chain" gs_node_id:name gs_attribute_name:"ui.style" gs_attribute_value:"fill-color:"+color+";";
+			}
 		}
 	}
 	

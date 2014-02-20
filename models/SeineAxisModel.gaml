@@ -41,7 +41,7 @@ global {
 	//Define the border of the environnement according to the road network
 	geometry shape <- envelope(roads_shapefile);
 	
-	bool use_gs <- false;
+	bool use_gs <- true;
 	bool use_r1 <- false;//actor
 	bool use_r2 <- false;//init_neighborhood_all
 	bool use_r3 <- false;//init_neighborhood_warehouse
@@ -49,7 +49,8 @@ global {
 	bool use_r5 <- false;//init_neighborhood_logistic_provider
 	bool use_r6 <- false;//init_neighborhood_warehouse_final
 	bool use_r7 <- false;//init_neighborhood_logistic_final
-	bool use_r8 <- true;//init_use_road_network
+	bool use_r8 <- false;//init_use_road_network
+	bool use_r9 <- true;//init_use_supply_chain
 	
 	float neighborhood_dist <- 1°km;
 	
@@ -101,8 +102,10 @@ global {
 		road_network <- as_edge_graph(Road);// with_weights move_weights;
 		
 		if(use_gs){
-			// Send the road network to Graphstream
-			do init_use_road_network;
+			if(use_r8){
+				// Send the road network to Graphstream
+				do init_use_road_network;
+			}
 		}
 		
 		
@@ -132,7 +135,7 @@ global {
 	}
 	
 	/**
-	 * Send neighborhood graph to graphstream. Can't be done in init() so it is made in a reflex at the first cycle.
+	 * Call inits methods to build graph with graphstream. They can't be called in global init so it is made in a reflex at the first cycle.
 	 */
 	reflex init_edges when: cycle = 1 {
 		if(use_gs){
@@ -275,6 +278,11 @@ global {
 			// In order to build the road network
 			gs_add_sender gs_host:"localhost" gs_port:2008 gs_sender_id:"road_network";
 		}
+		
+		if(use_r9){
+			// In order to build the supply chain network
+			gs_add_sender gs_host:"localhost" gs_port:2009 gs_sender_id:"supply_chain";
+		}
 	}
 	
 	action init_neighborhood_networks{
@@ -370,43 +378,41 @@ global {
 	}
 	
 	action init_use_road_network {
-		if(use_r8){
-			ask road_network.edges {
-				// Get the source node
-				point p_source <- (road_network source_of self);
-				// Make a list with coordinate in order to send it
-				list l_source <- [];
-				l_source <- l_source + p_source.x;
-				l_source <- l_source + p_source.y;
-				// Create the node
-				gs_add_node gs_sender_id:"road_network" gs_node_id:""+p_source.x+"_"+p_source.y;
-				// Send the coordinate
-				gs_add_node_attribute gs_sender_id:"road_network" gs_node_id:""+p_source.x+"_"+p_source.y gs_attribute_name:"xy" gs_attribute_value:l_source;
-				
-				// Get the target node
-				point p_target<- (road_network target_of self);
-				// Make a list with coordinate in order to send it
-				list l_target <- [];
-				l_target <- l_target + p_target.x;
-				l_target <- l_target + p_target.y;
-				// Create the node
-				gs_add_node gs_sender_id:"road_network" gs_node_id:""+p_target.x+"_"+p_target.y;
-				// Send the coordinate
-				gs_add_node_attribute gs_sender_id:"road_network" gs_node_id:""+p_target.x+"_"+p_target.y gs_attribute_name:"xy" gs_attribute_value:l_target;
-				
-				// Create an undirected edge between these two nodes
-				gs_add_edge gs_sender_id:"road_network" gs_edge_id:(""+p_source.x+"_"+p_source.y+p_target.x+"_"+p_target.y) gs_node_id_from:""+p_source.x+"_"+p_source.y gs_node_id_to:""+p_target.x+"_"+p_target.y gs_is_directed:false;
-			}
+		ask road_network.edges {
+			// Get the source node
+			point p_source <- (road_network source_of self);
+			// Make a list with coordinate in order to send it
+			list l_source <- [];
+			l_source <- l_source + p_source.x;
+			l_source <- l_source + p_source.y;
+			// Create the node
+			gs_add_node gs_sender_id:"road_network" gs_node_id:""+p_source.x+"_"+p_source.y;
+			// Send the coordinate
+			gs_add_node_attribute gs_sender_id:"road_network" gs_node_id:""+p_source.x+"_"+p_source.y gs_attribute_name:"xy" gs_attribute_value:l_source;
 			
-			// Send a step event to Graphstream to indicate that the graph has been built
-			gs_step gs_sender_id:"road_network" gs_step_number:1;
+			// Get the target node
+			point p_target<- (road_network target_of self);
+			// Make a list with coordinate in order to send it
+			list l_target <- [];
+			l_target <- l_target + p_target.x;
+			l_target <- l_target + p_target.y;
+			// Create the node
+			gs_add_node gs_sender_id:"road_network" gs_node_id:""+p_target.x+"_"+p_target.y;
+			// Send the coordinate
+			gs_add_node_attribute gs_sender_id:"road_network" gs_node_id:""+p_target.x+"_"+p_target.y gs_attribute_name:"xy" gs_attribute_value:l_target;
+			
+			// Create an undirected edge between these two nodes
+			gs_add_edge gs_sender_id:"road_network" gs_edge_id:(""+p_source.x+"_"+p_source.y+p_target.x+"_"+p_target.y) gs_node_id_from:""+p_source.x+"_"+p_source.y gs_node_id_to:""+p_target.x+"_"+p_target.y gs_is_directed:false;
 		}
+		
+		// Send a step event to Graphstream to indicate that the graph has been built
+		gs_step gs_sender_id:"road_network" gs_step_number:1;
 	}
 }
 
 experiment exp_graph type: gui {
 	output {
-		display display_FinalDestinationManager {
+	/*	display display_FinalDestinationManager {
 			species Batch aspect: base;
 			species Provider aspect: base;
 			species FinalDestinationManager aspect: base;
@@ -432,12 +438,12 @@ experiment exp_graph type: gui {
 			species Road aspect: geom; 
 		}
 	*/
-		display chart_average_number_of_batch refresh_every: 24 {
+	/*	display chart_average_number_of_batch refresh_every: 24 {
 			chart  "Number of batch" type: series {
 				data "Average total number of batch" value: totalNumberOfBatch color: rgb('purple') ;
 				data "Average number of batch going from the provider to a large warehouse" value: numberOfBatchProviderToLarge color: rgb('blue') ;
 				data "Average number of batch going from a large warehouse to an average one" value: numberOfBatchLargeToAverage color: rgb('green') ;
-				data "Average number of batch going from a average warehouse to an small one" value: numberOfBatchAverageToSmall color: rgb('orange') ;
+				data "Average number of batch going from an average warehouse to a small one" value: numberOfBatchAverageToSmall color: rgb('orange') ;
 				data "Average number of batch going from a small warehouse to a final destination" value: numberOfBatchSmallToFinal color: rgb('red') ;
 			}
 		}
@@ -486,6 +492,6 @@ experiment exp_graph type: gui {
 			chart  "Stock quantity in warehouses" type: series {
 				data "Stock quantity in warehouses" value: stockInWarehouseT2 color: rgb('orange') ;
 			}
-		}
+		}*/
 	}
 }
