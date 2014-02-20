@@ -449,7 +449,7 @@ experiment exp_graph type: gui {
 			species Warehouse aspect: base;
 			species Road aspect: geom; 
 		}
-		
+	/*	
 		display display_LogisticProvider {
 			species Batch aspect: base;
 			species Provider aspect: base;
@@ -461,7 +461,7 @@ experiment exp_graph type: gui {
 			species Batch aspect: little_base;
 			species Road aspect: geom; 
 		}
-	
+	*/
 		display chart_average_number_of_batch refresh_every: 24 {
 			chart  "Number of batch" type: series {
 				data "Average total number of batch" value: totalNumberOfBatch color: rgb('purple') ;
@@ -477,7 +477,7 @@ experiment exp_graph type: gui {
 				data "Number of batch" value: totalNumberOfBatchT2 color: rgb('purple') ;
 				data "Number of batch going from the provider to a large warehouse" value: numberOfBatchProviderToLargeT2 color: rgb('blue') ;
 				data "Number of batch going from a large warehouse to an average one" value: numberOfBatchLargeToAverageT2 color: rgb('green') ;
-				data "Number of batch going from a average warehouse to an small one" value: numberOfBatchAverageToSmallT2 color: rgb('orange') ;
+				data "Number of batch going from an average warehouse to a small one" value: numberOfBatchAverageToSmallT2 color: rgb('orange') ;
 				data "Number of batch going from a small warehouse to a final destination" value: numberOfBatchSmallToFinalT2 color: rgb('red') ;
 			}
 		}
