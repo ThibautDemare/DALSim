@@ -116,9 +116,14 @@ species LogisticProvider parent: Role {
 	action addFinalDest(FinalDestinationManager fdm){
 		list<Building> supplyChain <- [];
 		// Find appropriates warehouses
-		Warehouse small <- findSmallWarehouse(fdm);
-		Warehouse large <- findLargeWarehouse(fdm);
-		Warehouse average <- findAverageWarehouse(small, large, fdm);
+		Warehouse small <- nil;
+		Warehouse large <- nil;
+		Warehouse average <- nil;
+		loop while: small = large or small = average or large = average {
+			small <- findSmallWarehouse(fdm);
+			large <- findLargeWarehouse(fdm);
+			average <- findAverageWarehouse(small, large, fdm);
+		}
 		usedWarehouses <- usedWarehouses + small + large + average;
 		
 		// Associate new stock to these warehouse
@@ -193,16 +198,28 @@ species LogisticProvider parent: Role {
 	 * Return a small warehouse according to the position of the final destination : the more the warehouse is close to the final destination, the more he have a chance to be selected.
 	 */
 	Warehouse findSmallWarehouse(FinalDestinationManager fdm){
-		// Stupid selection method. To be improve, but I need test before going further.
-		return one_of(small_warehouse);
+		list<Warehouse> lsw <- Warehouse sort_by (fdm distance_to each);
+		int f <- ((rnd(10000)/10000)^6)*(length(lsw)-1);
+		// I assume that there is always at least one warehouse which have a free space greater than the occupied surface of the stock to outsource.
+		// According to results, it doesn't seem foolish.
+		loop while:( (lsw[f] as Building).totalSurface - (lsw[f] as Building).occupiedSurface ) < (fdm.building as Building).occupiedSurface {
+			f <- ((rnd(10000)/10000)^6)*(length(lsw)-1);
+		}
+		return lsw[f];
 	}
 	
 	/**
 	 * Return a large warehouse according to the position of the final destination : the more the warehouse has a big free surface, the more he have a chance to be selected.
 	 */
 	Warehouse findLargeWarehouse(FinalDestinationManager fdm){
-		// Stupid selection method. To be improve, but I need test before going further.
-		return one_of(large_warehouse);
+		list<Warehouse> llw <- Warehouse sort_by (each.totalSurface-each.occupiedSurface);
+		int f <- ((rnd(10000)/10000)^6)*(length(llw)-1);
+		// I assume that there is always at least one warehouse which have a free space greater than the occupied surface of the stock to outsource.
+		// According to results, it doesn't seem foolish.
+		loop while:( (llw[(length(llw)-1) - f] as Building).totalSurface - (llw[(length(llw)-1) - f] as Building).occupiedSurface ) < (fdm.building as Building).occupiedSurface {
+			f <- ((rnd(10000)/10000)^6)*(length(llw)-1);
+		}
+		return llw[(length(llw)-1) - f];
 	}
 	
 	/**
@@ -213,8 +230,25 @@ species LogisticProvider parent: Role {
 	 * So, we are trying to find B which minimize ||(->AB) + (->CB)||.
 	 */
 	Warehouse findAverageWarehouse(Warehouse small, Warehouse large, FinalDestinationManager fdm){
-		// Stupid selection method. To be improve, but I need test before going further.
-		return one_of(average_warehouse);
+		list<Warehouse> law <- Warehouse;
+		float min_euclidean_norm <-  -(2-252)*21023;// The max float value
+		int min_index <- 0;
+		int i <- 0;
+		float x_s <- small.location.x;
+		float y_s <- small.location.y;
+		float x_l <- large.location.x;
+		float y_l <- large.location.y;
+		loop while: i < length(law) {
+			float x_a <- (law[i] as Warehouse).location.x;
+			float y_a <- (law[i] as Warehouse).location.y;
+			float euclidean_norm <- sqrt( ((x_a-x_s) + (x_a-x_l))^2 + ((y_a-y_s) + (y_a-y_l))^2 );
+			if(euclidean_norm < min_euclidean_norm){
+				min_euclidean_norm <- euclidean_norm;
+				min_index <- i;
+			}
+			i <- i + 1;
+		}
+		return law[min_index];
 	}
 	
 	aspect base { 
