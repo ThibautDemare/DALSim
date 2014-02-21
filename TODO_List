@@ -1,27 +1,10 @@
-number of customer (according to Huff model) affect the decreasing of stock => done
-
-Add something (a color for instance) to locate the node in graphstream => done
-
 Size of building affect break bulk time
 
 The speed and length of must be considered to compute shortest path. But The maximum speed on a road must also affect the speed of the batch 
 agent.
 
-The surface of a building must affect the maximum quantity of a stock => done
-
-Add graphic with number of batch, quantity of goods on road (perhaps in warehouses and shops too) => done 
-
 Data of the graphic must be saved on a CSV file
 
-The logistic provider equilibrate stock of warehouse :
-	A batch does not follow a supply chain like now but go from a point to another and that's it.
-	When a customer ask for a restock, the goods need to be already in a local warehouse. => done
-
-Make a connection with graphstream to build a graph of the supply chains :
-	node = warehouse, final dest and provider
-	edge = this building deliver this other building in the supply chain
-	=> done
-	
 When a final dest manager change of logistic provider, his associated supply chain must be removed too
 
 Improve the behavior of logistic provider :
@@ -32,8 +15,6 @@ Improve the behavior of logistic provider :
 		- the average warehouse according to this formulae :Let ->AB the vector between the local warehouse and the average one.
 			Let ->CB be the vector between the large warehouse and the average one.
 			We try to find B which minimize ||(->AB) + (->CB)||.
-
-The road network could be send to Graphstream. => done
 
 The batch could let a trace of their path and we could analyze the flows on Graphstream.
 

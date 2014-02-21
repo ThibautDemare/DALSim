@@ -1,0 +1,18 @@
+number of customer (according to Huff model) affect the decreasing of stock => done
+
+Add something (a color for instance) to locate the node in graphstream => done
+
+The surface of a building must affect the maximum quantity of a stock => done
+
+Add graphic with number of batch, quantity of goods on road (perhaps in warehouses and shops too) => done 
+
+The logistic provider equilibrate stock of warehouse :
+	A batch does not follow a supply chain like now but go from a point to another and that's it.
+	When a customer ask for a restock, the goods need to be already in a local warehouse. => done
+
+Make a connection with graphstream to build a graph of the supply chains :
+	node = warehouse, final dest and provider
+	edge = this building deliver this other building in the supply chain
+	=> done
+	
+The road network could be send to Graphstream. => done
