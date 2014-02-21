@@ -16,8 +16,17 @@ species Batch skills:[moving]{
 	float speed <- 70.0 °km/°h;
 	int breakBulk <- 0;
 	string color;
+	
 	reflex move when: target != nil and breakBulk = 0 {
 		do goto target: target speed: speed on: road_network;
+	}
+	
+	/**
+	 * A break bulk can take between 2 and 24 hours.
+	 * This function must be improve and take care of the surface of the building
+	 */
+	int computeBreakBulk(float surface){
+		return rnd(22)+2;
 	}
 	
 	reflex decreaseBreakBulk when: breakBulk > 0 {

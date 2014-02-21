@@ -23,7 +23,7 @@ species Building {
 			ask entering_batch {
 				//If the batch is at the right adress
 				if( self.target = myself.location ){
-					self.breakBulk <- rnd(22)+2;// A break bulk can take between 2 and 24 hours.
+					self.breakBulk <- self.computeBreakBulk(myself.totalSurface);
 					target <- nil;
 				}
 				else if (target = nil and self.breakBulk = 0) {

@@ -70,6 +70,7 @@ species Warehouse parent: Building{
 			self.target <- order.building.location;
 			self.location <- myself.location;
 			self.color <- order.color;
+			self.breakBulk <- self.computeBreakBulk(myself.totalSurface);
 		}
 	}
 }
