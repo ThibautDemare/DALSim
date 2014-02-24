@@ -16,3 +16,15 @@ Make a connection with graphstream to build a graph of the supply chains :
 	=> done
 	
 The road network could be send to Graphstream. => done
+
+Improve the behavior of logistic provider :
+	They choose warehouse (purchasing or renting) according to their customer location. 
+	They can choose :
+		- the large warehouse according to his size and not necessarily his location in space
+		- the local warehouse according to his location and not necessarily his size
+		- the average warehouse according to this formulae :Let ->AB the vector between the local warehouse and the average one.
+			Let ->CB be the vector between the large warehouse and the average one.
+			We try to find B which minimize ||(->AB) + (->CB)||.
+	=> done
+
+Data of the graphic must be saved on a CSV file => done
