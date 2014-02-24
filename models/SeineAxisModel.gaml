@@ -13,6 +13,7 @@ import "./FinalDestinationManager.gaml"
 import "./Batch.gaml"
 import "./Building.gaml"
 import "./Role.gaml"
+import "./Observer.gaml"
 
 /*
  * Init global variables and agents
@@ -60,35 +61,6 @@ global {
 	list<Warehouse> small_warehouse;
 	list<Warehouse> average_warehouse;
 	list<Warehouse> large_warehouse;
-	
-	// Obeservation value
-		// Average  values
-	int totalNumberOfBatch <- 0;
-	int numberOfBatchProviderToLarge <- 0;
-	int numberOfBatchLargeToAverage <- 0;
-	int numberOfBatchAverageToSmall <- 0;
-	int numberOfBatchSmallToFinal <- 0;
-	float stockOnRoads <- 0.0;
-	float stockInFinalDest <- 0.0;
-	float stockInWarehouse <- 0.0;
-		// T1 values
-	int totalNumberOfBatchT1 <- 0;
-	int numberOfBatchProviderToLargeT1 <- 0;
-	int numberOfBatchLargeToAverageT1 <- 0;
-	int numberOfBatchAverageToSmallT1 <- 0;
-	int numberOfBatchSmallToFinalT1 <- 0;
-	float stockOnRoadsT1 <- 0.0;
-	float stockInFinalDestT1 <- 0.0;
-	float stockInWarehouseT1 <- 0.0;
-		// T2 values
-	int totalNumberOfBatchT2 <- 0;
-	int numberOfBatchProviderToLargeT2 <- 0;
-	int numberOfBatchLargeToAverageT2 <- 0;
-	int numberOfBatchAverageToSmallT2 <- 0;
-	int numberOfBatchSmallToFinalT2 <- 0;
-	float stockOnRoadsT2 <- 0.0;
-	float stockInFinalDestT2 <- 0.0;
-	float stockInWarehouseT2 <- 0.0;
 	
 	init {
 		if(use_gs){
@@ -143,72 +115,6 @@ global {
 		}
 	}
 	
-	/**
-	 * 
-	 */
-	reflex updateObservationValue {
-		// Keep old value in *T1
-		totalNumberOfBatchT1 <- totalNumberOfBatchT2;
-		numberOfBatchProviderToLargeT1 <- numberOfBatchProviderToLargeT2;
-		numberOfBatchLargeToAverageT1 <- numberOfBatchLargeToAverageT2;
-		numberOfBatchAverageToSmallT1 <- numberOfBatchAverageToSmallT2;
-		numberOfBatchSmallToFinalT1 <- numberOfBatchSmallToFinalT2;
-		stockOnRoadsT1 <- stockOnRoadsT2;
-		stockInFinalDestT1 <- stockInFinalDestT2;
-		stockInWarehouseT1 <- stockInWarehouseT2;
-		
-		// Compute current value in *T2
-		totalNumberOfBatchT2 <- length(Batch);
-		stockOnRoadsT2 <- 0.0;
-		numberOfBatchProviderToLargeT2 <- 0;
-		numberOfBatchLargeToAverageT2 <- 0;
-		numberOfBatchAverageToSmallT2 <- 0;
-		numberOfBatchSmallToFinalT2 <- 0;
-		ask Batch {
-			if(self.color = "blue"){
-				numberOfBatchProviderToLargeT2 <- numberOfBatchProviderToLargeT2 + 1;
-			}
-			else if(self.color = "green"){
-				numberOfBatchLargeToAverageT2 <- numberOfBatchLargeToAverageT2 + 1;
-			}
-			else if(self.color = "orange"){
-				numberOfBatchAverageToSmallT2 <- numberOfBatchAverageToSmallT2 + 1;
-			}
-			else if(self.color = "red"){
-				numberOfBatchSmallToFinalT2 <- numberOfBatchSmallToFinalT2 + 1;
-			}
-			
-			stockOnRoadsT2 <- stockOnRoadsT2 + self.quantity;
-		}
-		stockInFinalDestT2 <- 0.0;
-		ask FinalDestinationManager {
-			ask self.building.stocks {
-				stockInFinalDestT2 <- stockInFinalDestT2 + self.quantity;
-			}
-		}
-		stockInWarehouseT2 <- 0.0;
-		ask Warehouse {
-			ask self.stocks {
-				stockInWarehouseT2 <- stockInWarehouseT2 + self.quantity;
-			}
-		}
-	}
-
-	/**
-	 * 
-	 */
-	reflex updateAverageObservationValue when: ((time/3600.0) mod 24.0) = 0.0  {
-		// Update mean values
-		totalNumberOfBatch <- (totalNumberOfBatchT2 + totalNumberOfBatchT1)/2;
-		numberOfBatchProviderToLarge <- (numberOfBatchProviderToLargeT2 + numberOfBatchProviderToLargeT1)/2;
-		numberOfBatchLargeToAverage <- (numberOfBatchLargeToAverageT2 + numberOfBatchLargeToAverageT1)/2;
-		numberOfBatchAverageToSmall <- (numberOfBatchAverageToSmallT2 + numberOfBatchAverageToSmallT1)/2;
-		numberOfBatchSmallToFinal <- (numberOfBatchSmallToFinalT2 + numberOfBatchSmallToFinalT1)/2;
-		stockOnRoads <- (stockOnRoadsT2 + stockOnRoadsT1)/2.0;
-		stockInFinalDest <- (stockInFinalDestT2 + stockInFinalDestT1)/2.0;
-		stockInWarehouse <- (stockInWarehouseT2 + stockInWarehouseT1)/2.0;
-	}
-
 	/**
 	 * The final destinations are separated in 4 ordered sets. To each final destinations of these sets, we associate a decreasing rate of 
 	 * stocks according to the number of customer computed by the Huff model. The more the customers there are, the more the decreasing 
@@ -494,8 +400,9 @@ experiment exp_graph type: gui {
 			}
 		}
 	*/	
-		file name: "results" type: text data: ""+(time/3600.0) + "; " + stockInWarehouseT2 + ";" + stockInFinalDestT2 + ";" + stockOnRoadsT2 + ";" + numberOfBatchLargeToAverageT2 + ";" + numberOfBatchAverageToSmallT2 + ";" + numberOfBatchSmallToFinalT2 + ";" + numberOfBatchProviderToLargeT2 + ";" + totalNumberOfBatchT2;
-		file name: "results_average" type: text data: ""+(time/3600.0) + "; " + stockInWarehouse + ";" + stockInFinalDest + ";" + stockOnRoads + ";" + numberOfBatchLargeToAverage + ";" + numberOfBatchAverageToSmall + ";" + numberOfBatchSmallToFinal + ";" + numberOfBatchProviderToLarge + ";" + totalNumberOfBatch;
+	
+		file name: "results" type: text data: ""+(time/3600.0) + "; " + stockInWarehouseT2 + ";" + stockInFinalDestT2 + ";" + stockOnRoadsT2 + ";" + numberOfBatchLargeToAverageT2 + ";" + numberOfBatchAverageToSmallT2 + ";" + numberOfBatchSmallToFinalT2 + ";" + numberOfBatchProviderToLargeT2 + ";" + totalNumberOfBatchT2 + "; " + stockOnRoadsProviderToLargeT2 + "; " + stockOnRoadsLargeToAverageT2 + "; " + stockOnRoadsAverageToSmallT2 + "; " + stockOnRoadsSmallToFinalT2;
+		file name: "results_average" type: text data: ""+(time/3600.0) + "; " + stockInWarehouse + ";" + stockInFinalDest + ";" + stockOnRoads + ";" + numberOfBatchLargeToAverage + ";" + numberOfBatchAverageToSmall + ";" + numberOfBatchSmallToFinal + ";" + numberOfBatchProviderToLarge + ";" + totalNumberOfBatch + "; " + stockOnRoadsProviderToLarge + "; " + stockOnRoadsLargeToAverage + "; " + stockOnRoadsAverageToSmall + "; " + stockOnRoadsSmallToFinal;
 		
 	}
 }
