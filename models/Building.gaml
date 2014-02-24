@@ -1,7 +1,7 @@
 /**
  *  Building
  *  Author: Thibaut Démare
- *  Description: Iit is a physical structure that contains a stock and that has a surface. It can receive some batch and simulate a break bulk mechanism.
+ *  Description: It is a physical structure that contains a stock and which has a surface. It can receive some batch and simulate a break bulk mechanism.
  */
 
 model Building

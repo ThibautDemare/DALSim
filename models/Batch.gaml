@@ -18,7 +18,7 @@ species Batch skills:[moving]{
 	string color;
 	
 	reflex move when: target != nil and breakBulk = 0 {
-		do goto target: target speed: speed on: road_network;
+		do goto(target: target, speed: speed, on: road_network);
 	}
 	
 	/**
