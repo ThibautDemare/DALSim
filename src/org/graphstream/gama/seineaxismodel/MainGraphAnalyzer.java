@@ -3,8 +3,8 @@ package org.graphstream.gama.seineaxismodel;
 import java.io.IOException;
 import java.net.UnknownHostException;
 
-import org.graphstream.gama.seineaxismodel.analyzers.NeighborhoodSinkAdapater;
-import org.graphstream.gama.seineaxismodel.analyzers.SimpleSinkAdapter;
+import org.graphstream.gama.seineaxismodel.sinkadapters.NeighborhoodSinkAdapater;
+import org.graphstream.gama.seineaxismodel.sinkadapters.SimpleSinkAdapter;
 import org.graphstream.stream.netstream.NetStreamReceiver;
 import org.graphstream.stream.netstream.NetStreamSender;
 

@@ -1,11 +1,8 @@
-package org.graphstream.gama.seineaxismodel.analyzers;
+package org.graphstream.gama.seineaxismodel.sinkadapters;
 
-import org.graphstream.algorithm.APSP;
-import org.graphstream.algorithm.Centroid;
-import org.graphstream.algorithm.Eccentricity;
-import org.graphstream.graph.Edge;
+import java.io.IOException;
+
 import org.graphstream.graph.Graph;
-import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.SingleGraph;
 import org.graphstream.stream.SinkAdapter;
 import org.graphstream.stream.netstream.NetStreamReceiver;
@@ -22,7 +19,13 @@ public class SimpleSinkAdapter extends SinkAdapter {
 
 	@Override
 	public void stepBegins(String sourceId, long timeId, double step) {
-		
+		// Save the graph
+		try {
+			graph.write(graph.getAttribute("name")+".dgs");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public Graph getGraph() {

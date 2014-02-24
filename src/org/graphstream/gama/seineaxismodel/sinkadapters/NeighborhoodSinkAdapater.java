@@ -1,4 +1,4 @@
-package org.graphstream.gama.seineaxismodel.analyzers;
+package org.graphstream.gama.seineaxismodel.sinkadapters;
 
 import java.io.IOException;
 
