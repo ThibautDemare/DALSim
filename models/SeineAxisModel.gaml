@@ -41,7 +41,7 @@ global {
 	//Define the border of the environnement according to the road network
 	geometry shape <- envelope(roads_shapefile);
 	
-	bool use_gs <- true;
+	bool use_gs <- false;
 	bool use_r1 <- false;//actor
 	bool use_r2 <- false;//init_neighborhood_all
 	bool use_r3 <- false;//init_neighborhood_warehouse
@@ -492,6 +492,10 @@ experiment exp_graph type: gui {
 			chart  "Stock quantity in warehouses" type: series {
 				data "Stock quantity in warehouses" value: stockInWarehouseT2 color: rgb('orange') ;
 			}
-		}*/
+		}
+	*/	
+		file name: "results" type: text data: ""+(time/3600.0) + "; " + stockInWarehouseT2 + ";" + stockInFinalDestT2 + ";" + stockOnRoadsT2 + ";" + numberOfBatchLargeToAverageT2 + ";" + numberOfBatchAverageToSmallT2 + ";" + numberOfBatchSmallToFinalT2 + ";" + numberOfBatchProviderToLargeT2 + ";" + totalNumberOfBatchT2;
+		file name: "results_average" type: text data: ""+(time/3600.0) + "; " + stockInWarehouse + ";" + stockInFinalDest + ";" + stockOnRoads + ";" + numberOfBatchLargeToAverage + ";" + numberOfBatchAverageToSmall + ";" + numberOfBatchSmallToFinal + ";" + numberOfBatchProviderToLarge + ";" + totalNumberOfBatch;
+		
 	}
 }
