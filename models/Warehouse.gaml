@@ -12,6 +12,7 @@ import "./Batch.gaml"
 import "./Stock.gaml"
 import "./Order.gaml"
 import "./SeineAxisModel.gaml"
+import "./GraphStreamConnection.gaml"
 
 species Warehouse parent: Building{
 	float huffValue;

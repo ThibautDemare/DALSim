@@ -10,6 +10,7 @@ import "./SeineAxisModel.gaml"
 import "./LogisticProvider.gaml"
 import "./Batch.gaml"
 import "./Building.gaml"
+import "./GraphStreamConnection.gaml"
 
 species Provider parent: Role{
 	Building building;

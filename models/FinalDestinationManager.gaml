@@ -13,6 +13,7 @@ import "./Batch.gaml"
 import "./Building.gaml"
 import "./Order.gaml"
 import "./Stock.gaml"
+import "./GraphStreamConnection.gaml"
 
 species FinalDestinationManager parent: Role{
 	LogisticProvider logisticProvider;

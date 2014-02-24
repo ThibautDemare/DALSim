@@ -14,6 +14,7 @@ import "./SupplyChain.gaml"
 import "./Order.gaml"
 import "./Stock.gaml"
 import "./SeineAxisModel.gaml"
+import "./GraphStreamConnection.gaml"
 
 species LogisticProvider parent: Role {
 	list<SupplyChain> supplyChains;
