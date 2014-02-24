@@ -205,7 +205,8 @@ species LogisticProvider parent: Role {
 		loop while:( (lsw[f] as Building).totalSurface - (lsw[f] as Building).occupiedSurface ) < (fdm.building as Building).occupiedSurface {
 			f <- ((rnd(10000)/10000)^6)*(length(lsw)-1);
 		}
-		return lsw[f];
+		return lsw[f];/**/
+		//return one_of(average_warehouse);
 	}
 	
 	/**
@@ -219,7 +220,8 @@ species LogisticProvider parent: Role {
 		loop while:( (llw[(length(llw)-1) - f] as Building).totalSurface - (llw[(length(llw)-1) - f] as Building).occupiedSurface ) < (fdm.building as Building).occupiedSurface {
 			f <- ((rnd(10000)/10000)^6)*(length(llw)-1);
 		}
-		return llw[(length(llw)-1) - f];
+		return llw[(length(llw)-1) - f];/**/
+		//return one_of(large_warehouse);
 	}
 	
 	/**
@@ -232,23 +234,29 @@ species LogisticProvider parent: Role {
 	Warehouse findAverageWarehouse(Warehouse small, Warehouse large, FinalDestinationManager fdm){
 		list<Warehouse> law <- Warehouse;
 		float min_euclidean_norm <-  -(2-252)*21023;// The max float value
-		int min_index <- 0;
+		int min_index <- -1;
 		int i <- 0;
 		float x_s <- small.location.x;
 		float y_s <- small.location.y;
 		float x_l <- large.location.x;
 		float y_l <- large.location.y;
 		loop while: i < length(law) {
-			float x_a <- (law[i] as Warehouse).location.x;
-			float y_a <- (law[i] as Warehouse).location.y;
-			float euclidean_norm <- sqrt( ((x_a-x_s) + (x_a-x_l))^2 + ((y_a-y_s) + (y_a-y_l))^2 );
-			if(euclidean_norm < min_euclidean_norm){
-				min_euclidean_norm <- euclidean_norm;
-				min_index <- i;
+			if( ((law[i] as Building).totalSurface - (law[i] as Building).occupiedSurface ) > (fdm.building as Building).occupiedSurface ){
+				float x_a <- (law[i] as Warehouse).location.x;
+				float y_a <- (law[i] as Warehouse).location.y;
+				float euclidean_norm <- sqrt( ((x_a-x_s) + (x_a-x_l))^2 + ((y_a-y_s) + (y_a-y_l))^2 );
+				if(euclidean_norm < min_euclidean_norm){
+					min_euclidean_norm <- euclidean_norm;
+					min_index <- i;
+				}
 			}
 			i <- i + 1;
 		}
-		return law[min_index];
+		if(min_index = -1){
+			write "error : no average warehouse has been found";
+		}
+		return law[min_index];/**/
+		//return one_of(average_warehouse);
 	}
 	
 	aspect base { 
