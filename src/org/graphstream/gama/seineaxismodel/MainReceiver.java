@@ -3,12 +3,11 @@ package org.graphstream.gama.seineaxismodel;
 import java.io.IOException;
 import java.net.UnknownHostException;
 
-import org.graphstream.gama.seineaxismodel.sinkadapters.NeighborhoodSinkAdapater;
 import org.graphstream.gama.seineaxismodel.sinkadapters.SimpleSinkAdapter;
 import org.graphstream.stream.netstream.NetStreamReceiver;
 import org.graphstream.stream.netstream.NetStreamSender;
 
-public class MainGraphAnalyzer {
+public class MainReceiver {
 
 	public static void main(String[] args) throws InterruptedException, UnknownHostException, IOException {
 		// Receive event
@@ -18,22 +17,22 @@ public class MainGraphAnalyzer {
 		new SimpleSinkAdapter(receiver1);
 		
 		NetStreamReceiver receiver2 = new NetStreamReceiver(2002);
-		new NeighborhoodSinkAdapater(receiver2);
+		new SimpleSinkAdapter(receiver2);
 		
 		NetStreamReceiver receiver3 = new NetStreamReceiver(2003);
-		new NeighborhoodSinkAdapater(receiver3);
+		new SimpleSinkAdapter(receiver3);
 		
 		NetStreamReceiver receiver4 = new NetStreamReceiver(2004);
-		new NeighborhoodSinkAdapater(receiver4);
+		new SimpleSinkAdapter(receiver4);
 		
 		NetStreamReceiver receiver5 = new NetStreamReceiver(2005);
-		new NeighborhoodSinkAdapater(receiver5);
+		new SimpleSinkAdapter(receiver5);
 		
 		NetStreamReceiver receiver6 = new NetStreamReceiver(2006);
-		new NeighborhoodSinkAdapater(receiver6);
+		new SimpleSinkAdapter(receiver6);
 		
 		NetStreamReceiver receiver7 = new NetStreamReceiver(2007);
-		new NeighborhoodSinkAdapater(receiver7);
+		new SimpleSinkAdapter(receiver7);
 		
 		NetStreamReceiver receiver8 = new NetStreamReceiver(2008);
 		new SimpleSinkAdapter(receiver8);
