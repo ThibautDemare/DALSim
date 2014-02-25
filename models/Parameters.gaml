@@ -26,7 +26,7 @@ global {
 	// The numbers of hours between each calls to the reflex "decreasingStocks"
 	float numberOfHoursBeforeDS <- 24.0;
 	// The numbers of hours between each calls to the reflex "testOrdersNeeded"
-	float numberOfHoursBeforeTON <- 720.0;
+	float numberOfHoursBeforeTON <- 24.0;
 	
 	/**
 	 * The final destinations are separated in 4 ordered sets. To each final destinations of these sets, we associate a decreasing rate of 
