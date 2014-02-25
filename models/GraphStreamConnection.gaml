@@ -13,25 +13,57 @@ import "./FinalDestinationManager.gaml"
 
 global {
 	
-	bool use_gs <- false;
-	bool use_r1 <- false;//actor
-	bool use_r2 <- false;//init_neighborhood_all
-	bool use_r3 <- false;//init_neighborhood_warehouse
-	bool use_r4 <- false;//init_neighborhood_final_destination
-	bool use_r5 <- false;//init_neighborhood_logistic_provider
-	bool use_r6 <- false;//init_neighborhood_warehouse_final
-	bool use_r7 <- false;//init_neighborhood_logistic_final
-	bool use_r8 <- false;//init_use_road_network
+	bool use_gs <- true;
+	bool use_r1 <- true;//actor
+	bool use_r2 <- true;//init_neighborhood_all
+	bool use_r3 <- true;//init_neighborhood_warehouse
+	bool use_r4 <- true;//init_neighborhood_final_destination
+	bool use_r5 <- true;//init_neighborhood_logistic_provider
+	bool use_r6 <- true;//init_neighborhood_warehouse_final
+	bool use_r7 <- true;//init_neighborhood_logistic_final
+	bool use_r8 <- true;//init_use_road_network
 	bool use_r9 <- true;//init_use_supply_chain
 	
 	float neighborhood_dist <- 1°km;
 	
 	/**
-	 * Call inits methods to build graph with graphstream. They can't be called in global init so it is made in a reflex at the first cycle.
+	 * Second step to send graphs events. These functions can't be called in standard init so it is made in a reflex at the first cycle.
 	 */
 	reflex init_edges when: cycle = 1 {
 		if(use_gs){
-			do init_neighborhood_networks;
+			if(use_r1){
+				// Send a step event to Graphstream to indicate that the graph has been built
+				gs_step gs_sender_id:"actor" gs_step_number:1;
+			}
+			
+			if(use_r2){
+				do init_neighborhood_all;
+			}
+			
+			if(use_r3){
+				do init_neighborhood_warehouse;
+			}
+			
+			if(use_r4){
+				do init_neighborhood_final_destination;
+			}
+			
+			if(use_r5){
+				do init_neighborhood_logistic_provider;
+			}
+			
+			if(use_r6){
+				do init_neighborhood_warehouse_final;
+			}
+			
+			if(use_r7){
+				do init_neighborhood_logistic_final;
+			}
+		
+			if(use_r9){
+				// Send a step event to Graphstream to indicate that the graph has been built
+				gs_step gs_sender_id:"supply_chain" gs_step_number:1;
+			}
 		}
 	}
 	
@@ -94,96 +126,132 @@ global {
 		}
 	}
 	
-	action init_neighborhood_networks{
-		if(use_r2){
-			do init_neighborhood_all;
-		}
-		
-		if(use_r3){
-			do init_neighborhood_warehouse;
-		}
-		
-		if(use_r4){
-			do init_neighborhood_final_destination;
-		}
-		
-		if(use_r5){
-			do init_neighborhood_logistic_provider;
-		}
-		
-		if(use_r6){
-			do init_neighborhood_warehouse_final;
-		}
-		
-		if(use_r7){
-			do init_neighborhood_logistic_final;
-		}
-	}
-	
 	action init_neighborhood_all {
 		ask Warehouse {
 			ask (Warehouse at_distance(neighborhood_dist)) {
-				gs_add_edge gs_sender_id:"neighborhood_all" gs_edge_id:(myself.name + self.name) gs_node_id_from:myself.name gs_node_id_to:self.name gs_is_directed:false;
+				if(self != myself){
+					gs_add_edge gs_sender_id:"neighborhood_all" gs_edge_id:(myself.name + self.name) gs_node_id_from:myself.name gs_node_id_to:self.name gs_is_directed:false;
+				}		
 			}
 			ask (FinalDestinationManager at_distance(neighborhood_dist)) {
-				gs_add_edge gs_sender_id:"neighborhood_all" gs_edge_id:(myself.name + self.name) gs_node_id_from:myself.name gs_node_id_to:self.name gs_is_directed:false;
+				if(self != myself){
+					gs_add_edge gs_sender_id:"neighborhood_all" gs_edge_id:(myself.name + self.name) gs_node_id_from:myself.name gs_node_id_to:self.name gs_is_directed:false;
+				}		
 			}
 			ask LogisticProvider at_distance(neighborhood_dist) {
-				gs_add_edge gs_sender_id:"neighborhood_all" gs_edge_id:(myself.name + self.name) gs_node_id_from:myself.name gs_node_id_to:self.name gs_is_directed:false;
+				if(self != myself){
+					gs_add_edge gs_sender_id:"neighborhood_all" gs_edge_id:(myself.name + self.name) gs_node_id_from:myself.name gs_node_id_to:self.name gs_is_directed:false;
+				}		
 			}
 		}
 		
 		ask FinalDestinationManager {
 			ask LogisticProvider at_distance(neighborhood_dist) {
-				gs_add_edge gs_sender_id:"neighborhood_all" gs_edge_id:(myself.name + self.name) gs_node_id_from:myself.name gs_node_id_to:self.name gs_is_directed:false;
+				if(self != myself){
+					gs_add_edge gs_sender_id:"neighborhood_all" gs_edge_id:(myself.name + self.name) gs_node_id_from:myself.name gs_node_id_to:self.name gs_is_directed:false;
+				}		
+			}
+			
+			ask (FinalDestinationManager at_distance(neighborhood_dist)) {
+				if(self != myself){
+					gs_add_edge gs_sender_id:"neighborhood_all" gs_edge_id:(myself.name + self.name) gs_node_id_from:myself.name gs_node_id_to:self.name gs_is_directed:false;
+				}		
 			}
 		}
+		
+		ask LogisticProvider {
+			ask LogisticProvider at_distance(neighborhood_dist) {
+				if(self != myself){
+					gs_add_edge gs_sender_id:"neighborhood_all" gs_edge_id:(myself.name + self.name) gs_node_id_from:myself.name gs_node_id_to:self.name gs_is_directed:false;
+				}		
+			}
+		}
+		// Send a step event to Graphstream to indicate that the graph has been built
+		gs_step gs_sender_id:"neighborhood_all" gs_step_number:1;
 	}
 	
 	action init_neighborhood_warehouse {
 		ask Warehouse {
 			ask (Warehouse at_distance(neighborhood_dist)) {
-				gs_add_edge gs_sender_id:"neighborhood_warehouse" gs_edge_id:(myself.name + self.name) gs_node_id_from:myself.name gs_node_id_to:self.name gs_is_directed:false;
+				if(self != myself){
+					gs_add_edge gs_sender_id:"neighborhood_warehouse" gs_edge_id:(myself.name + self.name) gs_node_id_from:myself.name gs_node_id_to:self.name gs_is_directed:false;
+				}		
 			}
 		}
+		// Send a step event to Graphstream to indicate that the graph has been built
+		gs_step gs_sender_id:"neighborhood_warehouse" gs_step_number:1;
 	}
 	
 	action init_neighborhood_final_destination {
 		ask FinalDestinationManager {
 			ask FinalDestinationManager at_distance(neighborhood_dist) {
-				gs_add_edge gs_sender_id:"neighborhood_final_destination" gs_edge_id:(myself.name + self.name) gs_node_id_from:myself.name gs_node_id_to:self.name gs_is_directed:false;
+				if(self != myself){
+					gs_add_edge gs_sender_id:"neighborhood_final_destination" gs_edge_id:(myself.name + self.name) gs_node_id_from:myself.name gs_node_id_to:self.name gs_is_directed:false;
+				}		
 			}
 		}
+		// Send a step event to Graphstream to indicate that the graph has been built
+		gs_step gs_sender_id:"neighborhood_final_destination" gs_step_number:1;
 	}
 	
 	action init_neighborhood_logistic_provider {
 		ask LogisticProvider {
 			ask LogisticProvider at_distance(neighborhood_dist) {
-				gs_add_edge gs_sender_id:"neighborhood_logistic_provider" gs_edge_id:(myself.name + self.name) gs_node_id_from:myself.name gs_node_id_to:self.name gs_is_directed:false;
+				if(self != myself){
+					gs_add_edge gs_sender_id:"neighborhood_logistic_provider" gs_edge_id:(myself.name + self.name) gs_node_id_from:myself.name gs_node_id_to:self.name gs_is_directed:false;
+				}		
 			}
 		}
+		// Send a step event to Graphstream to indicate that the graph has been built
+		gs_step gs_sender_id:"neighborhood_logistic_provider" gs_step_number:1;
 	}
 	
 	action init_neighborhood_warehouse_final {
 		ask Warehouse {
 			ask (Warehouse at_distance(neighborhood_dist)) {
-				gs_add_edge gs_sender_id:"neighborhood_warehouse_final" gs_edge_id:(myself.name + self.name) gs_node_id_from:myself.name gs_node_id_to:self.name gs_is_directed:false;
+				if(self != myself){
+					gs_add_edge gs_sender_id:"neighborhood_warehouse_final" gs_edge_id:(myself.name + self.name) gs_node_id_from:myself.name gs_node_id_to:self.name gs_is_directed:false;
+				}
 			}
 			ask (FinalDestinationManager at_distance(neighborhood_dist)) {
-				gs_add_edge gs_sender_id:"neighborhood_warehouse_final" gs_edge_id:(myself.name + self.name) gs_node_id_from:myself.name gs_node_id_to:self.name gs_is_directed:false;
+				if(self != myself){
+					gs_add_edge gs_sender_id:"neighborhood_warehouse_final" gs_edge_id:(myself.name + self.name) gs_node_id_from:myself.name gs_node_id_to:self.name gs_is_directed:false;
+				}		
 			}
 		}
+		ask FinalDestinationManager {
+			ask (FinalDestinationManager at_distance(neighborhood_dist)) {
+				if(self != myself){
+					gs_add_edge gs_sender_id:"neighborhood_warehouse_final" gs_edge_id:(myself.name + self.name) gs_node_id_from:myself.name gs_node_id_to:self.name gs_is_directed:false;
+				}		
+			}
+		}
+		// Send a step event to Graphstream to indicate that the graph has been built
+		gs_step gs_sender_id:"neighborhood_warehouse_final" gs_step_number:1;
 	}
 	
 	action init_neighborhood_logistic_final {
 		ask FinalDestinationManager {
 			ask (FinalDestinationManager at_distance(neighborhood_dist)) {
-				gs_add_edge gs_sender_id:"neighborhood_logistic_final" gs_edge_id:(myself.name + self.name) gs_node_id_from:myself.name gs_node_id_to:self.name gs_is_directed:false;
+				if(self != myself){
+					gs_add_edge gs_sender_id:"neighborhood_logistic_final" gs_edge_id:(myself.name + self.name) gs_node_id_from:myself.name gs_node_id_to:self.name gs_is_directed:false;
+				}
 			}
 			ask LogisticProvider at_distance(neighborhood_dist) {
-				gs_add_edge gs_sender_id:"neighborhood_logistic_final" gs_edge_id:(myself.name + self.name) gs_node_id_from:myself.name gs_node_id_to:self.name gs_is_directed:false;
+				if(self != myself){
+					gs_add_edge gs_sender_id:"neighborhood_logistic_final" gs_edge_id:(myself.name + self.name) gs_node_id_from:myself.name gs_node_id_to:self.name gs_is_directed:false;
+				}
 			}
 		}
+		ask LogisticProvider {
+			ask LogisticProvider at_distance(neighborhood_dist) {
+				if(self != myself){
+					gs_add_edge gs_sender_id:"neighborhood_logistic_final" gs_edge_id:(myself.name + self.name) gs_node_id_from:myself.name gs_node_id_to:self.name gs_is_directed:false;
+				}
+			}
+		}
+		// Send a step event to Graphstream to indicate that the graph has been built
+		gs_step gs_sender_id:"neighborhood_logistic_final" gs_step_number:1;
 	}
 	
 	action init_use_road_network {
