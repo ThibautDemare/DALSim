@@ -16,13 +16,12 @@ import "./Role.gaml"
 import "./Observer.gaml"
 import "./Experiments.gaml"
 import "./GraphStreamConnection.gaml"
+import "./Parameters.gaml"
 
 /*
  * Init global variables and agents
  */
 global {
-	float step <- 60 °mn;//60 minutes per step
-	
 	//This data comes from "EuroRegionalMap" (EuroGeographics)
 	file roads_shapefile <- file("../../../BD_SIG/Routes/From_Europe/roads_speed_length.shp");
 	graph road_network;
@@ -35,23 +34,21 @@ global {
 	file warehouse_shapefile_average <- file("../../../BD_SIG/Warehouses/HuffColor/warehouses_average.shp");
 	file warehouse_shapefile_large <- file("../../../BD_SIG/Warehouses/HuffColor/warehouses_large.shp");
 	
+	list<Warehouse> small_warehouse;
+	list<Warehouse> average_warehouse;
+	list<Warehouse> large_warehouse;
+	
 	// Final destination (for instance : shop)
 	file destination_shapefile <- file("../../../BD_SIG/FinalDestination/FinalDestinationManager.shp");
 	
 	// A unique provider
 	file provider_shapefile <- file("../../../BD_SIG/Provider/Provider.shp");
 	
-	//Define the border of the environnement according to the road network
-	geometry shape <- envelope(roads_shapefile);
-	
-	float neighborhood_dist <- 1°km;
-	
 	// The only one provider
 	Provider provider;
 	
-	list<Warehouse> small_warehouse;
-	list<Warehouse> average_warehouse;
-	list<Warehouse> large_warehouse;
+	//Define the border of the environnement according to the road network
+	geometry shape <- envelope(roads_shapefile);
 	
 	init {
 		if(use_gs){
@@ -95,33 +92,6 @@ global {
 		// Init the decreasing rate of consumption
 		do init_decreasingRateOfStocks;
 		
-	}
-	
-	/**
-	 * The final destinations are separated in 4 ordered sets. To each final destinations of these sets, we associate a decreasing rate of 
-	 * stocks according to the number of customer computed by the Huff model. The more the customers there are, the more the decreasing 
-	 * rate allows a large consumption.
-	 */
-	action init_decreasingRateOfStocks {
-		list<FinalDestinationManager> dests <- FinalDestinationManager sort_by each.huffValue;
-		int i <- 0;
-		int ld <- length(dests);
-		loop while: i < ld {
-			FinalDestinationManager fdm <- dests[i];
-			if(i<length(dests)/4){
-				fdm.decreasingRateOfStocks <- 9;
-			}
-			else if(i<length(dests)*2/4){
-				fdm.decreasingRateOfStocks <- 7;
-			}
-			else if(i<length(dests)*3/4){
-				fdm.decreasingRateOfStocks <- 5;
-			}
-			else {
-				fdm.decreasingRateOfStocks <- 3;
-			}
-			i <- i + 1;
-		}
 	}
 }
 

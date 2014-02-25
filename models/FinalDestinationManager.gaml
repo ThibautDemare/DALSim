@@ -14,6 +14,7 @@ import "./Building.gaml"
 import "./Order.gaml"
 import "./Stock.gaml"
 import "./GraphStreamConnection.gaml"
+import "./Parameters.gaml"
 
 species FinalDestinationManager parent: Role{
 	LogisticProvider logisticProvider;
@@ -29,7 +30,7 @@ species FinalDestinationManager parent: Role{
 		// Init the inertia mechanism
 		currentInertia <- 0;
 		// There is one chance on 10 to never change of logistic provider
-		if(flip(0.9)){
+		if(flip(probabilityToChangeLogisticProvider)){
 			maxInertia <- rnd(24)+12;// Between one year and 3 years
 		}
 		else{
@@ -114,7 +115,6 @@ species FinalDestinationManager parent: Role{
 			}
 		}
 		
-		
 		logisticProvider <- chooseLogisticProvider();
 		ask logisticProvider {
 			do addFinalDest(myself);
@@ -124,7 +124,7 @@ species FinalDestinationManager parent: Role{
 	/**
 	 * The consumption is between 0 and 1/decreasingRateOfStocks of the maximum stock.
 	 */
-	reflex decreasingStocks  when: (cycle mod 24) = 0 {//the stock decrease one time by day (one cycle = 60min)
+	reflex decreasingStocks  when: ((time/3600.0) mod numberOfHoursBeforeDS) = 0.0 {//the stock decrease one time by day (one cycle = 60min)
 		loop stock over: building.stocks {
 			stock.quantity <- stock.quantity - (rnd(stock.maxQuantity/decreasingRateOfStocks));
 			if(stock.quantity < 0){
@@ -136,7 +136,7 @@ species FinalDestinationManager parent: Role{
 	/**
 	 * Increment the currentInertia value one time by month
 	 */
-	reflex updateCurrentInertia when: ((time/3600.0) mod 720.0) = 0.0 { // One time by month. 720 = number of hours in one month 
+	reflex updateCurrentInertia when: ((time/3600.0) mod numberOfHoursBeforeUCI) = 0.0 { // One time by month. 720 = number of hours in one month 
 		currentInertia <- currentInertia + 1;
 	}
 	
@@ -162,9 +162,9 @@ species FinalDestinationManager parent: Role{
 	 * Check for all product if it needs to be restock.
 	 * If yes, an order is made to the logistic provider
 	 */
-	reflex testOrdersNeeded when: ((time/3600.0) mod 24.0) = 0.0 { //An order is possible one time by day. 
+	reflex testOrdersNeeded when: ((time/3600.0) mod numberOfHoursBeforeTON) = 0.0 { //An order is possible one time by day. 
 		loop stock over: building.stocks {
-			if stock.quantity < 0.05*stock.maxQuantity and stock.ordered=false {
+			if stock.quantity < minimumStockFinalDestPercentage*stock.maxQuantity and stock.ordered=false {
 				stock.ordered <- true;
 				create Order number: 1 returns: b {
 					self.product <- stock.product;
