@@ -24,6 +24,7 @@ global {
 	bool use_r8 <- false;//init_use_road_network
 	bool use_r9 <- true;//init_use_supply_chain
 	
+	float neighborhood_dist <- 1°km;
 	
 	/**
 	 * Call inits methods to build graph with graphstream. They can't be called in global init so it is made in a reflex at the first cycle.
@@ -41,46 +42,55 @@ global {
 		if(use_r1){
 			// In order to build a network of interaction between final destination manager and logistic manager
 			gs_add_sender gs_host:"localhost" gs_port:2001 gs_sender_id:"actor";
+			gs_add_graph_attribute gs_sender_id:"actor" gs_attribute_name:"name" gs_attribute_value:"actor";
 		}
 		
 		if(use_r2){
 			// In order to build a neighborhood network between all agent
 			gs_add_sender gs_host:"localhost" gs_port:2002 gs_sender_id:"neighborhood_all";
+			gs_add_graph_attribute gs_sender_id:"neighborhood_all" gs_attribute_name:"name" gs_attribute_value:"neighborhood_all";
 		}
 		
 		if(use_r3){
 			// In order to build a neighborhood network between warehouse
 			gs_add_sender gs_host:"localhost" gs_port:2003 gs_sender_id:"neighborhood_warehouse";
+			gs_add_graph_attribute gs_sender_id:"neighborhood_warehouse" gs_attribute_name:"name" gs_attribute_value:"neighborhood_warehouse";
 		}
 		
 		if(use_r4){
 			// In order to build a neighborhood network between final destination
 			gs_add_sender gs_host:"localhost" gs_port:2004 gs_sender_id:"neighborhood_final_destination";
+			gs_add_graph_attribute gs_sender_id:"neighborhood_final_destination" gs_attribute_name:"name" gs_attribute_value:"neighborhood_final_destination";
 		}
 		
 		if(use_r5){
 			// In order to build a neighborhood network between logistic provider
 			gs_add_sender gs_host:"localhost" gs_port:2005 gs_sender_id:"neighborhood_logistic_provider";
+			gs_add_graph_attribute gs_sender_id:"neighborhood_logistic_provider" gs_attribute_name:"name" gs_attribute_value:"neighborhood_logistic_provider";
 		}
 		
 		if(use_r6){
 			// In order to build a neighborhood network between warehouse and final destination
 			gs_add_sender gs_host:"localhost" gs_port:2006 gs_sender_id:"neighborhood_warehouse_final";
+			gs_add_graph_attribute gs_sender_id:"neighborhood_warehouse_final" gs_attribute_name:"name" gs_attribute_value:"neighborhood_warehouse_final";
 		}
 		
 		if(use_r7){
 			// In order to build a neighborhood network between logistic provider and final destination
 			gs_add_sender gs_host:"localhost" gs_port:2007 gs_sender_id:"neighborhood_logistic_final";
+			gs_add_graph_attribute gs_sender_id:"neighborhood_logistic_final" gs_attribute_name:"name" gs_attribute_value:"neighborhood_logistic_final";
 		}
 		
 		if(use_r8){
 			// In order to build the road network
 			gs_add_sender gs_host:"localhost" gs_port:2008 gs_sender_id:"road_network";
+			gs_add_graph_attribute gs_sender_id:"road_network" gs_attribute_name:"name" gs_attribute_value:"road_network";
 		}
 		
 		if(use_r9){
 			// In order to build the supply chain network
 			gs_add_sender gs_host:"localhost" gs_port:2009 gs_sender_id:"supply_chain";
+			gs_add_graph_attribute gs_sender_id:"supply_chain" gs_attribute_name:"name" gs_attribute_value:"supply_chain";
 		}
 	}
 	
