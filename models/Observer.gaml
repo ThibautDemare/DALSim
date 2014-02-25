@@ -87,19 +87,19 @@ global {
 		ask Batch {
 			if(self.color = "blue"){
 				numberOfBatchProviderToLargeT2 <- numberOfBatchProviderToLargeT2 + 1;
-				stockOnRoadsProviderToLargeT2 <- stockOnRoadsProviderToLargeT2 + 1;
+				stockOnRoadsProviderToLargeT2 <- stockOnRoadsProviderToLargeT2 + self.quantity;
 			}
 			else if(self.color = "green"){
 				numberOfBatchLargeToAverageT2 <- numberOfBatchLargeToAverageT2 + 1;
-				stockOnRoadsLargeToAverageT2 <- stockOnRoadsLargeToAverageT2 + 1;
+				stockOnRoadsLargeToAverageT2 <- stockOnRoadsLargeToAverageT2 + self.quantity;
 			}
 			else if(self.color = "orange"){
 				numberOfBatchAverageToSmallT2 <- numberOfBatchAverageToSmallT2 + 1;
-				stockOnRoadsAverageToSmallT2 <- stockOnRoadsAverageToSmallT2 + 1;
+				stockOnRoadsAverageToSmallT2 <- stockOnRoadsAverageToSmallT2 + self.quantity;
 			}
 			else if(self.color = "red"){
 				numberOfBatchSmallToFinalT2 <- numberOfBatchSmallToFinalT2 + 1;
-				stockOnRoadsSmallToFinalT2 <- stockOnRoadsSmallToFinalT2 + 1;
+				stockOnRoadsSmallToFinalT2 <- stockOnRoadsSmallToFinalT2 + self.quantity;
 			}
 			
 			stockOnRoadsT2 <- stockOnRoadsT2 + self.quantity;
