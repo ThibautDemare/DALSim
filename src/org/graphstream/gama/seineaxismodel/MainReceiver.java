@@ -11,7 +11,7 @@ public class MainReceiver {
 
 	public static void main(String[] args) throws InterruptedException, UnknownHostException, IOException {
 		// Receive event
-		boolean use_viewer = true;
+		boolean use_viewer = false;
 		
 		NetStreamReceiver receiver1 = new NetStreamReceiver(2001);
 		new SimpleSinkAdapter(receiver1);

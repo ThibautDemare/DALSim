@@ -1,5 +1,6 @@
 package org.graphstream.gama.seineaxismodel.sinkadapters;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.graphstream.graph.Graph;
@@ -21,11 +22,12 @@ public class SimpleSinkAdapter extends SinkAdapter {
 	public void stepBegins(String sourceId, long timeId, double step) {
 		// Save the graph
 		try {
-			graph.write(graph.getAttribute("name")+".dgs");
+			graph.write(System.getProperty("user.dir" )+File.separator+"DGS"+File.separator+graph.getAttribute("name")+".dgs");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		System.out.println("The graph '"+graph.getAttribute("name")+"' has been saved.");
 	}
 
 	public Graph getGraph() {
