@@ -85,6 +85,20 @@ species FinalDestinationManager parent: Role{
 		}
 		building.stocks <- ls;
 
+		
+		// Connection to graphstream
+		if(use_gs){
+			if(use_r9){
+				gs_add_node gs_sender_id:"supply_chain" gs_node_id:building.name;
+				gs_add_node_attribute gs_sender_id:"supply_chain" gs_node_id:building.name gs_attribute_name:"ui.style" gs_attribute_value:"fill-color:"+color+";";
+			}
+		}
+		
+		logisticProvider <- chooseLogisticProvider();
+		ask logisticProvider {
+			do addFinalDest(myself);
+		}
+		
 		//Connection to graphstream
 		if(use_gs){
 			// Add new node/edge events for corresponding sender
@@ -109,15 +123,6 @@ species FinalDestinationManager parent: Role{
 				gs_add_node gs_sender_id:"neighborhood_logistic_final" gs_node_id:name;
 				gs_add_node_attribute gs_sender_id:"neighborhood_logistic_final" gs_node_id:name gs_attribute_name:"ui.style" gs_attribute_value:"fill-color:"+color+";";
 			}
-			if(use_r9){
-				gs_add_node gs_sender_id:"supply_chain" gs_node_id:building.name;
-				gs_add_node_attribute gs_sender_id:"supply_chain" gs_node_id:building.name gs_attribute_name:"ui.style" gs_attribute_value:"fill-color:"+color+";";
-			}
-		}
-		
-		logisticProvider <- chooseLogisticProvider();
-		ask logisticProvider {
-			do addFinalDest(myself);
 		}
 	}
 	
