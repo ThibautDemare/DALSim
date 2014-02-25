@@ -60,12 +60,10 @@ global {
 	 */
 	reflex updateObservationValue {
 		// Keep old value in *T1
-		totalNumberOfBatchT1 <- totalNumberOfBatchT2;
 		numberOfBatchProviderToLargeT1 <- numberOfBatchProviderToLargeT2;
 		numberOfBatchLargeToAverageT1 <- numberOfBatchLargeToAverageT2;
 		numberOfBatchAverageToSmallT1 <- numberOfBatchAverageToSmallT2;
 		numberOfBatchSmallToFinalT1 <- numberOfBatchSmallToFinalT2;
-		stockOnRoadsT1 <- stockOnRoadsT2;
 		stockOnRoadsProviderToLargeT2 <- stockOnRoadsProviderToLargeT1;
 		stockOnRoadsLargeToAverageT2 <- stockOnRoadsLargeToAverageT1;
 		stockOnRoadsAverageToSmallT2 <- stockOnRoadsAverageToSmallT1;
@@ -75,7 +73,6 @@ global {
 		
 		// Compute current value in *T2
 		totalNumberOfBatchT2 <- length(Batch);
-		stockOnRoadsT2 <- 0.0;
 		numberOfBatchProviderToLargeT2 <- 0;
 		numberOfBatchLargeToAverageT2 <- 0;
 		numberOfBatchAverageToSmallT2 <- 0;
@@ -101,9 +98,9 @@ global {
 				numberOfBatchSmallToFinalT2 <- numberOfBatchSmallToFinalT2 + 1;
 				stockOnRoadsSmallToFinalT2 <- stockOnRoadsSmallToFinalT2 + self.quantity;
 			}
-			
-			stockOnRoadsT2 <- stockOnRoadsT2 + self.quantity;
 		}
+		stockOnRoadsT2 <- stockOnRoadsProviderToLargeT2 + stockOnRoadsLargeToAverageT2 + stockOnRoadsAverageToSmallT2 + stockOnRoadsSmallToFinalT2;
+		
 		stockInFinalDestT2 <- 0.0;
 		ask FinalDestinationManager {
 			ask self.building.stocks {
@@ -123,16 +120,18 @@ global {
 	 */
 	reflex updateAverageObservationValue when: ((time/3600.0) mod 24.0) = 0.0  {
 		// Update mean values
-		totalNumberOfBatch <- (totalNumberOfBatchT2 + totalNumberOfBatchT1)/2;
 		numberOfBatchProviderToLarge <- (numberOfBatchProviderToLargeT2 + numberOfBatchProviderToLargeT1)/2;
 		numberOfBatchLargeToAverage <- (numberOfBatchLargeToAverageT2 + numberOfBatchLargeToAverageT1)/2;
 		numberOfBatchAverageToSmall <- (numberOfBatchAverageToSmallT2 + numberOfBatchAverageToSmallT1)/2;
 		numberOfBatchSmallToFinal <- (numberOfBatchSmallToFinalT2 + numberOfBatchSmallToFinalT1)/2;
-		stockOnRoads <- (stockOnRoadsT2 + stockOnRoadsT1)/2.0;
+		totalNumberOfBatch <- numberOfBatchProviderToLarge + numberOfBatchLargeToAverage + numberOfBatchAverageToSmall + numberOfBatchSmallToFinal;
+		
 		stockOnRoadsProviderToLarge <- (stockOnRoadsProviderToLargeT2 + stockOnRoadsProviderToLargeT1)/2.0;
 		stockOnRoadsLargeToAverage <- (stockOnRoadsLargeToAverageT2 + stockOnRoadsLargeToAverageT1)/2.0;
 		stockOnRoadsAverageToSmall <- (stockOnRoadsAverageToSmallT2 + stockOnRoadsAverageToSmallT1)/2.0;
 		stockOnRoadsSmallToFinal <- (stockOnRoadsSmallToFinalT2 + stockOnRoadsSmallToFinalT1)/2.0;
+		stockOnRoads <- stockOnRoadsProviderToLarge + stockOnRoadsLargeToAverage + stockOnRoadsAverageToSmall + stockOnRoadsSmallToFinal;
+		
 		stockInFinalDest <- (stockInFinalDestT2 + stockInFinalDestT1)/2.0;
 		stockInWarehouse <- (stockInWarehouseT2 + stockInWarehouseT1)/2.0;
 	}
