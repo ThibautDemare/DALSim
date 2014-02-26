@@ -6,6 +6,7 @@ import java.io.IOException;
 import org.graphstream.algorithm.BetweennessCentrality;
 import org.graphstream.algorithm.Toolkit;
 import org.graphstream.graph.Edge;
+import org.graphstream.graph.Element;
 import org.graphstream.graph.ElementNotFoundException;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
@@ -13,65 +14,6 @@ import org.graphstream.graph.implementations.SingleGraph;
 import org.graphstream.stream.GraphParseException;
 
 public class SimpleAnalyzers {
-
-	public static void updateNode(Graph g, String att) {
-		double min = Double.POSITIVE_INFINITY;
-		double max = Double.NEGATIVE_INFINITY;
-
-		// Obtain the maximum and minimum values.
-		for(Node n: g.getEachNode()) {
-			double passes = n.getNumber(att);
-			max = Math.max(max, passes);
-			min = Math.min(min, passes);
-		}
-
-		// Set the colors.
-		for(Node n: g.getEachNode()) {
-			if(n.hasAttribute(att)){
-				double passes = n.getNumber(att);
-				double color;
-				if(max==min)
-					color = 0.;
-				else
-					color = ((passes-min)/(max-min));
-				n.setAttribute("ui.color", color);
-				n.changeAttribute("ui.style", "fill-mode: dyn-plain; fill-color: blue, red; size: 4px;");
-			}
-		}
-	}
-
-	public static void updateEdge(Graph g, String att) {
-		Double min = Double.POSITIVE_INFINITY;
-		Double max = Double.NEGATIVE_INFINITY;
-		// Obtain the maximum and minimum values.
-		for(Edge e: g.getEachEdge()) {
-			double passes = e.getNumber(att);
-			max = Math.max(max, passes);
-			min = Math.min(min, passes);
-		}
-
-		// Set the colors.
-		for(Edge e: g.getEachEdge()) {
-			if(e.hasAttribute(att)){
-				double passes = e.getNumber(att);
-				double color;
-				if(max==min)
-					color = 0.;
-				else
-					color = ((passes-min)/(max-min));
-				e.setAttribute("ui.color", color);
-				e.changeAttribute("ui.style", "fill-mode: dyn-plain; fill-color: blue, red; size: 1px;");
-			}
-		}
-	}
-
-	/**
-	 * Update the coloration of the elements of the graph
-	 */
-	public static void updateGraph(Graph g, String att) {
-		updateNode(g, att);
-		updateEdge(g, att);
-	}
 
 	public static void betweennessCentrality(Graph g){
 		BetweennessCentrality bcb = new BetweennessCentrality();
@@ -82,37 +24,73 @@ public class SimpleAnalyzers {
 	}
 
 	public static void main(String args[]){
-		//String name = "actor";boolean display = true;
-		String name = "neighborhood_all";boolean display = true;
-		//String name = "neighborhood_warehouse";boolean display = true;
-		//String name = "neighborhood_final_destination";boolean display = true;
-		//String name = "neighborhood_logistic_provider";boolean display = true;
-		//String name = "neighborhood_warehouse_final";boolean display = true;
-		//String name = "neighborhood_logistic_final";boolean display = true;
-		//String name = "road_network";boolean display = false;
-		//String name = "supply_chain";boolean display = true;
+		String[] names = {	//"actor", 
+				//"neighborhood_all", 
+				//"neighborhood_warehouse", 
+				//"neighborhood_final_destination", 
+				//"neighborhood_logistic_provider", 
+				"neighborhood_warehouse_final", 
+				"neighborhood_logistic_final", 
+				"road_network", 
+				"supply_chain"
+		};
 
-		Graph graph = new SingleGraph("");
-		try {
-			graph.read(System.getProperty("user.dir" )+File.separator+"DGS"+File.separator+name+".dgs");
-		} catch (ElementNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (GraphParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		for(String name : names){
+			Graph graph = new SingleGraph("");
+			try {
+				graph.read(System.getProperty("user.dir" )+File.separator+"DGS"+File.separator+name+".dgs");
+			} catch (ElementNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (GraphParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			System.out.println("Analysis of '"+name+"'.");
+
+			System.out.println("Number of nodes : "+graph.getNodeCount());
+			System.out.println("Number of edges : "+graph.getEdgeCount());
+
+			double ade = Toolkit.averageDegree(graph);
+			System.out.println("Average degree : " + ade);
+			graph.addAttribute("AverageDegree", ade);
+
+			double de = Toolkit.density(graph);
+			System.out.println("Density : " + de);
+			graph.addAttribute("Density", de);
+
+			double di = Toolkit.diameter(graph);
+			System.out.println("Diameter : " + di);
+			graph.addAttribute("Diameter", di);
+
+			double acc = Toolkit.averageClusteringCoefficient(graph);
+			System.out.println("Average clustering coefficients : " + acc);
+			graph.addAttribute("AverageClusteringCoefficients", acc);
+
+			double dad = Toolkit.degreeAverageDeviation(graph);
+			System.out.println("Degree average deviation : " + dad);
+			graph.addAttribute("DegreeAverageDeviation", dad);
+
+			System.out.println("Compute degree distribution...");
+			graph.addAttribute("DegreeDistribution", Toolkit.degreeDistribution(graph));
+
+			System.out.println("Compute betweenness centrality...");
+			betweennessCentrality(graph);
+
+			System.out.println("Analysis of '"+name+"' ended");
+
+			System.out.println("Saving data...");
+			try {
+				graph.write(System.getProperty("user.dir" )+File.separator+"Analyzed_DGS"+File.separator+graph.getAttribute("name")+".dgs");
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
-		
-		System.out.println("Average degree : " + Toolkit.averageDegree(graph));
-		System.out.println("Density : " + Toolkit.density(graph));
-		System.out.println("Diameter : " + Toolkit.diameter(graph));
-		System.out.println("Average clustering coefficients : " + Toolkit.averageClusteringCoefficient(graph));
-		System.out.println("Start computation of betweenness centrality");
-		betweennessCentrality(graph);
-		updateGraph(graph, "BetweennessCentrality");
-		graph.display(display);
+		System.out.println("All analysis have been done");
 	}
 }
