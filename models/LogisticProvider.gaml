@@ -110,11 +110,64 @@ species LogisticProvider parent: Role {
 		}
 	}
 	
+	/**
+	 * When a logistic provider loose a customer (a FinalDestinationManager) he must update the stock on its warehouses
+	 */
+	action lostCustomer(FinalDestinationManager fdm){
+		// Find the good supply chain
+		int i <- 0;
+		SupplyChain sc <- nil;
+		loop while: i<length(supplyChains) and sc = nil {
+			if(fdm.building = (supplyChains[i] as SupplyChain).buildings[(length((supplyChains[i] as SupplyChain).buildings)-1)] ){
+				sc <- supplyChains[i];
+			}
+			i <- i + 1;
+		}
+		// Browse the different stock of the final dest
+		loop stockFdm over: (fdm.building as Building).stocks {
+			i <- 1;
+			// Browse the warehouses of this supply chain 
+			loop while: i < (length(sc.buildings)-1) {
+				Warehouse w <- (sc.buildings[i] as Warehouse);
+				int j <- 0;
+				Stock stockW <- nil;
+				bool found <- false;
+				// Browse the stocks of this warehouse and remove the outsourced stock
+				loop while: j < length(w.stocks) and !found {
+					stockW <- w.stocks[j];
+					if(stockW.product = stockFdm.product){
+						found <- true;
+						float deletedStock <- 0.0;
+						ask stockW {
+							self.maxQuantity <- self.maxQuantity - stockFdm.maxQuantity;
+							if(self.quantity > self.maxQuantity){// because we don't have a traceability of the stocks (where each part of a stock comes from), we must update the quantity and the quantity to delete to the occupied surface as below (it is open to criticism) :
+								deletedStock <- self.quantity - self.maxQuantity;
+								self.quantity <- self.maxQuantity;
+							}
+						}
+						
+						// If the maxQuantity is equal to zero, we can remove it in the list of stock
+						if(stockW.maxQuantity = 0){
+							remove stockW from: (sc.buildings[i] as Warehouse).stocks;
+							ask stockW {
+								do die;
+							}
+						}
+						
+						// Finally we update the occupied surface
+						(sc.buildings[i] as Warehouse).occupiedSurface <- (sc.buildings[i] as Warehouse).occupiedSurface - deletedStock;
+					}
+					j <- j + 1;
+				}
+				i <- i + 1;
+			}
+		}
+	}
 	
 	/**
 	 * When a logistic provider has a new customer, he need to find a new supply chain. This method build it.
 	 */
-	action addFinalDest(FinalDestinationManager fdm){
+	action getNewCustomer(FinalDestinationManager fdm){
 		list<Building> supplyChain <- [];
 		// Find appropriates warehouses
 		Warehouse small <- nil;
@@ -199,7 +252,7 @@ species LogisticProvider parent: Role {
 	 * Return a small warehouse according to the position of the final destination : the more the warehouse is close to the final destination, the more he have a chance to be selected.
 	 */
 	Warehouse findSmallWarehouse(FinalDestinationManager fdm){
-		list<Warehouse> lsw <- Warehouse sort_by (fdm distance_to each);
+		/*list<Warehouse> lsw <- Warehouse sort_by (fdm distance_to each);
 		int f <- ((rnd(10000)/10000)^6)*(length(lsw)-1);
 		// I assume that there is always at least one warehouse which have a free space greater than the occupied surface of the stock to outsource.
 		// According to results, it doesn't seem foolish.
@@ -207,14 +260,14 @@ species LogisticProvider parent: Role {
 			f <- ((rnd(10000)/10000)^6)*(length(lsw)-1);
 		}
 		return lsw[f];/**/
-		//return one_of(average_warehouse);
+		return one_of(average_warehouse);
 	}
 	
 	/**
 	 * Return a large warehouse according to the position of the final destination : the more the warehouse has a big free surface, the more he have a chance to be selected.
 	 */
 	Warehouse findLargeWarehouse(FinalDestinationManager fdm){
-		list<Warehouse> llw <- Warehouse sort_by (each.totalSurface-each.occupiedSurface);
+		/*list<Warehouse> llw <- Warehouse sort_by (each.totalSurface-each.occupiedSurface);
 		int f <- ((rnd(10000)/10000)^6)*(length(llw)-1);
 		// I assume that there is always at least one warehouse which have a free space greater than the occupied surface of the stock to outsource.
 		// According to results, it doesn't seem foolish.
@@ -222,7 +275,7 @@ species LogisticProvider parent: Role {
 			f <- ((rnd(10000)/10000)^6)*(length(llw)-1);
 		}
 		return llw[(length(llw)-1) - f];/**/
-		//return one_of(large_warehouse);
+		return one_of(large_warehouse);
 	}
 	
 	/**
@@ -233,7 +286,7 @@ species LogisticProvider parent: Role {
 	 * So, we are trying to find B which minimize ||(->AB) + (->CB)||.
 	 */
 	Warehouse findAverageWarehouse(Warehouse small, Warehouse large, FinalDestinationManager fdm){
-		list<Warehouse> law <- Warehouse;
+		/*list<Warehouse> law <- Warehouse;
 		float min_euclidean_norm <-  -(2-252)*21023;// The max float value
 		int min_index <- -1;
 		int i <- 0;
@@ -257,7 +310,7 @@ species LogisticProvider parent: Role {
 			write "error : no average warehouse has been found";
 		}
 		return law[min_index];/**/
-		//return one_of(average_warehouse);
+		return one_of(average_warehouse);
 	}
 	
 	aspect base { 

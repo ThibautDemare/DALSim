@@ -6,8 +6,6 @@ Develop a new "move" skills with these functions :
 	- The batch let a trace on the path when he moves which allow to analyze the flows on Graphstream.
 	- Add an easy way to make a graphic with average distance traveled by batch (and by kind of batch).
 
-When a final dest manager change of logistic provider, his associated supply chain must be removed too
-
 The probability to change the logistic provider must depend on his performance.
 
 network or rail network which are more fast in the transport but not with break bulk).

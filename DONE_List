@@ -30,3 +30,5 @@ Improve the behavior of logistic provider :
 Data of the graphic must be saved on a CSV file => done
 
 stockInRoads must be unbundle by type of batch for data on file => done
+
+When a final dest manager change of logistic provider, his associated supply chain must be removed too = done

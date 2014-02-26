@@ -96,7 +96,7 @@ species FinalDestinationManager parent: Role{
 		
 		logisticProvider <- chooseLogisticProvider();
 		ask logisticProvider {
-			do addFinalDest(myself);
+			do getNewCustomer(myself);
 		}
 		
 		//Connection to graphstream
@@ -150,7 +150,16 @@ species FinalDestinationManager parent: Role{
 	 */
 	reflex wantToChangeLogisticProvider when: (currentInertia > maxInertia and maxInertia >= 0) {
 		if(flip((currentInertia - maxInertia)/1000)){
+			// Inform current logistic provider that he lost a customer
+			ask logisticProvider {
+				do lostCustomer(myself);
+			}
+			// Choose a new one
 			logisticProvider <- chooseLogisticProvider();
+			// Inform him that he gets a new customer
+			ask logisticProvider {
+				do getNewCustomer(myself);
+			}
 			currentInertia <- 0;
 			if(use_gs){
 				// Add new node/edge events for corresponding sender
