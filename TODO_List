@@ -1,19 +1,15 @@
-stockInRoads must be unbundle by type of batch for data on file
-
 Size of building affect break bulk time
 
-The speed and length of must be considered to compute shortest path. But The maximum speed on a road must also affect the speed of the batch 
-agent.
-
-add a graphic with average distance traveled by batch (and kind of batch).
+Develop a new "move" skills with these functions :
+	- The speed and length of Road must be considered to compute shortest path. But The maximum speed on a road must also affect the speed of the batch agent when he moves.
+	- make a new algo to compute shortest path: need to consider the break bulks time and not just the length or the speed (useful if we had river 
+	- The batch let a trace on the path when he moves which allow to analyze the flows on Graphstream.
+	- Add an easy way to make a graphic with average distance traveled by batch (and by kind of batch).
 
 When a final dest manager change of logistic provider, his associated supply chain must be removed too
 
-The batch could let a trace of their path and we could analyze the flows on Graphstream.
-
 The probability to change the logistic provider must depend on his performance.
 
-make a new algo to compute shortest path: need to consider the break bulks time and not just the length or the speed (useful if we had river 
 network or rail network which are more fast in the transport but not with break bulk).
 
 Add river network

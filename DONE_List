@@ -28,3 +28,5 @@ Improve the behavior of logistic provider :
 	=> done
 
 Data of the graphic must be saved on a CSV file => done
+
+stockInRoads must be unbundle by type of batch for data on file => done
