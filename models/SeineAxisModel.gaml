@@ -27,7 +27,7 @@ global {
 	graph road_network;
 	
 	// Logistic provider
-	file commissionaire_shapefile <- file("../../../BD_SIG/commissionnaire_transport/LogisticProvider.shp");
+	file logistic_provider_shapefile <- file("../../../BD_SIG/LogisticProvider/LogisticProvider.shp");
 	
 	// Warehouses classified by their size
 	file warehouse_shapefile_small <- file("../../../BD_SIG/Warehouses/HuffColor/warehouses_small.shp");
@@ -84,7 +84,7 @@ global {
 		large_warehouse <- lw;
 		
 		//  Logistic providers
-		create LogisticProvider from: commissionaire_shapefile;
+		create LogisticProvider from: logistic_provider_shapefile;
 		
 		// Final destinations
 		create FinalDestinationManager from: destination_shapefile with: [huffValue::read("huff") as float, surface::read("surface") as float, color::read("color") as string];
