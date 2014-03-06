@@ -65,7 +65,7 @@ public class DisplayGraph {
 
 	public static void main(String args[]){
 		String[] names = {
-				"actor", 
+				"actor",
 				"neighborhood_all", 
 				"neighborhood_warehouse", 
 				"neighborhood_final_destination", 
@@ -86,8 +86,8 @@ public class DisplayGraph {
 				false, 
 				true
 		};
-		//String folder = "Analyzed_DGS";
-		String folder = "DGS";
+		String folder = "Analyzed_DGS";
+		//String folder = "DGS";
 		for(int i = 0; i<names.length; i++){
 			Graph graph = new SingleGraph("");
 			try {

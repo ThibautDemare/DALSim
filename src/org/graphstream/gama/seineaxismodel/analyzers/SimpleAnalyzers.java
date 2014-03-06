@@ -23,12 +23,36 @@ public class SimpleAnalyzers {
 		bcb.compute();
 	}
 
+	/**
+	 * Clean a graph deleting all attributes in listAttributesNames
+	 * @param g the graph
+	 * @param listAttributesNames the list of attribute which must be deleted
+	 */
+	public static void clearAll(Graph g, String[] listAttributesNames){
+		// Remove attributes in nodes
+		for(Node n : g.getEachNode()){
+			for(String s : listAttributesNames){
+				if(n.hasAttribute(s))
+					n.removeAttribute(s);
+			}
+		}
+
+		// Remove attributes in edges
+		for(Edge e : g.getEachEdge()){
+			for(String s : listAttributesNames){
+				if(e.hasAttribute(s))
+					e.removeAttribute(s);
+			}
+		}
+	}
+
 	public static void main(String args[]){
-		String[] names = {	//"actor", 
-				//"neighborhood_all", 
-				//"neighborhood_warehouse", 
-				//"neighborhood_final_destination", 
-				//"neighborhood_logistic_provider", 
+		String[] names = {
+				"actor", 
+				"neighborhood_all", 
+				"neighborhood_warehouse", 
+				"neighborhood_final_destination", 
+				"neighborhood_logistic_provider", 
 				"neighborhood_warehouse_final", 
 				"neighborhood_logistic_final", 
 				"road_network", 
@@ -53,8 +77,11 @@ public class SimpleAnalyzers {
 			System.out.println("Analysis of '"+name+"'.");
 
 			System.out.println("Number of nodes : "+graph.getNodeCount());
+			graph.addAttribute("NodeNumber", graph.getNodeCount());
+			
 			System.out.println("Number of edges : "+graph.getEdgeCount());
-
+			graph.addAttribute("EdgeNumber", graph.getEdgeCount());
+			
 			double ade = Toolkit.averageDegree(graph);
 			System.out.println("Average degree : " + ade);
 			graph.addAttribute("AverageDegree", ade);
@@ -83,7 +110,16 @@ public class SimpleAnalyzers {
 
 			System.out.println("Analysis of '"+name+"' ended");
 
+			System.out.println("Clear graph...");
+			String[] listAttributesNames = {
+					"brandes.d",
+					"brandes.sigma",
+					"brandes.delta",
+					"brandes.P"
+			};
 			System.out.println("Saving data...");
+			SimpleAnalyzers.clearAll(graph, listAttributesNames);
+			
 			try {
 				graph.write(System.getProperty("user.dir" )+File.separator+"Analyzed_DGS"+File.separator+graph.getAttribute("name")+".dgs");
 			} catch (IOException e) {
