@@ -20,25 +20,31 @@ species LogisticProvider parent: Role {
 	list<SupplyChain> supplyChains;
 	list<Warehouse> usedWarehouses;
 	string color;
+	int department;
+	int region;
 	
 	init {
 		if(use_gs){
 			// Add a new node event for corresponding sender
 			if(use_r1){
 				gs_add_node gs_sender_id:"actor" gs_node_id:name;
-				gs_add_node_attribute gs_sender_id:"actor" gs_node_id:name gs_attribute_name:"ui.style" gs_attribute_value:"fill-color:"+color+"; stroke-mode:plain; stroke-width:3px; stroke-color:red;";
+				gs_add_node_attribute gs_sender_id:"actor" gs_node_id:name gs_attribute_name:"region" gs_attribute_value:region;
+				gs_add_node_attribute gs_sender_id:"actor" gs_node_id:name gs_attribute_name:"department" gs_attribute_value:department;
 			}
 			if(use_r2){
 				gs_add_node gs_sender_id:"neighborhood_all" gs_node_id:name;
-				gs_add_node_attribute gs_sender_id:"neighborhood_all" gs_node_id:name gs_attribute_name:"ui.style" gs_attribute_value:"fill-color:"+color+";";
+				gs_add_node_attribute gs_sender_id:"neighborhood_all" gs_node_id:name gs_attribute_name:"region" gs_attribute_value:region;
+				gs_add_node_attribute gs_sender_id:"neighborhood_all" gs_node_id:name gs_attribute_name:"department" gs_attribute_value:department;
 			}
 			if(use_r5){
 				gs_add_node gs_sender_id:"neighborhood_logistic_provider" gs_node_id:name;
-				gs_add_node_attribute gs_sender_id:"neighborhood_logistic_provider" gs_node_id:name gs_attribute_name:"ui.style" gs_attribute_value:"fill-color:"+color+";";
+				gs_add_node_attribute gs_sender_id:"neighborhood_logistic_provider" gs_node_id:name gs_attribute_name:"region" gs_attribute_value:region;
+				gs_add_node_attribute gs_sender_id:"neighborhood_logistic_provider" gs_node_id:name gs_attribute_name:"department" gs_attribute_value:department;
 			}
 			if(use_r7){
 				gs_add_node gs_sender_id:"neighborhood_logistic_final" gs_node_id:name;
-				gs_add_node_attribute gs_sender_id:"neighborhood_logistic_final" gs_node_id:name gs_attribute_name:"ui.style" gs_attribute_value:"fill-color:"+color+";";
+				gs_add_node_attribute gs_sender_id:"neighborhood_logistic_final" gs_node_id:name gs_attribute_name:"region" gs_attribute_value:region;
+				gs_add_node_attribute gs_sender_id:"neighborhood_logistic_final" gs_node_id:name gs_attribute_name:"department" gs_attribute_value:department;
 			}
 		}
 	}
@@ -252,7 +258,7 @@ species LogisticProvider parent: Role {
 	 * Return a small warehouse according to the position of the final destination : the more the warehouse is close to the final destination, the more he have a chance to be selected.
 	 */
 	Warehouse findSmallWarehouse(FinalDestinationManager fdm){
-		/*list<Warehouse> lsw <- Warehouse sort_by (fdm distance_to each);
+		list<Warehouse> lsw <- Warehouse sort_by (fdm distance_to each);
 		int f <- ((rnd(10000)/10000)^6)*(length(lsw)-1);
 		// I assume that there is always at least one warehouse which have a free space greater than the occupied surface of the stock to outsource.
 		// According to results, it doesn't seem foolish.
@@ -260,14 +266,14 @@ species LogisticProvider parent: Role {
 			f <- ((rnd(10000)/10000)^6)*(length(lsw)-1);
 		}
 		return lsw[f];/**/
-		return one_of(average_warehouse);
+		//return one_of(average_warehouse);
 	}
 	
 	/**
 	 * Return a large warehouse according to the position of the final destination : the more the warehouse has a big free surface, the more he have a chance to be selected.
 	 */
 	Warehouse findLargeWarehouse(FinalDestinationManager fdm){
-		/*list<Warehouse> llw <- Warehouse sort_by (each.totalSurface-each.occupiedSurface);
+		list<Warehouse> llw <- Warehouse sort_by (each.totalSurface-each.occupiedSurface);
 		int f <- ((rnd(10000)/10000)^6)*(length(llw)-1);
 		// I assume that there is always at least one warehouse which have a free space greater than the occupied surface of the stock to outsource.
 		// According to results, it doesn't seem foolish.
@@ -275,7 +281,7 @@ species LogisticProvider parent: Role {
 			f <- ((rnd(10000)/10000)^6)*(length(llw)-1);
 		}
 		return llw[(length(llw)-1) - f];/**/
-		return one_of(large_warehouse);
+		//return one_of(large_warehouse);
 	}
 	
 	/**
@@ -286,7 +292,7 @@ species LogisticProvider parent: Role {
 	 * So, we are trying to find B which minimize ||(->AB) + (->CB)||.
 	 */
 	Warehouse findAverageWarehouse(Warehouse small, Warehouse large, FinalDestinationManager fdm){
-		/*list<Warehouse> law <- Warehouse;
+		list<Warehouse> law <- Warehouse;
 		float min_euclidean_norm <-  -(2-252)*21023;// The max float value
 		int min_index <- -1;
 		int i <- 0;
@@ -310,7 +316,7 @@ species LogisticProvider parent: Role {
 			write "error : no average warehouse has been found";
 		}
 		return law[min_index];/**/
-		return one_of(average_warehouse);
+		//return one_of(average_warehouse);
 	}
 	
 	aspect base { 
