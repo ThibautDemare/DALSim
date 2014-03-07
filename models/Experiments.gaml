@@ -22,8 +22,8 @@ experiment exp_no_output type: gui {
 
 experiment exp_save_results type: gui {
 	output {
-		file name: "results" type: text data: ""+(time/3600.0) + "; " + stockInWarehouseT2 + ";" + stockInFinalDestT2 + ";" + numberOfBatchLargeToAverageT2 + ";" + numberOfBatchAverageToSmallT2 + ";" + numberOfBatchSmallToFinalT2 + ";" + numberOfBatchProviderToLargeT2 + ";" + totalNumberOfBatchT2 + "; " + stockOnRoadsProviderToLargeT2 + "; " + stockOnRoadsLargeToAverageT2 + "; " + stockOnRoadsAverageToSmallT2 + "; " + stockOnRoadsSmallToFinalT2 + ";" + stockOnRoadsT2;
-		file name: "results_average" type: text data: ""+(time/3600.0) + "; " + stockInWarehouse + ";" + stockInFinalDest + ";" + numberOfBatchLargeToAverage + ";" + numberOfBatchAverageToSmall + ";" + numberOfBatchSmallToFinal + ";" + numberOfBatchProviderToLarge + ";" + totalNumberOfBatch + "; " + stockOnRoadsProviderToLarge + "; " + stockOnRoadsLargeToAverage + "; " + stockOnRoadsAverageToSmall + "; " + stockOnRoadsSmallToFinal + ";" + stockOnRoads;
+		file name: "results" type: text data: ""+ ((time/3600.0) as int) + "; " + stockInWarehouseT2 + ";" + stockInFinalDestT2 + ";" + numberOfBatchLargeToAverageT2 + ";" + numberOfBatchAverageToSmallT2 + ";" + numberOfBatchSmallToFinalT2 + ";" + numberOfBatchProviderToLargeT2 + ";" + totalNumberOfBatchT2 + "; " + stockOnRoadsProviderToLargeT2 + "; " + stockOnRoadsLargeToAverageT2 + "; " + stockOnRoadsAverageToSmallT2 + "; " + stockOnRoadsSmallToFinalT2 + ";" + stockOnRoadsT2;
+		file name: "results_average" type: text data: ""+ ((time/3600.0) as int) + "; " + stockInWarehouse + ";" + stockInFinalDest + ";" + numberOfBatchLargeToAverage + ";" + numberOfBatchAverageToSmall + ";" + numberOfBatchSmallToFinal + ";" + numberOfBatchProviderToLarge + ";" + totalNumberOfBatch + "; " + stockOnRoadsProviderToLarge + "; " + stockOnRoadsLargeToAverage + "; " + stockOnRoadsAverageToSmall + "; " + stockOnRoadsSmallToFinal + ";" + stockOnRoads;
 	}
 }
 
