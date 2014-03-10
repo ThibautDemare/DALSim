@@ -2,6 +2,8 @@ Size of building affect break bulk time + include more hazard with international
 
 A stock belong to a FinalDestinationManager. Need to update in consequences the management of warehouse according to this method.
 
+update supply chain network when logistic provider loose a final dest manager
+ 
 Develop a new "move" skills with these functions :
 	- The speed and length of Road must be considered to compute shortest path. But The maximum speed on a road must also affect the speed of the batch agent when he moves.
 	- make a new algo to compute shortest path: need to consider the break bulks time and not just the length or the speed (useful if we had river network or rail network which are more fast in the transport but not with break bulk).
