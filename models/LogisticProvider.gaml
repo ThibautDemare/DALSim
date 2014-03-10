@@ -153,7 +153,8 @@ species LogisticProvider parent: Role {
 						}
 						
 						// If the maxQuantity is equal to zero, we can remove it in the list of stock
-						if(stockW.maxQuantity = 0){
+						// In reality, there is some computation error. So, we can assume that values lower than 0.0001 are values normally equals to zero.
+						if(stockW.maxQuantity < 0.0001){
 							remove stockW from: (sc.buildings[i] as Warehouse).stocks;
 							ask stockW {
 								do die;
@@ -167,6 +168,10 @@ species LogisticProvider parent: Role {
 				}
 				i <- i + 1;
 			}
+		}
+		// Delete the associated supply chain
+		ask sc {
+			do die;
 		}
 	}
 	
