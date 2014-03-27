@@ -1,7 +1,9 @@
 package org.graphstream.gama.seineaxismodel;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Collection;
 
 import org.graphstream.algorithm.Toolkit;
@@ -13,7 +15,6 @@ import org.graphstream.graph.implementations.SingleGraph;
 import org.graphstream.stream.GraphParseException;
 
 public class DisplayGraph {
-
 	public static void updateNode(Graph g, String att) {
 		updateElement(g.getEachNode(), att);
 	}
@@ -64,6 +65,7 @@ public class DisplayGraph {
 	}
 
 	public static void main(String args[]){
+		// The list of existing graph
 		String[] names = {
 				"actor",
 				"neighborhood_all", 
@@ -75,36 +77,64 @@ public class DisplayGraph {
 				"road_network", 
 				"supply_chain"
 		};
+		// Which graph we want to display
 		boolean[] displays = {
-				true, 
-				true, 
-				true, 
-				true, 
-				true, 
-				true, 
+				false, 
+				false, 
+				false, 
+				false, 
 				true, 
 				false, 
-				true
+				false, 
+				false, 
+				false
 		};
+		// Comment/uncomment which graph you want (previously analyzed or not)
 		String folder = "Analyzed_DGS";
 		//String folder = "DGS";
 		for(int i = 0; i<names.length; i++){
-			Graph graph = new SingleGraph("");
-			try {
-				graph.read(System.getProperty("user.dir" )+File.separator+folder+File.separator+names[i]+".dgs");
-			} catch (ElementNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (GraphParseException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			if(displays[i]){
+				Graph graph = new SingleGraph("");
+				try {
+					graph.read(System.getProperty("user.dir" )+File.separator+folder+File.separator+names[i]+".dgs");
+				} catch (ElementNotFoundException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				} catch (GraphParseException e) {
+					e.printStackTrace();
+				}
+
+				// Print measures (if it has been computed)
+				System.out.println("Number of nodes : "+graph.getNodeCount());				
+				System.out.println("Number of edges : "+graph.getEdgeCount());
+				if(folder.equals("Analyzed_DGS")){
+					System.out.println("Average degree : " + graph.getAttribute("AverageDegree"));
+					System.out.println("Density : " + graph.getAttribute("Density"));
+					System.out.println("Diameter : " + graph.getAttribute("Diameter"));
+					System.out.println("Average clustering coefficients : " + graph.getAttribute("AverageClusteringCoefficients"));
+					System.out.println("Degree average deviation : " + graph.getAttribute("DegreeAverageDeviation"));
+					updateGraph(graph, "BetweennessCentrality");
+				}
+
+				graph.addAttribute("ui.title", names[i]);
+				graph.display(true);
+
+				//Ask for a SVG save of the display
+				System.out.println("============================");
+				System.out.println("Do you want to save the display in SVG? [Y]es / [N]o");
+				BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
+				String choice = "";
+				try {
+					choice = bufferRead.readLine();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				if(choice.equals("Y") || choice.equals("y") || choice.equals("Yes") || choice.equals("yes") || choice.equals("YES")){
+					graph.addAttribute("ui.screenshot", System.getProperty("user.dir" )+File.separator+"SVG_Screenshots"+File.separator+names[i]+".svg");
+					System.out.println("Saved.");
+				}
 			}
-			updateGraph(graph, "BetweennessCentrality");
-			graph.display(displays[i]);
-			graph.addAttribute("ui.title", names[i]);
 		}
 	}
 }
