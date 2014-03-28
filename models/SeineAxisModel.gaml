@@ -23,26 +23,31 @@ import "./Parameters.gaml"
  */
 global {
 	//This data comes from "EuroRegionalMap" (EuroGeographics)
-	file roads_shapefile <- file("../../../BD_SIG/Routes/From_Europe/roads_speed_length.shp");
+	file roads_shapefile <- file("../../BD_SIG/Used/Roads/roads_speed_length.shp");
 	graph road_network;
 	
 	// Logistic provider
-	file logistic_provider_shapefile <- file("../../../BD_SIG/LogisticProvider/LogisticProvider.shp");
+	file logistic_provider_shapefile <- file("../../BD_SIG/Used/LogisticProvider/LogisticProvider.shp");
 	
 	// Warehouses classified by their size
-	file warehouse_shapefile_small <- file("../../../BD_SIG/Warehouses/HuffColor/warehouses_small.shp");
-	file warehouse_shapefile_average <- file("../../../BD_SIG/Warehouses/HuffColor/warehouses_average.shp");
-	file warehouse_shapefile_large <- file("../../../BD_SIG/Warehouses/HuffColor/warehouses_large.shp");
+	file warehouse_shapefile_small <- file("../../BD_SIG/Used/Warehouses/warehouses_small.shp");
+	file warehouse_shapefile_average <- file("../../BD_SIG/Used/Warehouses/warehouses_average.shp");
+	file warehouse_shapefile_large <- file("../../BD_SIG/Used/Warehouses/warehouses_large.shp");
 	
 	list<Warehouse> small_warehouse;
 	list<Warehouse> average_warehouse;
 	list<Warehouse> large_warehouse;
 	
 	// Final destination (for instance : shop)
-	file destination_shapefile <- file("../../../BD_SIG/FinalDestination/FinalDestinationManager.shp");
+	file destination_shapefile <- file("../../BD_SIG/Used/FinalDestination/FinalDestinationManager.shp");
+	//file destination_shapefile <- file("../../BD_SIG/Used/FinalDestination/FinalDestinationManager_subset_Paris_1.shp");
+	//file destination_shapefile <- file("../../BD_SIG/Used/FinalDestination/FinalDestinationManager_subset_Paris_20.shp");
+	//file destination_shapefile <- file("../../BD_SIG/Used/FinalDestination/FinalDestinationManager_subset_Paris_190.shp");
+	//file destination_shapefile <- file("../../BD_SIG/Used/FinalDestination/FinalDestinationManager_subset_scattered_24.shp");
+	//file destination_shapefile <- file("../../BD_SIG/Used/FinalDestination/FinalDestinationManager_subset_scattered_592.shp");
 	
 	// A unique provider
-	file provider_shapefile <- file("../../../BD_SIG/Provider/Provider.shp");
+	file provider_shapefile <- file("../../BD_SIG/Used/Provider/Provider.shp");
 	
 	// The only one provider
 	Provider provider;
