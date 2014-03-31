@@ -39,12 +39,14 @@ global {
 	list<Warehouse> large_warehouse;
 	
 	// Final destination (for instance : shop)
-	file destination_shapefile <- file("../../BD_SIG/Used/FinalDestination/FinalDestinationManager.shp");
-	//file destination_shapefile <- file("../../BD_SIG/Used/FinalDestination/FinalDestinationManager_subset_Paris_1.shp");
-	//file destination_shapefile <- file("../../BD_SIG/Used/FinalDestination/FinalDestinationManager_subset_Paris_20.shp");
-	//file destination_shapefile <- file("../../BD_SIG/Used/FinalDestination/FinalDestinationManager_subset_Paris_190.shp");
-	//file destination_shapefile <- file("../../BD_SIG/Used/FinalDestination/FinalDestinationManager_subset_scattered_24.shp");
-	//file destination_shapefile <- file("../../BD_SIG/Used/FinalDestination/FinalDestinationManager_subset_scattered_592.shp");
+	string destination_path <- "../../BD_SIG/Used/FinalDestination/";
+	string destination_file_name <- "FinalDestinationManager";
+	//string destination_file_name <- "FinalDestinationManager_subset_Paris_1";
+	//string destination_file_name <- "FinalDestinationManager_subset_Paris_20";
+	//string destination_file_name <- "FinalDestinationManager_subset_Paris_190";
+	//string destination_file_name <- "FinalDestinationManager_subset_scattered_24";
+	//string destination_file_name <- "FinalDestinationManager_subset_scattered_592";
+	file destination_shapefile <- file(destination_path+destination_file_name+".shp");
 	
 	// A unique provider
 	file provider_shapefile <- file("../../BD_SIG/Used/Provider/Provider.shp");
