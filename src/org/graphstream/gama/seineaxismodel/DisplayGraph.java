@@ -77,26 +77,56 @@ public class DisplayGraph {
 				"road_network", 
 				"supply_chain"
 		};
-		// Which graph we want to display
+		String[] destination_files = {
+				"FinalDestinationManager",
+				"FinalDestinationManager_subset_Paris_1",
+				"FinalDestinationManager_subset_Paris_20",
+				"FinalDestinationManager_subset_Paris_190",
+				"FinalDestinationManager_subset_scattered_24",
+				"FinalDestinationManager_subset_scattered_592"
+		};
+		// Which kind of graph we want to display
 		boolean[] displays = {
-				false, 
-				false, 
-				false, 
-				false, 
 				true, 
+				false, 
+				false, 
+				false, 
+				false, 
 				false, 
 				false, 
 				false, 
 				false
 		};
+		// Which final_destination shapefile have been use graph we want to display
+		boolean display_final = true;
+		boolean[] displays_final = {
+				false, 
+				false, 
+				true, 
+				false, 
+				false, 
+				false
+		};
 		// Comment/uncomment which graph you want (previously analyzed or not)
-		String folder = "Analyzed_DGS";
-		//String folder = "DGS";
+		//String folder = "Analyzed_DGS";
+		String folder = "DGS";
+		
+		// If the node alone need to be deleted of the displayed graph
+		//boolean deleteNodeAlone = false;
+		boolean deleteNodeAlone = true;
+		
 		for(int i = 0; i<names.length; i++){
 			if(displays[i]){
+				String name = names[i];
+				if(display_final){
+					for(int j = 0; j<displays_final.length; j++){
+						if(displays_final[j])
+							name = name+"_"+destination_files[j];
+					}
+				}
 				Graph graph = new SingleGraph("");
 				try {
-					graph.read(System.getProperty("user.dir" )+File.separator+folder+File.separator+names[i]+".dgs");
+					graph.read(System.getProperty("user.dir" )+File.separator+"DGS"+File.separator+name+".dgs");
 				} catch (ElementNotFoundException e) {
 					e.printStackTrace();
 				} catch (IOException e) {
@@ -105,6 +135,18 @@ public class DisplayGraph {
 					e.printStackTrace();
 				}
 
+				if(deleteNodeAlone){
+					int j = 0;
+					while(j<graph.getNodeCount()){
+						if(graph.getNode(j).getDegree() == 0){
+							graph.removeNode(j);
+						}
+						else{
+							j++;
+						}
+					}
+				}
+				
 				// Print measures (if it has been computed)
 				System.out.println("Number of nodes : "+graph.getNodeCount());				
 				System.out.println("Number of edges : "+graph.getEdgeCount());
