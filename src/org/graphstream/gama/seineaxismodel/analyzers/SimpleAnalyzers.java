@@ -1,7 +1,14 @@
 package org.graphstream.gama.seineaxismodel.analyzers;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 
 import org.graphstream.algorithm.BetweennessCentrality;
 import org.graphstream.algorithm.Toolkit;
@@ -21,6 +28,23 @@ public class SimpleAnalyzers {
 		bcb.setCentralityAttributeName("BetweennessCentrality");
 		bcb.init(g);
 		bcb.compute();
+	}
+
+	public static void buildCSV(Graph graph, String file) throws FileNotFoundException, UnsupportedEncodingException{
+		PrintWriter writer_degreeDistribution = new PrintWriter(System.getProperty("user.dir" )+File.separator+"CSV_Graphs_Measures"+File.separator+"degreeDistribution_"+file+".csv", "UTF-8");
+		int[] degreeDistribution = (int[])graph.getAttribute("DegreeDistribution");
+		for(int i = 0; i < degreeDistribution.length; i++){
+			writer_degreeDistribution.println(i+"; "+degreeDistribution[i]);
+		}
+		writer_degreeDistribution.close();
+
+		PrintWriter writer_betweennessCentrality = new PrintWriter(System.getProperty("user.dir" )+File.separator+"CSV_Graphs_Measures"+File.separator+"betweennessCentrality_"+file+".csv", "UTF-8");
+		ArrayList<Node> nodes = new ArrayList<Node>(graph.getNodeSet());
+		Collections.sort(nodes, new BetweennessComparator());
+		for(int i = 0; i < nodes.size(); i++){
+			writer_betweennessCentrality.println(i+"; "+nodes.get(i).getNumber("BetweennessCentrality"));
+		}
+		writer_betweennessCentrality.close();
 	}
 
 	/**
@@ -82,43 +106,43 @@ public class SimpleAnalyzers {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-	
+
 				System.out.println("Analysis of '"+name+"_"+destination_file+"'.");
-	
+
 				System.out.println("Number of nodes : "+graph.getNodeCount());
 				graph.addAttribute("NodeNumber", graph.getNodeCount());
-	
+
 				System.out.println("Number of edges : "+graph.getEdgeCount());
 				graph.addAttribute("EdgeNumber", graph.getEdgeCount());
-	
+
 				double ade = Toolkit.averageDegree(graph);
 				System.out.println("Average degree : " + ade);
 				graph.addAttribute("AverageDegree", ade);
-	
+
 				double de = Toolkit.density(graph);
 				System.out.println("Density : " + de);
 				graph.addAttribute("Density", de);
-	
+
 				double di = Toolkit.diameter(graph);
 				System.out.println("Diameter : " + di);
 				graph.addAttribute("Diameter", di);
-	
+
 				double acc = Toolkit.averageClusteringCoefficient(graph);
 				System.out.println("Average clustering coefficients : " + acc);
 				graph.addAttribute("AverageClusteringCoefficients", acc);
-	
+
 				double dad = Toolkit.degreeAverageDeviation(graph);
 				System.out.println("Degree average deviation : " + dad);
 				graph.addAttribute("DegreeAverageDeviation", dad);
-	
+
 				System.out.println("Compute degree distribution...");
 				graph.addAttribute("DegreeDistribution", Toolkit.degreeDistribution(graph));
-	
+
 				System.out.println("Compute betweenness centrality...");
 				betweennessCentrality(graph);
-	
+
 				System.out.println("Analysis of '"+name+"' ended");
-	
+
 				System.out.println("Clear graph...");
 				String[] listAttributesNames = {
 						"brandes.d",
@@ -128,7 +152,17 @@ public class SimpleAnalyzers {
 				};
 				System.out.println("Saving data...");
 				SimpleAnalyzers.clearAll(graph, listAttributesNames);
-	
+
+				try {
+					buildCSV(graph, name+"_"+destination_file);
+				} catch (FileNotFoundException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (UnsupportedEncodingException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+
 				try {
 					graph.write(System.getProperty("user.dir" )+File.separator+"Analyzed_DGS"+File.separator+graph.getAttribute("name")+".dgs");
 				} catch (IOException e) {
@@ -138,5 +172,23 @@ public class SimpleAnalyzers {
 			}
 		}
 		System.out.println("All analysis have been done");
+	}
+
+	public static class BetweennessComparator implements Comparator<Element>{
+		public BetweennessComparator(){
+			super();
+		}
+
+		public int compare(Element n1, Element n2) {
+			double nb1 = n1.getNumber("BetweennessCentrality");
+			double nb2 = n2.getNumber("BetweennessCentrality");
+			if(nb1>nb2)
+				return -1;
+			else if(nb1 == nb2)
+				return 0;
+			else
+				return 1;
+		}
+
 	}
 }
