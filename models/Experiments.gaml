@@ -32,8 +32,8 @@ experiment exp_one_display type: gui {
 		display all {
 			species Batch aspect: base;
 			species Provider aspect: base;
-			species FinalDestinationManager aspect: base;
 			species Warehouse aspect: base;
+			species FinalDestinationManager aspect: base;
 			species Road aspect: geom;
 		}
 	}

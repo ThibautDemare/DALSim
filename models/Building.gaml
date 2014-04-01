@@ -40,8 +40,4 @@ species Building {
 			}
  		}
 	}
-	
-	aspect base {
-		draw circle(1.5°km) color: rgb("yellow");
-	}
 }
