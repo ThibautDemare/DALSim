@@ -87,7 +87,6 @@ public class DisplayGraph {
 		};
 		// Which kind of graph we want to display
 		boolean[] displays = {
-				true, 
 				false, 
 				false, 
 				false, 
@@ -95,7 +94,8 @@ public class DisplayGraph {
 				false, 
 				false, 
 				false, 
-				false
+				false, 
+				true
 		};
 		// Which final_destination shapefile have been use graph we want to display
 		boolean display_final = true;
@@ -110,72 +110,105 @@ public class DisplayGraph {
 		// Comment/uncomment which graph you want (previously analyzed or not)
 		//String folder = "Analyzed_DGS";
 		String folder = "DGS";
-		
+
 		// If the node alone need to be deleted of the displayed graph
 		//boolean deleteNodeAlone = false;
 		boolean deleteNodeAlone = true;
-		
+
+		System.setProperty("org.graphstream.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer");
+
 		for(int i = 0; i<names.length; i++){
 			if(displays[i]){
-				String name = names[i];
+				int k = 0;
 				if(display_final){
-					for(int j = 0; j<displays_final.length; j++){
-						if(displays_final[j])
-							name = name+"_"+destination_files[j];
+					while(k<displays_final.length && !displays_final[k])
+						k++;
+				}
+				do{
+					String name = names[i];
+					if(display_final)
+						name = name+"_"+destination_files[k];
+					k++;
+
+					Graph graph = new SingleGraph("");
+					try {
+						graph.read(System.getProperty("user.dir" )+File.separator+"DGS"+File.separator+name+".dgs");
+					} catch (ElementNotFoundException e) {
+						e.printStackTrace();
+					} catch (IOException e) {
+						e.printStackTrace();
+					} catch (GraphParseException e) {
+						e.printStackTrace();
 					}
-				}
-				Graph graph = new SingleGraph("");
-				try {
-					graph.read(System.getProperty("user.dir" )+File.separator+"DGS"+File.separator+name+".dgs");
-				} catch (ElementNotFoundException e) {
-					e.printStackTrace();
-				} catch (IOException e) {
-					e.printStackTrace();
-				} catch (GraphParseException e) {
-					e.printStackTrace();
-				}
 
-				if(deleteNodeAlone){
-					int j = 0;
-					while(j<graph.getNodeCount()){
-						if(graph.getNode(j).getDegree() == 0){
-							graph.removeNode(j);
-						}
-						else{
-							j++;
+					if(deleteNodeAlone){
+						int j = 0;
+						while(j<graph.getNodeCount()){
+							if(graph.getNode(j).getDegree() == 0){
+								graph.removeNode(j);
+							}
+							else{
+								j++;
+							}
 						}
 					}
-				}
-				
-				// Print measures (if it has been computed)
-				System.out.println("Number of nodes : "+graph.getNodeCount());				
-				System.out.println("Number of edges : "+graph.getEdgeCount());
-				if(folder.equals("Analyzed_DGS")){
-					System.out.println("Average degree : " + graph.getAttribute("AverageDegree"));
-					System.out.println("Density : " + graph.getAttribute("Density"));
-					System.out.println("Diameter : " + graph.getAttribute("Diameter"));
-					System.out.println("Average clustering coefficients : " + graph.getAttribute("AverageClusteringCoefficients"));
-					System.out.println("Degree average deviation : " + graph.getAttribute("DegreeAverageDeviation"));
-					updateGraph(graph, "BetweennessCentrality");
-				}
 
-				graph.addAttribute("ui.title", names[i]);
-				graph.display(true);
+					for(Node n : graph.getEachNode()){
+						if(n.hasAttribute("type")){
+							String val = n.getAttribute("type");
+							String style = "";
+							if(val.equals("large_warehouse")){
+								style += "fill-color: red;";
+							}
+							else if(val.equals("average_warehouse")){
+								style += "fill-color: orange;";
+							}
+							else if(val.equals("small_warehouse")){
+								style += "fill-color: green;";
+							}
+							else if(val.equals("final_dest")){
+								style += "fill-color: blue;";
+							}
+							else if(val.equals("provider")){
+								style += "fill-color: darkmagenta;";
+							}
+							n.addAttribute("ui.style", style);
+						}
+					}
 
-				//Ask for a SVG save of the display
-				System.out.println("============================");
-				System.out.println("Do you want to save the display in SVG? [Y]es / [N]o");
-				BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
-				String choice = "";
-				try {
-					choice = bufferRead.readLine();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				if(choice.equals("Y") || choice.equals("y") || choice.equals("Yes") || choice.equals("yes") || choice.equals("YES")){
-					graph.addAttribute("ui.screenshot", System.getProperty("user.dir" )+File.separator+"SVG_Screenshots"+File.separator+names[i]+".svg");
-					System.out.println("Saved.");
-				}
+					// Print measures (if it has been computed)
+					System.out.println("Number of nodes : "+graph.getNodeCount());				
+					System.out.println("Number of edges : "+graph.getEdgeCount());
+					if(folder.equals("Analyzed_DGS")){
+						System.out.println("Average degree : " + graph.getAttribute("AverageDegree"));
+						System.out.println("Density : " + graph.getAttribute("Density"));
+						System.out.println("Diameter : " + graph.getAttribute("Diameter"));
+						System.out.println("Average clustering coefficients : " + graph.getAttribute("AverageClusteringCoefficients"));
+						System.out.println("Degree average deviation : " + graph.getAttribute("DegreeAverageDeviation"));
+						updateGraph(graph, "BetweennessCentrality");
+					}
+
+					graph.addAttribute("ui.title", name);
+					graph.display(true);
+
+					//Ask for a SVG save of the display
+					System.out.println("============================");
+					System.out.println("Do you want to save the display in SVG? [Y]es / [N]o");
+					BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
+					String choice = "";
+					try {
+						choice = bufferRead.readLine();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					if(choice.equals("Y") || choice.equals("y") || choice.equals("Yes") || choice.equals("yes") || choice.equals("YES")){
+						graph.addAttribute("ui.screenshot", System.getProperty("user.dir" )+File.separator+"SVG_Screenshots"+File.separator+name+".svg");
+						System.out.println("Saved.");
+					}
+
+					while(k<displays_final.length && !displays_final[k])
+						k++;
+				}while(display_final && k<displays_final.length);
 			}
 		}
 	}
