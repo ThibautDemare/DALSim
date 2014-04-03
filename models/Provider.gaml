@@ -28,6 +28,7 @@ species Provider parent: Role{
 			// Add a new node event for corresponding sender
 			if(use_r9){
 				gs_add_node gs_sender_id:"supply_chain" gs_node_id:building.name;
+				gs_add_node_attribute gs_sender_id:"supply_chain" gs_node_id:building.name gs_attribute_name:"type" gs_attribute_value:"provider";
 			}
 		}
 	}

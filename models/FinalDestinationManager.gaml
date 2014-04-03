@@ -92,7 +92,6 @@ species FinalDestinationManager parent: Role{
 		if(use_gs){
 			if(use_r9){
 				gs_add_node gs_sender_id:"supply_chain" gs_node_id:building.name;
-				gs_add_node_attribute gs_sender_id:"supply_chain" gs_node_id:building.name gs_attribute_name:"ui.style" gs_attribute_value:"fill-color:"+color+";";
 			}
 		}
 		

@@ -217,6 +217,10 @@ species LogisticProvider parent: Role {
 				gs_add_edge gs_sender_id:"supply_chain" gs_edge_id:(average.name + small.name) gs_node_id_from:average.name gs_node_id_to:small.name gs_is_directed:false;
 				gs_add_edge gs_sender_id:"supply_chain" gs_edge_id:(small.name + fdm.building.name) gs_node_id_from:small.name gs_node_id_to:fdm.building.name gs_is_directed:false;
 				
+				gs_add_node_attribute gs_sender_id:"supply_chain" gs_node_id:large.name gs_attribute_name:"type" gs_attribute_value:"large_warehouse";
+				gs_add_node_attribute gs_sender_id:"supply_chain" gs_node_id:average.name gs_attribute_name:"type" gs_attribute_value:"average_warehouse";
+				gs_add_node_attribute gs_sender_id:"supply_chain" gs_node_id:small.name gs_attribute_name:"type" gs_attribute_value:"small_warehouse";
+				gs_add_node_attribute gs_sender_id:"supply_chain" gs_node_id:fdm.building.name gs_attribute_name:"type" gs_attribute_value:"final_dest";
 			}
 		}
 	}
