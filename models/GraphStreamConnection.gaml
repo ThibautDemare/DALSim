@@ -59,14 +59,13 @@ global {
 			if(use_r7){
 				do init_neighborhood_logistic_final;
 			}
-		
+			
 			if(use_r9){
 				// Send a step event to Graphstream to indicate that the graph has been built
 				gs_step gs_sender_id:"supply_chain" gs_step_number:1;
 			}
 		}
 	}
-	
 	
 	action init_senders {
 		gs_clear_senders;
@@ -265,7 +264,8 @@ global {
 			// Create the node
 			gs_add_node gs_sender_id:"road_network" gs_node_id:""+p_source.x+"_"+p_source.y;
 			// Send the coordinate
-			gs_add_node_attribute gs_sender_id:"road_network" gs_node_id:""+p_source.x+"_"+p_source.y gs_attribute_name:"xy" gs_attribute_value:l_source;
+			gs_add_node_attribute gs_sender_id:"road_network" gs_node_id:""+p_source.x+"_"+p_source.y gs_attribute_name:"x" gs_attribute_value:l_source[0];
+			gs_add_node_attribute gs_sender_id:"road_network" gs_node_id:""+p_source.x+"_"+p_source.y gs_attribute_name:"y" gs_attribute_value:l_source[1];
 			
 			// Get the target node
 			point p_target<- (road_network target_of self);
@@ -276,7 +276,8 @@ global {
 			// Create the node
 			gs_add_node gs_sender_id:"road_network" gs_node_id:""+p_target.x+"_"+p_target.y;
 			// Send the coordinate
-			gs_add_node_attribute gs_sender_id:"road_network" gs_node_id:""+p_target.x+"_"+p_target.y gs_attribute_name:"xy" gs_attribute_value:l_target;
+			gs_add_node_attribute gs_sender_id:"road_network" gs_node_id:""+p_target.x+"_"+p_target.y gs_attribute_name:"x" gs_attribute_value:l_target[0];
+			gs_add_node_attribute gs_sender_id:"road_network" gs_node_id:""+p_target.x+"_"+p_target.y gs_attribute_name:"y" gs_attribute_value:l_target[1];
 			
 			// Create an undirected edge between these two nodes
 			gs_add_edge gs_sender_id:"road_network" gs_edge_id:(""+p_source.x+"_"+p_source.y+p_target.x+"_"+p_target.y) gs_node_id_from:""+p_source.x+"_"+p_source.y gs_node_id_to:""+p_target.x+"_"+p_target.y gs_is_directed:false;
