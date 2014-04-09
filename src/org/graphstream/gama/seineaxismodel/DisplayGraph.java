@@ -115,7 +115,7 @@ public class DisplayGraph {
 		//boolean deleteNodeAlone = false;
 		boolean deleteNodeAlone = true;
 
-		System.setProperty("org.graphstream.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer");
+		//System.setProperty("org.graphstream.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer");
 
 		for(int i = 0; i<names.length; i++){
 			if(displays[i]){
@@ -154,7 +154,8 @@ public class DisplayGraph {
 					}
 
 					for(Node n : graph.getEachNode()){
-						n.addAttribute("y", (-1)*n.getNumber("y"));
+						if(n.hasAttribute("y"))
+								n.addAttribute("y", (-1)*n.getNumber("y"));
 						String style = "";
 						if(n.hasAttribute("type")){
 							String val = n.getAttribute("type");
