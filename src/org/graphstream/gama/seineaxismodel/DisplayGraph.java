@@ -154,9 +154,10 @@ public class DisplayGraph {
 					}
 
 					for(Node n : graph.getEachNode()){
+						n.addAttribute("y", (-1)*n.getNumber("y"));
+						String style = "";
 						if(n.hasAttribute("type")){
 							String val = n.getAttribute("type");
-							String style = "";
 							if(val.equals("large_warehouse")){
 								style += "fill-color: red;";
 							}
@@ -172,8 +173,29 @@ public class DisplayGraph {
 							else if(val.equals("provider")){
 								style += "fill-color: darkmagenta;";
 							}
-							n.addAttribute("ui.style", style);
 						}
+						else if(n.hasAttribute("region")){
+							String val = ""+n.getAttribute("region");
+							if(val.equals("0")){
+								style += "fill-color: Crimson;";
+							}
+							else if(val.equals("1")){
+								style += "fill-color: CornflowerBlue ;";
+							}
+							else if(val.equals("2")){
+								style += "fill-color: DarkMagenta;";
+							}
+							else if(val.equals("3")){
+								style += "fill-color: LightGreen;";
+							}
+							else if(val.equals("4")){
+								style += "fill-color: DarkOrange;";
+							}
+							else if(val.equals("5")){
+								style += "fill-color: LightSlateGray;";
+							}
+						}
+						n.addAttribute("ui.style", style+"size: 6px;");
 					}
 
 					// Print measures (if it has been computed)
