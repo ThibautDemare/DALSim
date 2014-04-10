@@ -49,6 +49,6 @@ species Provider parent: Role{
 	}
 	
 	aspect base { 
-		draw square(1.5°km) color: rgb([100, 0, 100]) ;
+		draw square(5°km) color: rgb("MediumSeaGreen") ;
 	} 
 }
