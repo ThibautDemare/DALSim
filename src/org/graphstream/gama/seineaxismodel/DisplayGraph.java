@@ -87,6 +87,7 @@ public class DisplayGraph {
 		};
 		// Which kind of graph we want to display
 		boolean[] displays = {
+				true, 
 				false, 
 				false, 
 				false, 
@@ -94,15 +95,14 @@ public class DisplayGraph {
 				false, 
 				false, 
 				false, 
-				false, 
-				true
+				false
 		};
 		// Which final_destination shapefile have been use graph we want to display
 		boolean display_final = true;
 		boolean[] displays_final = {
-				false, 
-				false, 
 				true, 
+				false, 
+				false, 
 				false, 
 				false, 
 				false

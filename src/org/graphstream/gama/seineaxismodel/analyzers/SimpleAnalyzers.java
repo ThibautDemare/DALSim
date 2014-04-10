@@ -9,8 +9,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 
 import org.graphstream.algorithm.BetweennessCentrality;
+import org.graphstream.algorithm.ConnectedComponents;
+import org.graphstream.algorithm.ConnectedComponents.ConnectedComponent;
 import org.graphstream.algorithm.Toolkit;
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Element;
@@ -41,10 +44,18 @@ public class SimpleAnalyzers {
 		PrintWriter writer_betweennessCentrality = new PrintWriter(System.getProperty("user.dir" )+File.separator+"CSV_Graphs_Measures"+File.separator+"betweennessCentrality_"+file+".csv", "UTF-8");
 		ArrayList<Node> nodes = new ArrayList<Node>(graph.getNodeSet());
 		Collections.sort(nodes, new BetweennessComparator());
-		for(int i = 0; i < nodes.size(); i++){
+		for(int i = 0; i < nodes.size() ; i++){
 			writer_betweennessCentrality.println(i+"; "+nodes.get(i).getNumber("BetweennessCentrality"));
 		}
 		writer_betweennessCentrality.close();
+		
+		PrintWriter writer_sizeConnectedComponentsDistribution = new PrintWriter(System.getProperty("user.dir" )+File.separator+"CSV_Graphs_Measures"+File.separator+"sizeConnectedComponentsDistribution_"+file+".csv", "UTF-8");
+		int[] sizeConnectedComponentsDistribution = graph.getAttribute("SizeConnectedComponentsDistribution");
+		for(int i = 0; i < sizeConnectedComponentsDistribution.length; i++){
+			writer_sizeConnectedComponentsDistribution.println(i+"; "+sizeConnectedComponentsDistribution[i]);
+		}
+		writer_sizeConnectedComponentsDistribution.close();
+		
 	}
 
 	/**
@@ -73,7 +84,7 @@ public class SimpleAnalyzers {
 	public static void main(String args[]){
 		String[] names = {
 				"actor", 
-				"neighborhood_all", 
+				"neighborhood_all",
 				"neighborhood_warehouse", 
 				"neighborhood_final_destination", 
 				"neighborhood_logistic_provider", 
@@ -138,6 +149,32 @@ public class SimpleAnalyzers {
 				System.out.println("Compute degree distribution...");
 				graph.addAttribute("DegreeDistribution", Toolkit.degreeDistribution(graph));
 
+				System.out.println("Compute distribution of size of connected components");
+				ConnectedComponents ccs = new ConnectedComponents();
+				ccs.init(graph);
+				ccs.setCountAttribute("connectedComponent");
+				ccs.compute();
+				// Get size of each connected components
+				ArrayList<Integer> sizeConnectedComponents = new ArrayList<Integer>();
+				Iterator<ConnectedComponent> it = ccs.iterator();
+				int maxSize = 0;
+				while(it.hasNext()){
+					int i = 0;
+					ConnectedComponent cc = it.next();
+					for(Node n : cc.getEachNode()){
+						i++;
+					}
+					if(maxSize < i)
+						maxSize = i;
+					sizeConnectedComponents.add(i);
+				}
+				// Compute distribution
+				int[] connectedComponentsDistribution = new int[maxSize+1];
+				for(int i = 0; i<sizeConnectedComponents.size(); i++){
+					connectedComponentsDistribution[sizeConnectedComponents.get(i)]++;
+				}
+				graph.addAttribute("SizeConnectedComponentsDistribution", connectedComponentsDistribution);
+				
 				System.out.println("Compute betweenness centrality...");
 				betweennessCentrality(graph);
 
@@ -164,7 +201,7 @@ public class SimpleAnalyzers {
 				}
 
 				try {
-					graph.write(System.getProperty("user.dir" )+File.separator+"Analyzed_DGS"+File.separator+graph.getAttribute("name")+".dgs");
+					graph.write(System.getProperty("user.dir" )+File.separator+"Test"+File.separator+"Analyzed_DGS"+File.separator+graph.getAttribute("name")+".dgs");
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
