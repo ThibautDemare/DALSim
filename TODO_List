@@ -1,6 +1,8 @@
 Size of building affect break bulk time + include more hazard with international travel. 
 
-A stock belong to a FinalDestinationManager. Need to update in consequences the management of warehouse according to this method.
+A stock and a supply chain belong to a FinalDestinationManager. Need to update in consequences the management of warehouse according to this method.
+Moreover, when a FinalDest change of LogisticProvider, the LogisticProvider need to update in consequences the usedWarehouses list.
+When the LogisticProvider test if an order is needed, he must find the right supply chain
 
 update supply chain network when logistic provider loose a final dest manager
  
