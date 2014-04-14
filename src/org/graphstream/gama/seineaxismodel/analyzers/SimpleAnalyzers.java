@@ -201,7 +201,7 @@ public class SimpleAnalyzers {
 				}
 
 				try {
-					graph.write(System.getProperty("user.dir" )+File.separator+"Test"+File.separator+"Analyzed_DGS"+File.separator+graph.getAttribute("name")+".dgs");
+					graph.write(System.getProperty("user.dir" )+File.separator+"Analyzed_DGS"+File.separator+graph.getAttribute("name")+".dgs");
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
