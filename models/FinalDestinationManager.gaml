@@ -113,6 +113,7 @@ species FinalDestinationManager parent: Role{
 				gs_add_node gs_sender_id:"neighborhood_all" gs_node_id:name;
 				gs_add_node_attribute gs_sender_id:"neighborhood_all" gs_node_id:name gs_attribute_name:"region" gs_attribute_value:region;
 				gs_add_node_attribute gs_sender_id:"neighborhood_all" gs_node_id:name gs_attribute_name:"department" gs_attribute_value:department;
+				gs_add_node_attribute gs_sender_id:"neighborhood_all" gs_node_id:name gs_attribute_name:"type" gs_attribute_value:"final_dest";
 			}
 			if(use_r4){
 				gs_add_node gs_sender_id:"neighborhood_final_destination" gs_node_id:name;
