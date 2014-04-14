@@ -168,11 +168,17 @@ public class DisplayGraph {
 							else if(val.equals("small_warehouse")){
 								style += "fill-color: green;";
 							}
+							else if(val.equals("provider")){
+								style += "fill-color: darkmagenta;";
+							}
 							else if(val.equals("final_dest")){
 								style += "fill-color: blue;";
 							}
-							else if(val.equals("provider")){
-								style += "fill-color: darkmagenta;";
+							else if(val.equals("logistic_provider")){
+								style += "fill-color: DarkOrange;";
+							}
+							else if(val.equals("warehouse")){
+								style += "fill-color: LightGreen;";
 							}
 						}
 						else if(n.hasAttribute("region")){
