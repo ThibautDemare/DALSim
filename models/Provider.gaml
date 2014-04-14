@@ -29,6 +29,8 @@ species Provider parent: Role{
 			if(use_r9){
 				gs_add_node gs_sender_id:"supply_chain" gs_node_id:building.name;
 				gs_add_node_attribute gs_sender_id:"supply_chain" gs_node_id:building.name gs_attribute_name:"type" gs_attribute_value:"provider";
+				gs_add_node_attribute gs_sender_id:"supply_chain" gs_node_id:building.name gs_attribute_name:"x" gs_attribute_value:location.x;
+				gs_add_node_attribute gs_sender_id:"supply_chain" gs_node_id:building.name gs_attribute_name:"y" gs_attribute_value:location.y;
 			}
 		}
 	}

@@ -41,8 +41,8 @@ species Warehouse parent: Building{
 			}
 			if(use_r9){
 				gs_add_node gs_sender_id:"supply_chain" gs_node_id:name;
-				gs_add_node_attribute gs_sender_id:"supply_chain" gs_node_id:name gs_attribute_name:"region" gs_attribute_value:region;
-				gs_add_node_attribute gs_sender_id:"supply_chain" gs_node_id:name gs_attribute_name:"department" gs_attribute_value:department;
+				gs_add_node_attribute gs_sender_id:"supply_chain" gs_node_id:name gs_attribute_name:"x" gs_attribute_value:location.x;
+				gs_add_node_attribute gs_sender_id:"supply_chain" gs_node_id:name gs_attribute_name:"y" gs_attribute_value:location.y;
 			}
 		}
 	}
