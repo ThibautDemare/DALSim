@@ -138,8 +138,7 @@ species FinalDestinationManager parent: Role{
 				i <- i + 1;
 				maxQuantity <- surfaceByProduct;
 				quantity <- rnd(maxQuantity as int) as float;
-				building <- myself.building;
-				building.occupiedSurface <- building.occupiedSurface + quantity;
+				myself.building.occupiedSurface <- myself.building.occupiedSurface + quantity;
 				fdm <- myself;
 			}
 			ls <- ls + s;

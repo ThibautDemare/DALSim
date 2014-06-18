@@ -232,7 +232,6 @@ species LogisticProvider parent: Role {
 				self.quantity <- stockFdm.maxQuantity;
 				self.maxQuantity <- stockFdm.maxQuantity;
 				self.ordered <- false;
-				self.building <- warehouse;
 				self.fdm <- fdm;
 				self.lp <- myself;
 			}

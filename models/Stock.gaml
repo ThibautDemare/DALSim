@@ -13,7 +13,6 @@ species Stock schedules:[]{
 	float quantity;
 	float maxQuantity;
 	bool ordered <- false;
-	Building building;
 	FinalDestinationManager fdm;
 	LogisticProvider lp;
 }
