@@ -8,10 +8,12 @@ model Stock
 
 import "./Building.gaml"
 
-species Stock {
+species Stock schedules:[]{
 	int product;
 	float quantity;
 	float maxQuantity;
 	bool ordered <- false;
 	Building building;
+	FinalDestinationManager fdm;
+	LogisticProvider lp;
 }

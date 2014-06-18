@@ -28,7 +28,7 @@ species Building {
 				}
 				else if (target = nil and self.breakBulk = 0) {
 					loop stock over: myself.stocks {
-						if( stock.product = self.product ){
+						if( stock.fdm = self.fdm and stock.product = self.product ){
 							stock.ordered <- false;
 							stock.quantity <- stock.quantity + self.quantity;
 						}

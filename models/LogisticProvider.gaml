@@ -56,12 +56,13 @@ species LogisticProvider parent: Role {
 	reflex testOrdersNeeded when: ((time/3600.0) mod 24.0) = 0.0 { //An order is possible one time by day.
 		loop warehouse over: usedWarehouses {
 			loop stock over: warehouse.stocks {
-  				if stock.quantity < 0.5*stock.maxQuantity and stock.ordered=false {
+  				if stock.lp = self and stock.quantity < 0.5*stock.maxQuantity and stock.ordered = false {
 					stock.ordered <- true;
 					create Order number: 1 returns: b {
 						self.product <- stock.product;
 						self.quantity <- stock.maxQuantity-stock.quantity;
 						self.building <- warehouse;
+						self.fdm <- stock.fdm;
 					}
 					
 					do receiveOrder(first(b));
@@ -73,25 +74,31 @@ species LogisticProvider parent: Role {
 	/**
 	 * 
 	 */
-	action receiveOrder(Order order){		
+	action receiveOrder(Order order){
 		// Need to know which warehouse must restock
 		list<Building> supplyChain <- nil;
 		Building sender <- nil;
 		int i <- 0;
 		int j <- 0;
+		
+		// Find the right supply chain
 		loop while: i < length(supplyChains) and sender = nil{
-			supplyChain <- (supplyChains[i] as SupplyChain).buildings;
-			j <- length(supplyChain)-1;
-			loop while: j > 0 and sender = nil {
-				if( order.building = supplyChain[j] ){
-					sender <- supplyChain[j-1];
-				}
-				else{
-					j <- j - 1;
+			if((supplyChains[i] as SupplyChain).fdm = order.fdm){
+				supplyChain <- (supplyChains[i] as SupplyChain).buildings;
+				j <- length(supplyChain)-1;
+				// find the building which must restock;
+				loop while: j > 0 and sender = nil {
+					if( order.building = supplyChain[j] ){
+						sender <- supplyChain[j-1];
+					}
+					else{
+						j <- j - 1;
+					}
 				}
 			}
 			i <- i + 1;
-		}	
+		}
+		
 		if( j = 1){// The provider must send new stock
 			order.color <- "blue";
 			ask Provider {
@@ -99,8 +106,9 @@ species LogisticProvider parent: Role {
 			}
 		}
 		else{// A warehouse must send new stock
+			
 			if( j = 2 ){
-				order.color <- "green";
+			order.color <- "green";
 			}
 			else if ( j = 3 ){
 				order.color <- "orange";
@@ -108,10 +116,12 @@ species LogisticProvider parent: Role {
 			else {
 				order.color <- "red";
 			}
+			
 			ask (sender as Warehouse) {
 				do receiveRestockRequest(order);
 			}
 		}
+		
 		ask order {
 			do die;
 		}
@@ -125,7 +135,7 @@ species LogisticProvider parent: Role {
 		int i <- 0;
 		SupplyChain sc <- nil;
 		loop while: i<length(supplyChains) and sc = nil {
-			if(fdm.building = (supplyChains[i] as SupplyChain).buildings[(length((supplyChains[i] as SupplyChain).buildings)-1)] ){
+			if(fdm = sc.fdm ){
 				sc <- supplyChains[i];
 			}
 			i <- i + 1;
@@ -138,34 +148,20 @@ species LogisticProvider parent: Role {
 				Warehouse w <- (sc.buildings[i] as Warehouse);
 				int j <- 0;
 				Stock stockW <- nil;
-				bool found <- false;
 				// Browse the stocks of this warehouse and remove the outsourced stock
-				loop while: j < length(w.stocks) and !found {
+				loop while: j < length(w.stocks) {
 					stockW <- w.stocks[j];
-					if(stockW.product = stockFdm.product){
-						found <- true;
-						float deletedStock <- 0.0;
+					if(stockW.fdm = fdm and stockW.product = stockFdm.product){
+						// We update the occupied surface
+						w.occupiedSurface <- w.occupiedSurface - stockW.maxQuantity;
+						remove stockW from: w.stocks;
 						ask stockW {
-							self.maxQuantity <- self.maxQuantity - stockFdm.maxQuantity;
-							if(self.quantity > self.maxQuantity){// because we don't have a traceability of the stocks (where each part of a stock comes from), we must update the quantity and the quantity to delete to the occupied surface as below (it is open to criticism) :
-								deletedStock <- self.quantity - self.maxQuantity;
-								self.quantity <- self.maxQuantity;
-							}
+							do die;
 						}
-						
-						// If the maxQuantity is equal to zero, we can remove it in the list of stock
-						// In reality, there is some computation error. So, we can assume that values lower than 0.0001 are values normally equals to zero.
-						if(stockW.maxQuantity < 0.0001){
-							remove stockW from: (sc.buildings[i] as Warehouse).stocks;
-							ask stockW {
-								do die;
-							}
-						}
-						
-						// Finally we update the occupied surface
-						(sc.buildings[i] as Warehouse).occupiedSurface <- (sc.buildings[i] as Warehouse).occupiedSurface - deletedStock;
 					}
-					j <- j + 1;
+					else {
+						j <- j + 1;
+					}
 				}
 				i <- i + 1;
 			}
@@ -181,27 +177,30 @@ species LogisticProvider parent: Role {
 	 */
 	action getNewCustomer(FinalDestinationManager fdm){
 		list<Building> supplyChain <- [];
-		// Find appropriates warehouses
+		supplyChain <- supplyChain + provider.building;
+		
 		Warehouse small <- nil;
 		Warehouse large <- nil;
 		Warehouse average <- nil;
+		
 		loop while: small = large or small = average or large = average {
 			small <- findSmallWarehouse(fdm);
 			large <- findLargeWarehouse(fdm);
 			average <- findAverageWarehouse(small, large, fdm);
 		}
-		usedWarehouses <- usedWarehouses + small + large + average;
 		
-		// Associate new stock to these warehouse
 		do initStock(small, fdm);
 		do initStock(large, fdm);
 		do initStock(average, fdm);
 		
-		// Build the supply chain : the provider is the first one, and the final destination is the last.
-		supplyChain <- supplyChain + provider.building;
 		supplyChain <- supplyChain + large;
 		supplyChain <- supplyChain + average;
 		supplyChain <- supplyChain + small;
+		
+		usedWarehouses <- usedWarehouses + small;
+		usedWarehouses <- usedWarehouses + large;
+		usedWarehouses <- usedWarehouses + average;
+		
 		supplyChain <- supplyChain + fdm.building;
 		
 		// Add the new supply chain to others
@@ -209,15 +208,11 @@ species LogisticProvider parent: Role {
 		ask sc {
 			buildings <- supplyChain;
 			myself.supplyChains <- myself.supplyChains + self;
+			self.fdm <- fdm;
 		}
 		
 		if(use_gs){
 			if(use_r9){
-				gs_add_edge gs_sender_id:"supply_chain" gs_edge_id:(provider.building.name + large.name) gs_node_id_from:provider.building.name gs_node_id_to:large.name gs_is_directed:false;
-				gs_add_edge gs_sender_id:"supply_chain" gs_edge_id:(large.name + average.name) gs_node_id_from:large.name gs_node_id_to:average.name gs_is_directed:false;
-				gs_add_edge gs_sender_id:"supply_chain" gs_edge_id:(average.name + small.name) gs_node_id_from:average.name gs_node_id_to:small.name gs_is_directed:false;
-				gs_add_edge gs_sender_id:"supply_chain" gs_edge_id:(small.name + fdm.building.name) gs_node_id_from:small.name gs_node_id_to:fdm.building.name gs_is_directed:false;
-				
 				gs_add_node_attribute gs_sender_id:"supply_chain" gs_node_id:large.name gs_attribute_name:"type" gs_attribute_value:"large_warehouse";
 				gs_add_node_attribute gs_sender_id:"supply_chain" gs_node_id:average.name gs_attribute_name:"type" gs_attribute_value:"average_warehouse";
 				gs_add_node_attribute gs_sender_id:"supply_chain" gs_node_id:small.name gs_attribute_name:"type" gs_attribute_value:"small_warehouse";
@@ -231,34 +226,20 @@ species LogisticProvider parent: Role {
 	 */
 	action initStock(Warehouse warehouse, FinalDestinationManager fdm){
 		loop stockFdm over: (fdm.building as Building).stocks {
-			Stock stockW <- nil;
-			bool found <- false;
-			int i <- 0;
-			loop while: i < length(warehouse.stocks) and !found {
-				stockW <- warehouse.stocks[i];
-				if(stockW.product = stockFdm.product){
-					found <- true;
-				}
-				i <- i + 1;
+			// We create the stock agent
+			create Stock number:1 returns:s {
+				self.product <- stockFdm.product;
+				self.quantity <- stockFdm.maxQuantity;
+				self.maxQuantity <- stockFdm.maxQuantity;
+				self.ordered <- false;
+				self.building <- warehouse;
+				self.fdm <- fdm;
+				self.lp <- myself;
 			}
 			
-			// If we have not found a stock, we must create one 
-			if(!found){
-				create Stock number:1 returns:s {
-					self.product <- stockFdm.product;
-					self.quantity <- stockFdm.maxQuantity;
-					self.maxQuantity <- stockFdm.maxQuantity;
-					self.ordered <- false;
-					self.building <- warehouse;
-				}
-				warehouse.stocks <- warehouse.stocks + s[0];
-			}
-			else {// There is already a stock, we must update it
-				ask stockW {
-					self.quantity <- self.quantity + stockFdm.maxQuantity;
-					self.maxQuantity <- self.maxQuantity + stockFdm.maxQuantity;
-				}
-			}
+			// and add it to the list of stocks in the warehouse
+			warehouse.stocks <- warehouse.stocks + s[0];
+			
 			// Finally we update the occupied surface
 			warehouse.occupiedSurface <- warehouse.occupiedSurface + stockFdm.maxQuantity;
 		}

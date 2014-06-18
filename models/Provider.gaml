@@ -47,6 +47,7 @@ species Provider parent: Role{
 			self.location <- myself.location;
 			self.color <- order.color;
 			self.breakBulk <- self.computeBreakBulk(rnd(10000)+2000);//We consider a fictive surface between 2000 and 12000
+			self.fdm <- order.fdm;
 		}
 	}
 	

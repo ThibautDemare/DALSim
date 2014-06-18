@@ -55,10 +55,11 @@ species Warehouse parent: Building{
 		float sendedQuantity <- 0.0;
 		int i <- 0;
 		bool found <- false;
-					
+		
+		// Find the right stock
 		loop while: i < length(stocks) and !found {
 			Stock stock <- stocks[i];
-			if stock.product = order.product {				
+			if stock.fdm = order.fdm and stock.product = order.product {				
 				if((stock.quantity -  order.quantity) > 0){
 					sendedQuantity <- order.quantity;
 				}
@@ -71,7 +72,7 @@ species Warehouse parent: Building{
 			i <- i + 1;
 		}
 		
-		// We create a new batch which can move to this warehouse to another building
+		// We create a new batch which can move from this warehouse to another building
 		create Batch number: 1 {
 			self.product <- order.product;
 			self.quantity <- sendedQuantity;		
@@ -79,6 +80,7 @@ species Warehouse parent: Building{
 			self.location <- myself.location;
 			self.color <- order.color;
 			self.breakBulk <- self.computeBreakBulk(myself.totalSurface);
+			self.fdm <- order.fdm;
 		}
 	}
 	

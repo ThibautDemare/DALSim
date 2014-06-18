@@ -14,4 +14,5 @@ species Order {
 	Building building;
 	LogisticProvider logisticProvider;
 	string color;
+	FinalDestinationManager fdm;
 }
