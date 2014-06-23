@@ -50,7 +50,7 @@ species LogisticProvider {
 		}
 	}
 	
-	reflex testRestockNeeded when: ((time/3600.0) mod numberOfHoursBeforeTRN) = 0.0 {
+	reflex testRestockNeeded when: supplyChain != nil and ((time/3600.0) mod numberOfHoursBeforeTRN) = 0.0 and (time/3600.0) > 0 {
 		ask supplyChain.leafs { 
 			do recursiveTests([] as list<Order>);
 		}
