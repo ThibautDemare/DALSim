@@ -13,6 +13,6 @@ species Order {
 	float quantity;
 	Building building;
 	LogisticProvider logisticProvider;
-	string color;
+	int position;// The position in the supply chain
 	FinalDestinationManager fdm;
 }

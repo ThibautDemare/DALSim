@@ -24,8 +24,8 @@ experiment exp_save_results type: gui {
 	output {
 	file name: "results" type: text data: ""+ ((time/3600.0) as int) + "; " +
 		stockInWarehouse + ";" + stockInFinalDest + ";" +
-		totalNumberOfBatch + ";" + numberOfBatchProviderToLarge + ";" + numberOfBatchLargeToAverage + ";" + numberOfBatchAverageToSmall + ";" + numberOfBatchSmallToFinal + ";" + 
-		stockOnRoads + ";" + stockOnRoadsProviderToLarge + ";" + stockOnRoadsLargeToAverage + ";" + stockOnRoadsAverageToSmall + ";" + stockOnRoadsSmallToFinal;
+		totalNumberOfBatch + ";" + numberOfBatchProviderToLarge + ";" + numberOfBatchLargeToClose + ";" + numberOfBatchCloseToFinal + ";" + 
+		stockOnRoads + ";" + stockOnRoadsProviderToLarge + ";" + stockOnRoadsLargeToClose + ";" + stockOnRoadsCloseToFinal;
 	}
 }
 
@@ -74,9 +74,8 @@ experiment exp_chart type: gui {
 			chart  "Number of batch of a supply chains with three intermediaries warehouses" type: series {
 				data "Total number of batch" value: totalNumberOfBatch color: rgb('purple') ;
 				data "Number of batch going from the provider to a large warehouse" value: numberOfBatchProviderToLarge color: rgb('blue') ;
-				data "Number of batch going from a large warehouse to an average one" value: numberOfBatchLargeToAverage color: rgb('green') ;
-				data "Number of batch going from an average warehouse to a small one" value: numberOfBatchAverageToSmall color: rgb('orange') ;
-				data "Number of batch going from a small warehouse to a final destination" value: numberOfBatchSmallToFinal color: rgb('red') ;
+				data "Number of batch going from a large warehouse to an average one" value: numberOfBatchLargeToClose color: rgb('green') ;
+				data "Number of batch going from a small warehouse to a final destination" value: numberOfBatchCloseToFinal color: rgb('red') ;
 			}
 		}
 		
@@ -84,9 +83,8 @@ experiment exp_chart type: gui {
 			chart  "Stock quantity within batch of a supply chains with two intermediaries warehouses" type: series {
 				data "Total quantity of goods within batches" value: stockOnRoads color: rgb('purple') ;
 				data "Quantity of goods within batches going from the provider to a large warehouse" value: stockOnRoadsProviderToLarge color: rgb('blue') ;
-				data "Quantity of goods within batches going from a large warehouse to a average one" value: stockOnRoadsLargeToAverage color: rgb('green') ;
-				data "Quantity of goods within batches going from a average warehouse to a small one" value: stockOnRoadsAverageToSmall color: rgb('orange') ;
-				data "Quantity of goods within batches going from a small warehouse to a final destination" value: stockOnRoadsSmallToFinal color: rgb('red') ;
+				data "Quantity of goods within batches going from a large warehouse to a average one" value: stockOnRoadsLargeToClose color: rgb('green') ;
+				data "Quantity of goods within batches going from a small warehouse to a final destination" value: stockOnRoadsCloseToFinal color: rgb('red') ;
 			}
 		}
 		/**/

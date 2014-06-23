@@ -15,10 +15,10 @@ import "./Order.gaml"
 import "./Stock.gaml"
 import "./SeineAxisModel.gaml"
 import "./GraphStreamConnection.gaml"
+import "./Parameters.gaml"
 
 species LogisticProvider {
 	SupplyChain supplyChain <- nil;
-	list<SupplyChainElement> leafs <- [];
 	string color;
 	int department;
 	int region;
@@ -50,107 +50,11 @@ species LogisticProvider {
 		}
 	}
 	
-	/**
-	 * Test for each warehouse if it needs to be restock;
-	 */
-	/*reflex testOrdersNeeded when: ((time/3600.0) mod 24.0) = 0.0 { //An order is possible one time by day.
-		loop warehouse over: usedWarehouses {
-			loop stock over: warehouse.stocks {
-  				if stock.lp = self and stock.quantity < 0.5*stock.maxQuantity and stock.ordered = false {
-					stock.ordered <- true;
-					create Order number: 1 returns: b {
-						self.product <- stock.product;
-						self.quantity <- stock.maxQuantity-stock.quantity;
-						self.building <- warehouse;
-						self.fdm <- stock.fdm;
-					}
-					
-					do receiveOrder(first(b));
-				}
-			}
+	reflex testRestockNeeded when: ((time/3600.0) mod numberOfHoursBeforeTRN) = 0.0 {
+		ask supplyChain.leafs { 
+			do recursiveTests([] as list<Order>);
 		}
-	}/**/
-	
-	
-	/**
-	 * Check for all product if it needs to be restock.
-	 * If yes, an order is made to the logistic provider
-	 */
-	/*reflex testOrdersNeeded when: ((time/3600.0) mod numberOfHoursBeforeTON) = 0.0 { //An order is possible one time by day. 
-		loop stock over: building.stocks {
-			if stock.quantity < minimumStockFinalDestPercentage*stock.maxQuantity and stock.ordered=false {
-				stock.ordered <- true;
-				create Order number: 1 returns: b {
-					self.product <- stock.product;
-					self.quantity <- stock.maxQuantity-stock.quantity;
-					self.building <- myself.building;
-					self.logisticProvider <- myself.logisticProvider;
-					fdm <- myself;
-				}
-				
-				ask logisticProvider {
-					//do receiveOrder(first(b));
-				}
-
-			}
-		}
-	}/**/
-	
-	/**
-	 * 
-	 */
-	/*action receiveOrder(Order order){
-		// Need to know which warehouse must restock
-		list<Building> supplyChain <- nil;
-		Building sender <- nil;
-		int i <- 0;
-		int j <- 0;
-		
-		// Find the right supply chain
-		loop while: i < length(supplyChains) and sender = nil{
-			if((supplyChains[i] as SupplyChain).fdm = order.fdm){
-				supplyChain <- (supplyChains[i] as SupplyChain).buildings;
-				j <- length(supplyChain)-1;
-				// find the building which must restock;
-				loop while: j > 0 and sender = nil {
-					if( order.building = supplyChain[j] ){
-						sender <- supplyChain[j-1];
-					}
-					else{
-						j <- j - 1;
-					}
-				}
-			}
-			i <- i + 1;
-		}
-		
-		if( j = 1){// The provider must send new stock
-			order.color <- "blue";
-			ask Provider {
-				do receiveOrder(order);
-			}
-		}
-		else{// A warehouse must send new stock
-			
-			if( j = 2 ){
-			order.color <- "green";
-			}
-			else if ( j = 3 ){
-				order.color <- "orange";
-			}
-			else {
-				order.color <- "red";
-			}
-			
-			ask (sender as Warehouse) {
-				do receiveRestockRequest(order);
-			}
-		}
-		
-		ask order {
-			do die;
-		}
-	}/**/
+	}
 	
 	/**
 	 * When a logistic provider loose a customer (a FinalDestinationManager) he must update the stock on its warehouses
@@ -159,9 +63,9 @@ species LogisticProvider {
 		// Find the good SCE
 		int i <- 0;
 		SupplyChainElement sceLeaf <- nil;
-		loop while: i<length(leafs) and sceLeaf = nil {
-			if(fdm = ((leafs[i] as SupplyChainElement).building )){
-				sceLeaf <- leafs[i];
+		loop while: i<length(supplyChain.leafs) and sceLeaf = nil {
+			if(fdm = ((supplyChain.leafs[i] as SupplyChainElement).building )){
+				sceLeaf <- supplyChain.leafs[i];
 			}
 			i <- i + 1;
 		}
@@ -204,18 +108,21 @@ species LogisticProvider {
 	 */
 	action getNewCustomer(FinalDestinationManager fdm){
 		/*
-		 * If the supply chain has not been initiated yet.
+		 * Initiate the supply chain with just the provider as root
 		 */
 		if(supplyChain = nil){
 			// Build the root of this almost-tree
 			create SupplyChainElement number:1 returns:rt {
 				building <- provider;
 				sons <- [];
+				position <- 0;
 			}
 			// and build the supply chain with this root
 			create SupplyChain number:1 returns:sc {
 				root <- rt[0];
 			}
+			supplyChain <- first(sc);
+			first(rt).supplyChain <- supplyChain;
 		}
 		
 		/*
@@ -224,8 +131,10 @@ species LogisticProvider {
 		create SupplyChainElement number:1 returns:fdmLeaf {
 			self.building <- fdm.building;
 			self.sons <- [];
+			self.supplyChain <- myself.supplyChain;
+			position <- 3;
 		}
-		leafs <- leafs + fdmLeaf[0];
+		supplyChain.leafs <- supplyChain.leafs + fdmLeaf[0];
 		
 		/*
 		 * connect this leaf to a close warehouse
@@ -252,6 +161,8 @@ species LogisticProvider {
 		if(sceCloseWarehouse = nil){
 			// We must create a SCE corresponding to this warehouse
 			create SupplyChainElement number:1 returns:sceBuild {
+				self.supplyChain <- myself.supplyChain;
+				position <- 2;
 				building <- closeWarehouse;
 				sons <- [] + fdmLeaf;
 				fathers <- [];
@@ -287,6 +198,8 @@ species LogisticProvider {
 			do initStock(largeWarehouse, fdm);
 			// and create a SCE
 			create SupplyChainElement number:1 returns:sceBuild {
+				self.supplyChain <- myself.supplyChain;
+				position <- 1;
 				building <- largeWarehouse;
 				sons <- [];
 				fathers <- [] + myself.supplyChain.root;

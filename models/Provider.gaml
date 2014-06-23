@@ -26,22 +26,6 @@ species Provider parent: Building{
 			}
 		}
 	}
-		
-	/*
-	 * Receive order from a logistic provider
-	 */
-	action receiveOrder(Order order){
-		// We create a new batch which can move to this provider to another building
-		create Batch number: 1 {
-			self.product <- order.product;
-			self.quantity <- order.quantity;		
-			self.target <- order.building.location;
-			self.location <- myself.location;
-			self.color <- order.color;
-			self.breakBulk <- self.computeBreakBulk(rnd(10000)+2000);//We consider a fictive surface between 2000 and 12000
-			self.fdm <- order.fdm;
-		}
-	}
 	
 	aspect base { 
 		draw square(5°km) color: rgb("MediumSeaGreen") ;

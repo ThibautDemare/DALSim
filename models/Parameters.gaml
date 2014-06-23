@@ -14,7 +14,7 @@ global {
 	float step <- 60 °mn;//60 minutes per step
 	
 	/*
-	 * Some variables and functions to set FinalDestinationManager
+	 * Some variables and functions to call some reflex
 	 */
 	 
 	// Minimum stock of the final destination in percentage before ordered a restock
@@ -25,8 +25,8 @@ global {
 	float numberOfHoursBeforeUCI <- 720.0;
 	// The numbers of hours between each calls to the reflex "decreasingStocks"
 	float numberOfHoursBeforeDS <- 24.0;
-	// The numbers of hours between each calls to the reflex "testOrdersNeeded"
-	float numberOfHoursBeforeTON <- 24.0;
+	// The numbers of hours between each calls to the reflex "testRestockNeeded"
+	float numberOfHoursBeforeTRN <- 24.0;
 	
 	/**
 	 * The final destinations are separated in 4 ordered sets. To each final destinations of these sets, we associate a decreasing rate of 

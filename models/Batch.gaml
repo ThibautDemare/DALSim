@@ -11,12 +11,12 @@ import "./Building.gaml"
 import "./FinalDestinationManager.gaml"
 
 species Batch skills:[moving]{
-	int product;
-	float quantity;
+	float overallQuantity;
+	list<Stock> stocks;
 	point target;
 	float speed <- 70.0 °km/°h;
 	int breakBulk <- 0;
-	string color;
+	int position;
 	FinalDestinationManager fdm;
 	
 	reflex move when: target != nil and breakBulk = 0 {
@@ -34,11 +34,32 @@ species Batch skills:[moving]{
 	reflex decreaseBreakBulk when: breakBulk > 0 {
 		breakBulk <- breakBulk - 1;
 	}
-	aspect base { 
+	
+	aspect base {
+		string color <- "";
+		if( position = 0){// The provider must send new stock
+			color <- "blue";
+		}
+		else if( position = 1 ){
+			color <- "green";
+		}
+		else if( position = 2){
+			color <- "orange";
+		}
 		draw triangle(3.0°km) color: rgb(color) ;
 	}
 	
 	aspect little_base {
+		string color <- "";
+		if( position = 0){// The provider must send new stock
+			color <- "blue";
+		}
+		else if( position = 1 ){
+			color <- "green";
+		}
+		else if( position = 2){
+			color <- "orange";
+		}
 		draw triangle(1.0°km) color: rgb(color) ;
 	}
 }
