@@ -16,7 +16,7 @@ import "./Stock.gaml"
 import "./GraphStreamConnection.gaml"
 import "./Parameters.gaml"
 
-species FinalDestinationManager parent: Role{
+species FinalDestinationManager {
 	LogisticProvider logisticProvider;
 	Building building;
 	float huffValue;// number of customer according to huff model => this value cant be used like this because the Huff model does not take care of time.
@@ -144,30 +144,6 @@ species FinalDestinationManager parent: Role{
 					// Is it a problem? Do we need to remove this edge?
 					gs_add_edge gs_sender_id:"actor" gs_edge_id:(name + logisticProvider.name) gs_node_id_from:name gs_node_id_to:logisticProvider.name gs_is_directed:false;
 				}
-			}
-		}
-	}
-	
-	/**
-	 * Check for all product if it needs to be restock.
-	 * If yes, an order is made to the logistic provider
-	 */
-	reflex testOrdersNeeded when: ((time/3600.0) mod numberOfHoursBeforeTON) = 0.0 { //An order is possible one time by day. 
-		loop stock over: building.stocks {
-			if stock.quantity < minimumStockFinalDestPercentage*stock.maxQuantity and stock.ordered=false {
-				stock.ordered <- true;
-				create Order number: 1 returns: b {
-					self.product <- stock.product;
-					self.quantity <- stock.maxQuantity-stock.quantity;
-					self.building <- myself.building;
-					self.logisticProvider <- myself.logisticProvider;
-					fdm <- myself;
-				}
-				
-				ask logisticProvider {
-					do receiveOrder(first(b));
-				}
-
 			}
 		}
 	}

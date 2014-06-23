@@ -10,6 +10,11 @@ model SupplyChain
 import "./Building.gaml"
 
 species SupplyChain {
-	FinalDestinationManager fdm;
-	list<Building> buildings;
+	SupplyChainElement root;
+}
+
+species SupplyChainElement {
+	Building building;
+	list<SupplyChainElement> fathers;
+	list<SupplyChainElement> sons;
 }
