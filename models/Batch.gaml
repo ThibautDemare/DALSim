@@ -37,13 +37,13 @@ species Batch skills:[moving]{
 	
 	aspect base {
 		string color <- "";
-		if( position = 0){// The provider must send new stock
+		if( position = 1){// The provider must send new stock
 			color <- "blue";
 		}
-		else if( position = 1 ){
+		else if( position = 2 ){
 			color <- "green";
 		}
-		else if( position = 2){
+		else if( position = 3){
 			color <- "orange";
 		}
 		draw triangle(3.0°km) color: rgb(color) ;
@@ -51,13 +51,13 @@ species Batch skills:[moving]{
 	
 	aspect little_base {
 		string color <- "";
-		if( position = 0){// The provider must send new stock
+		if( position = 1){// The provider must send new stock
 			color <- "blue";
 		}
-		else if( position = 1 ){
+		else if( position = 2 ){
 			color <- "green";
 		}
-		else if( position = 2){
+		else if( position = 3){
 			color <- "orange";
 		}
 		draw triangle(1.0°km) color: rgb(color) ;
