@@ -69,6 +69,10 @@ species FinalDestinationManager {
 			do getNewCustomer(myself);
 		}
 		
+		loop stock over: building.stocks {
+			stock.lp <- logisticProvider;
+		}
+		
 		//Connection to graphstream
 		if(use_gs){
 			// Add new node/edge events for corresponding sender

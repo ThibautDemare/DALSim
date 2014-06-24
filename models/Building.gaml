@@ -29,12 +29,17 @@ species Building {
 					target <- nil;
 				}
 				else if (target = nil and self.breakBulk = 0) {
-					loop stockBatch over: self.stocks {
+					loop while: !empty(self.stocks){
+						Stock stockBatch <- first(self.stocks);
 						loop stockBuilding over: myself.stocks {
 							if( stockBuilding.fdm = self.fdm and stockBuilding.product = stockBatch.product ){
 								stockBuilding.ordered <- false;
 								stockBuilding.quantity <- stockBuilding.quantity + stockBatch.quantity;
 							}
+						}
+						remove index:0 from: self.stocks;
+						ask stockBatch {
+							do die;
 						}
 					}
 					ask self {
@@ -53,8 +58,7 @@ species Building {
 	 * Receive a request from a logistic provider to restock another building
 	 */
 	reflex processOrders when: !empty(currentOrders){
-		list<Batch> leavingBatch <- [];
-		
+		list<Batch> leavingBatches <- [];
 		// We empty progressively the list of orders after have processed them
 		loop while: !empty(currentOrders) {
 			Order order <- first(currentOrders);
@@ -84,29 +88,33 @@ species Building {
 					// Looking for a batch which go to the same building
 					bool foundBatch <- false;
 					int j <- 0;
-					loop while: j < length(leavingBatch) and !foundBatch {
-						if( (leavingBatch[j] as Batch).target = order.building.location){
+					loop while: j < length(leavingBatches) and !foundBatch {
+						if( (leavingBatches[j] as Batch).target = order.building.location){
 							foundBatch <- true;
 						}
 						j <- j + 1;
 					}
-					
+					Batch lb <- nil;
 					// We there is a such Batch, we update it
 					if(foundBatch){
-						(leavingBatch[j] as Batch).overallQuantity <- (leavingBatch[j] as Batch).overallQuantity + sendedQuantity;
-						(leavingBatch[j] as Batch).stocks <- (leavingBatch[j] as Batch).stocks + sendedStock;
+						lb <- leavingBatches[j];
 					}
 					else {
 						// else, we create one
-						create Batch number: 1 {
+						create Batch number: 1 returns:rlb {
 							self.target <- order.building.location;
 							self.location <- myself.location;
 							self.breakBulk <- self.computeBreakBulk(myself.totalSurface);
 							self.fdm <- order.fdm;
 							self.position <- order.position;
 						}
+						lb <- first(rlb);
 					}
+					
+					lb.overallQuantity <- lb.overallQuantity + sendedQuantity;
+					lb.stocks <- lb.stocks + sendedStock;
 				}
+				i <- i + 1;
 			}
 						
 			// This order is useless now. We kill it before process the next one

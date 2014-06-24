@@ -119,6 +119,7 @@ species LogisticProvider {
 			}
 			// and build the supply chain with this root
 			create SupplyChain number:1 returns:sc {
+				logisticProvider <- myself;
 				root <- rt[0];
 			}
 			supplyChain <- first(sc);

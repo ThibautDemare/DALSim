@@ -7,7 +7,7 @@
 model Provider
 
 import "./SeineAxisModel.gaml"
-import "./LogisticProvider.gaml"
+import "./Stock.gaml"
 import "./Batch.gaml"
 import "./Building.gaml"
 import "./GraphStreamConnection.gaml"
@@ -23,6 +23,58 @@ species Provider parent: Building{
 				gs_add_node_attribute gs_sender_id:"supply_chain" gs_node_id:name gs_attribute_name:"type" gs_attribute_value:"provider";
 				gs_add_node_attribute gs_sender_id:"supply_chain" gs_node_id:name gs_attribute_name:"x" gs_attribute_value:location.x;
 				gs_add_node_attribute gs_sender_id:"supply_chain" gs_node_id:name gs_attribute_name:"y" gs_attribute_value:location.y;
+			}
+		}
+	}
+	
+	/*
+	 * Receive a request from a logistic provider to restock another building
+	 */
+	reflex processOrders when: !empty(currentOrders){
+		list<Batch> leavingBatches <- [];
+		// We empty progressively the list of orders after have processed them
+		loop while: !empty(currentOrders) {
+			Order order <- first(currentOrders);
+			
+			// And create a Stock agent which will move within a Batch
+			create Stock number:1 returns:sendedStock {
+				self.product <- order.product;
+				self.quantity <- order.quantity;
+			}
+			
+			// Looking for a batch which go to the same building
+			bool foundBatch <- false;
+			int j <- 0;
+			loop while: j < length(leavingBatches) and !foundBatch {
+				if( (leavingBatches[j] as Batch).target = order.building.location){
+					foundBatch <- true;
+				}
+				j <- j + 1;
+			}
+			Batch lb <- nil;
+			// We there is a such Batch, we update it
+			if(foundBatch){
+				lb <- leavingBatches[j];
+			}
+			else {
+				// else, we create one
+				create Batch number: 1 returns:rlb {
+					self.target <- order.building.location;
+					self.location <- myself.location;
+					self.breakBulk <- self.computeBreakBulk(myself.totalSurface);
+					self.fdm <- order.fdm;
+					self.position <- order.position;
+				}
+				lb <- first(rlb);
+			}
+			
+			lb.overallQuantity <- lb.overallQuantity + order.quantity;
+			lb.stocks <- lb.stocks + sendedStock;
+
+			// This order is useless now. We kill it before process the next one
+			remove index: 0 from:currentOrders;
+			ask order {
+				do die;
 			}
 		}
 	}

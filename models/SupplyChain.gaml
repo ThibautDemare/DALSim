@@ -12,6 +12,7 @@ import "./Order.gaml"
 import "./Stock.gaml"
 
 species SupplyChain {
+	LogisticProvider logisticProvider;
 	SupplyChainElement root;
 	list<SupplyChainElement> leafs <- [];
 }
@@ -43,7 +44,8 @@ species SupplyChainElement {
 		// Now, we can build an order with each product which needs to be restock
 		list<Order> orders <- [];
 		loop stock over: b.stocks {
-			if stock.lp = self and stock.quantity < 0.5*stock.maxQuantity and stock.ordered = false {
+			//write "stock.lp = "+stock.lp+" et supplyChain.logisticProvider = "+supplyChain.logisticProvider;
+			if stock.lp = supplyChain.logisticProvider and stock.quantity < 0.5*stock.maxQuantity and stock.ordered = false {
 				stock.ordered <- true;
 				create Order number: 1 returns: o {
 					self.product <- stock.product;
@@ -57,7 +59,9 @@ species SupplyChainElement {
 		}
 		
 		loop father over: fathers {
-			do recursiveTests(orders);
+			ask father {
+				do recursiveTests(orders);
+			}
 		}
 	}
 }
