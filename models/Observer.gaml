@@ -56,15 +56,15 @@ global {
 		
 		// Filter the right agents
 		ask Batch {
-			if(self.position = 0){
+			if(self.position = 1){
 				numberOfBatchProviderToLarge <- numberOfBatchProviderToLarge + 1;
 				stockOnRoadsProviderToLarge <- stockOnRoadsProviderToLarge + self.overallQuantity;
 			}
-			else if(self.position = 1){
+			else if(self.position = 2){
 				numberOfBatchLargeToClose <- numberOfBatchLargeToClose + 1;
 				stockOnRoadsLargeToClose <- stockOnRoadsLargeToClose + self.overallQuantity;
 			}
-			else if(self.position = 2){
+			else if(self.position = 3){
 				numberOfBatchCloseToFinal <- numberOfBatchCloseToFinal + 1;
 				stockOnRoadsCloseToFinal <- stockOnRoadsCloseToFinal + self.overallQuantity;
 			}
