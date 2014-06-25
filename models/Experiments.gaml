@@ -32,10 +32,10 @@ experiment exp_save_results type: gui {
 experiment exp_one_display type: gui {
 	output {
 		display all {
-			species Batch aspect: base;
 			species Provider aspect: base;
 			species Warehouse aspect: base;
 			species FinalDestinationManager aspect: base;
+			species Batch aspect: base;
 			species Road aspect: geom;
 		}
 	}
@@ -70,7 +70,7 @@ experiment exp_separate_displays type: gui {
 
 experiment exp_chart type: gui {
 	output {
-		display chart_number_of_batch_ refresh_every: 24 {
+		display chart_number_of_batch_ refresh_every: 1 {
 			chart  "Number of batch of a supply chains with three intermediaries warehouses" type: series {
 				data "Total number of batch" value: totalNumberOfBatch color: rgb('purple') ;
 				data "Number of batch going from the provider to a large warehouse" value: numberOfBatchProviderToLarge color: rgb('blue') ;
@@ -79,7 +79,7 @@ experiment exp_chart type: gui {
 			}
 		}
 		
-		display chart_stock_on_roads refresh_every: 24 {
+		display chart_stock_on_roads refresh_every: 1 {
 			chart  "Stock quantity within batch of a supply chains with two intermediaries warehouses" type: series {
 				data "Total quantity of goods within batches" value: stockOnRoads color: rgb('purple') ;
 				data "Quantity of goods within batches going from the provider to a large warehouse" value: stockOnRoadsProviderToLarge color: rgb('blue') ;
@@ -94,16 +94,17 @@ experiment exp_chart type: gui {
 			chart "Stock quantity on road" type: series {
 				data "Average stock quantity on road" value: stockOnRoads color: rgb('red') ;
 			}
-		}
-		display chart_average_stock_in_final_dest refresh_every: 24 {
+		}/**/
+		
+		display chart_average_stock_in_final_dest refresh_every: 1 {
 			chart  "Stock quantity in final destinations" type: series {
 				data "Average stock quantity in final destinations" value: stockInFinalDest color: rgb('green') ;
 			}
-		}
-		display chart_average_stock_in_warehouse refresh_every: 24 {
+		}/**/
+		display chart_average_stock_in_warehouse refresh_every: 1 {
 			chart  "Stock quantity in warehouses" type: series {
 				data "Average stock quantity in warehouses" value: stockInWarehouse color: rgb('orange') ;
 			}
-		}*/
+		}/**/
 	}
 }
