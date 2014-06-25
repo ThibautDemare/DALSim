@@ -15,4 +15,5 @@ species Order {
 	LogisticProvider logisticProvider;
 	int position;// The position in the supply chain
 	FinalDestinationManager fdm;
+	Stock reference;
 }

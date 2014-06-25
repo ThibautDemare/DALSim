@@ -45,14 +45,15 @@ species SupplyChainElement {
 		list<Order> orders <- [];
 		loop stock over: b.stocks {
 			//write "stock.lp = "+stock.lp+" et supplyChain.logisticProvider = "+supplyChain.logisticProvider;
-			if stock.lp = supplyChain.logisticProvider and stock.quantity < 0.5*stock.maxQuantity and stock.ordered = false {
-				stock.ordered <- true;
+			if stock.lp = supplyChain.logisticProvider and stock.quantity < 0.5*stock.maxQuantity and stock.status = 0 {
+				stock.status <- 1;
 				create Order number: 1 returns: o {
 					self.product <- stock.product;
 					self.quantity <- stock.maxQuantity-stock.quantity;
 					self.building <- b;
 					self.fdm <- stock.fdm;
 					self.position <- myself.position;
+					self.reference <- stock;
 				}
 				orders <- orders + o;
 			}

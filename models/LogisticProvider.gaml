@@ -233,7 +233,7 @@ species LogisticProvider {
 				self.product <- stockFdm.product;
 				self.quantity <- stockFdm.maxQuantity;
 				self.maxQuantity <- stockFdm.maxQuantity;
-				self.ordered <- false;
+				self.status <- 0;
 				self.fdm <- fdm;
 				self.lp <- myself;
 			}

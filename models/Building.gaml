@@ -9,6 +9,7 @@ model Building
 import "./Batch.gaml"
 import "./Stock.gaml"
 import "./Order.gaml"
+import "./Parameters.gaml"
 		
 species Building {
 	list<Stock> stocks;
@@ -33,7 +34,7 @@ species Building {
 						Stock stockBatch <- first(self.stocks);
 						loop stockBuilding over: myself.stocks {
 							if( stockBuilding.fdm = self.fdm and stockBuilding.product = stockBatch.product ){
-								stockBuilding.ordered <- false;
+								stockBuilding.status <- 0;
 								stockBuilding.quantity <- stockBuilding.quantity + stockBatch.quantity;
 							}
 						}
@@ -57,7 +58,7 @@ species Building {
 	/*
 	 * Receive a request from a logistic provider to restock another building
 	 */
-	reflex processOrders when: !empty(currentOrders){
+	reflex processOrders when: !empty(currentOrders) and ((time/3600.0) mod numberofHoursBeforePO) = 0.0 and (time/3600.0) > 0{
 		list<Batch> leavingBatches <- [];
 		// We empty progressively the list of orders after have processed them
 		loop while: !empty(currentOrders) {
@@ -70,6 +71,7 @@ species Building {
 				// If we find the right stock, we had the corresponding quantity within a batch 
 				if stock.fdm = order.fdm and stock.product = order.product {
 					foundStock <- true;
+					order.reference.status <- 3;
 					// Compute the right quantity to send
 					float sendedQuantity <- 0.0; 
 					if((stock.quantity -  order.quantity) > 0){
@@ -92,7 +94,9 @@ species Building {
 						if( (leavingBatches[j] as Batch).target = order.building.location){
 							foundBatch <- true;
 						}
-						j <- j + 1;
+						else {
+							j <- j + 1;
+						}
 					}
 					Batch lb <- nil;
 					// We there is a such Batch, we update it
@@ -109,6 +113,7 @@ species Building {
 							self.position <- order.position;
 						}
 						lb <- first(rlb);
+						leavingBatches <- leavingBatches + lb;
 					}
 					
 					lb.overallQuantity <- lb.overallQuantity + sendedQuantity;

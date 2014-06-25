@@ -49,7 +49,9 @@ species Provider parent: Building{
 				if( (leavingBatches[j] as Batch).target = order.building.location){
 					foundBatch <- true;
 				}
-				j <- j + 1;
+				else {
+					j <- j + 1;
+				}
 			}
 			Batch lb <- nil;
 			// We there is a such Batch, we update it
@@ -66,6 +68,7 @@ species Provider parent: Building{
 					self.position <- order.position;
 				}
 				lb <- first(rlb);
+				leavingBatches <- leavingBatches + lb;
 			}
 			
 			lb.overallQuantity <- lb.overallQuantity + order.quantity;
