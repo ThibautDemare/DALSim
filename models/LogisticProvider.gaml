@@ -15,10 +15,10 @@ import "./Order.gaml"
 import "./Stock.gaml"
 import "./SeineAxisModel.gaml"
 import "./GraphStreamConnection.gaml"
+import "./Parameters.gaml"
 
-species LogisticProvider parent: Role {
-	list<SupplyChain> supplyChains;
-	list<Warehouse> usedWarehouses;
+species LogisticProvider {
+	SupplyChain supplyChain <- nil;
 	string color;
 	int department;
 	int region;
@@ -50,80 +50,9 @@ species LogisticProvider parent: Role {
 		}
 	}
 	
-	/**
-	 * Test for each warehouse if it needs to be restock;
-	 */
-	reflex testOrdersNeeded when: ((time/3600.0) mod 24.0) = 0.0 { //An order is possible one time by day.
-		loop warehouse over: usedWarehouses {
-			loop stock over: warehouse.stocks {
-  				if stock.lp = self and stock.quantity < 0.5*stock.maxQuantity and stock.ordered = false {
-					stock.ordered <- true;
-					create Order number: 1 returns: b {
-						self.product <- stock.product;
-						self.quantity <- stock.maxQuantity-stock.quantity;
-						self.building <- warehouse;
-						self.fdm <- stock.fdm;
-					}
-					
-					do receiveOrder(first(b));
-				}
-			}
-		}
-	}
-	
-	/**
-	 * 
-	 */
-	action receiveOrder(Order order){
-		// Need to know which warehouse must restock
-		list<Building> supplyChain <- nil;
-		Building sender <- nil;
-		int i <- 0;
-		int j <- 0;
-		
-		// Find the right supply chain
-		loop while: i < length(supplyChains) and sender = nil{
-			if((supplyChains[i] as SupplyChain).fdm = order.fdm){
-				supplyChain <- (supplyChains[i] as SupplyChain).buildings;
-				j <- length(supplyChain)-1;
-				// find the building which must restock;
-				loop while: j > 0 and sender = nil {
-					if( order.building = supplyChain[j] ){
-						sender <- supplyChain[j-1];
-					}
-					else{
-						j <- j - 1;
-					}
-				}
-			}
-			i <- i + 1;
-		}
-		
-		if( j = 1){// The provider must send new stock
-			order.color <- "blue";
-			ask Provider {
-				do receiveOrder(order);
-			}
-		}
-		else{// A warehouse must send new stock
-			
-			if( j = 2 ){
-			order.color <- "green";
-			}
-			else if ( j = 3 ){
-				order.color <- "orange";
-			}
-			else {
-				order.color <- "red";
-			}
-			
-			ask (sender as Warehouse) {
-				do receiveRestockRequest(order);
-			}
-		}
-		
-		ask order {
-			do die;
+	reflex testRestockNeeded when: supplyChain != nil and ((time/3600.0) mod numberOfHoursBeforeTRN) = 0.0 and (time/3600.0) > 0 {
+		ask supplyChain.leafs { 
+			do recursiveTests([] as list<Order>);
 		}
 	}
 	
@@ -131,44 +60,46 @@ species LogisticProvider parent: Role {
 	 * When a logistic provider loose a customer (a FinalDestinationManager) he must update the stock on its warehouses
 	 */
 	action lostCustomer(FinalDestinationManager fdm){
-		// Find the good supply chain
+		// Find the good SCE
 		int i <- 0;
-		SupplyChain sc <- nil;
-		loop while: i<length(supplyChains) and sc = nil {
-			if(fdm = sc.fdm ){
-				sc <- supplyChains[i];
+		SupplyChainElement sceLeaf <- nil;
+		loop while: i<length(supplyChain.leafs) and sceLeaf = nil {
+			if(fdm = ((supplyChain.leafs[i] as SupplyChainElement).building )){
+				sceLeaf <- supplyChain.leafs[i];
 			}
 			i <- i + 1;
 		}
-		// Browse the different stock of the final dest
-		loop stockFdm over: (fdm.building as Building).stocks {
-			i <- 1;
-			// Browse the warehouses of this supply chain 
-			loop while: i < (length(sc.buildings)-1) {
-				Warehouse w <- (sc.buildings[i] as Warehouse);
-				int j <- 0;
-				Stock stockW <- nil;
-				// Browse the stocks of this warehouse and remove the outsourced stock
-				loop while: j < length(w.stocks) {
-					stockW <- w.stocks[j];
-					if(stockW.fdm = fdm and stockW.product = stockFdm.product){
-						// We update the occupied surface
-						w.occupiedSurface <- w.occupiedSurface - stockW.maxQuantity;
-						remove stockW from: w.stocks;
-						ask stockW {
-							do die;
-						}
-					}
-					else {
-						j <- j + 1;
-					}
-				}
-				i <- i + 1;
+		
+		loop sceClose over: sceLeaf.fathers {
+			Building b1 <- (sceClose as SupplyChainElement).building;
+			do deleteStock(fdm, b1);
+			
+			loop sceLarge over: sceClose.fathers {
+				Building b2 <- (sceLarge as SupplyChainElement).building;
+				do deleteStock(fdm, b2);
 			}
 		}
-		// Delete the associated supply chain
-		ask sc {
-			do die;
+	}
+	
+	action deleteStock(FinalDestinationManager fdm, Building b){
+		loop stockFdm over: (fdm.building as Building).stocks {	
+			int i <- 0;
+			Stock stockW <- nil;
+			// Browse the stocks of this warehouse and remove the outsourced stock
+			loop while: i < length(b.stocks) {
+				stockW <- b.stocks[i];
+				if(stockW.fdm = fdm and stockW.product = stockFdm.product){
+					// We update the occupied surface
+					b.occupiedSurface <- b.occupiedSurface - stockW.maxQuantity;
+					remove stockW from: b.stocks;
+					ask stockW {
+						do die;
+					}
+				}
+				else {
+					i <- i + 1;
+				}
+			}
 		}
 	}
 	
@@ -176,41 +107,112 @@ species LogisticProvider parent: Role {
 	 * When a logistic provider has a new customer, he need to find a new supply chain. This method build it.
 	 */
 	action getNewCustomer(FinalDestinationManager fdm){
-		list<Building> supplyChain <- [];
-		supplyChain <- supplyChain + provider.building;
-		
-		Warehouse small <- nil;
-		Warehouse large <- nil;
-		Warehouse average <- nil;
-		
-		loop while: small = large or small = average or large = average {
-			small <- findSmallWarehouse(fdm);
-			large <- findLargeWarehouse(fdm);
-			average <- findAverageWarehouse(small, large, fdm);
+		/*
+		 * Initiate the supply chain with just the provider as root
+		 */
+		if(supplyChain = nil){
+			// Build the root of this almost-tree
+			create SupplyChainElement number:1 returns:rt {
+				building <- provider;
+				sons <- [];
+				position <- 0;
+			}
+			// and build the supply chain with this root
+			create SupplyChain number:1 returns:sc {
+				logisticProvider <- myself;
+				root <- rt[0];
+			}
+			supplyChain <- first(sc);
+			first(rt).supplyChain <- supplyChain;
 		}
 		
-		do initStock(small, fdm);
-		do initStock(large, fdm);
-		do initStock(average, fdm);
+		/*
+		 * The new customer become a new leaf of the "almost-tree" supply chain.
+		 */
+		create SupplyChainElement number:1 returns:fdmLeaf {
+			self.building <- fdm.building;
+			self.sons <- [];
+			self.supplyChain <- myself.supplyChain;
+			position <- 3;
+		}
+		supplyChain.leafs <- supplyChain.leafs + fdmLeaf[0];
 		
-		supplyChain <- supplyChain + large;
-		supplyChain <- supplyChain + average;
-		supplyChain <- supplyChain + small;
+		/*
+		 * connect this leaf to a close warehouse
+		 */
+		// First we find an appropriate local warehouse
+		Warehouse closeWarehouse <- findCloseWarehouse(fdm);
+		do initStock(closeWarehouse, fdm);
 		
-		usedWarehouses <- usedWarehouses + small;
-		usedWarehouses <- usedWarehouses + large;
-		usedWarehouses <- usedWarehouses + average;
-		
-		supplyChain <- supplyChain + fdm.building;
-		
-		// Add the new supply chain to others
-		create SupplyChain number:1 returns:sc;
-		ask sc {
-			buildings <- supplyChain;
-			myself.supplyChains <- myself.supplyChains + self;
-			self.fdm <- fdm;
+		// And next, we look if there is already this warehouse in the supply chain
+		SupplyChainElement sceCloseWarehouse <- nil;
+		bool found <- false;
+		int i <- 0;
+		loop while: i<length( (supplyChain.root as SupplyChainElement).sons) and sceCloseWarehouse != nil {
+			int j <- 0;
+			loop while: j<length( (supplyChain.root.sons[i] as SupplyChainElement).sons) and sceCloseWarehouse != nil {
+				if(closeWarehouse = ((supplyChain.root.sons[i] as SupplyChainElement).sons[j] as SupplyChainElement).building){
+					sceCloseWarehouse <- (supplyChain.root.sons[i] as SupplyChainElement).sons[j];
+				}
+				j <- j + 1;
+			}
+			i <- i + 1;
+		}
+		// If there is not already this SCE
+		if(sceCloseWarehouse = nil){
+			// We must create a SCE corresponding to this warehouse
+			create SupplyChainElement number:1 returns:sceBuild {
+				self.supplyChain <- myself.supplyChain;
+				position <- 2;
+				building <- closeWarehouse;
+				sons <- [] + fdmLeaf;
+				fathers <- [];
+				(fdmLeaf[0] as SupplyChainElement).fathers <- [] + self;
+			}
+			sceCloseWarehouse <- sceBuild[0];
+		}
+		else{
+			// We must update the fathers of the leaf and the sons of the close warehouse
+			sceCloseWarehouse.sons <- sceCloseWarehouse.sons + fdmLeaf[0];
+			(fdmLeaf[0] as SupplyChainElement).fathers <- [] + sceCloseWarehouse;
 		}
 		
+		/*
+		 * Connect the close warehouse to the large warehouse
+		 */
+		// We try to find a father who has an appropriate surface
+		SupplyChainElement sceLarge <- nil;
+		found <- false;
+		int i <- 0;
+		loop while: i<length(supplyChain.root.sons) and !found {
+			sceLarge <- supplyChain.root.sons[i];
+			if( ((sceLarge.building as Building).totalSurface - (sceLarge.building as Building).occupiedSurface ) >= (fdm.building as Building).occupiedSurface ){
+				found <- true;
+			}
+			i <- i + 1;
+		}
+		// If we have not found it in the large warehouses
+		if(!found){
+			// we must create one SCE
+			// we find an appropriate large warehouse
+			Warehouse largeWarehouse <- findLargeWarehouse(fdm);
+			do initStock(largeWarehouse, fdm);
+			// and create a SCE
+			create SupplyChainElement number:1 returns:sceBuild {
+				self.supplyChain <- myself.supplyChain;
+				position <- 1;
+				building <- largeWarehouse;
+				sons <- [];
+				fathers <- [] + myself.supplyChain.root;
+			}
+			sceLarge <- sceBuild[0];
+		}
+		// and then this father become the real father of this close warehouse
+		sceCloseWarehouse.fathers <- sceCloseWarehouse.fathers + sceLarge;
+		sceLarge.sons <- sceLarge.sons + sceCloseWarehouse;
+		
+		
+		/*
 		if(use_gs){
 			if(use_r9){
 				gs_add_node_attribute gs_sender_id:"supply_chain" gs_node_id:large.name gs_attribute_name:"type" gs_attribute_value:"large_warehouse";
@@ -218,7 +220,7 @@ species LogisticProvider parent: Role {
 				gs_add_node_attribute gs_sender_id:"supply_chain" gs_node_id:small.name gs_attribute_name:"type" gs_attribute_value:"small_warehouse";
 				gs_add_node_attribute gs_sender_id:"supply_chain" gs_node_id:fdm.building.name gs_attribute_name:"type" gs_attribute_value:"final_dest";
 			}
-		}
+		}/**/
 	}
 	
 	/**
@@ -231,7 +233,7 @@ species LogisticProvider parent: Role {
 				self.product <- stockFdm.product;
 				self.quantity <- stockFdm.maxQuantity;
 				self.maxQuantity <- stockFdm.maxQuantity;
-				self.ordered <- false;
+				self.status <- 0;
 				self.fdm <- fdm;
 				self.lp <- myself;
 			}
@@ -247,7 +249,7 @@ species LogisticProvider parent: Role {
 	/**
 	 * Return a small warehouse according to the position of the final destination : the more the warehouse is close to the final destination, the more he have a chance to be selected.
 	 */
-	Warehouse findSmallWarehouse(FinalDestinationManager fdm){
+	Warehouse findCloseWarehouse(FinalDestinationManager fdm){
 		list<Warehouse> lsw <- Warehouse sort_by (fdm distance_to each);
 		int f <- ((rnd(10000)/10000)^6)*(length(lsw)-1);
 		// I assume that there is always at least one warehouse which have a free space greater than the occupied surface of the stock to outsource.

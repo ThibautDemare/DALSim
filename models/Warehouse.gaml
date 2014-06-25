@@ -7,11 +7,6 @@
 model Warehouse
 
 import "./Building.gaml"
-import "./LogisticProvider.gaml"
-import "./Batch.gaml"
-import "./Stock.gaml"
-import "./Order.gaml"
-import "./SeineAxisModel.gaml"
 import "./GraphStreamConnection.gaml"
 
 species Warehouse parent: Building{
@@ -44,43 +39,6 @@ species Warehouse parent: Building{
 				gs_add_node_attribute gs_sender_id:"supply_chain" gs_node_id:name gs_attribute_name:"x" gs_attribute_value:location.x;
 				gs_add_node_attribute gs_sender_id:"supply_chain" gs_node_id:name gs_attribute_name:"y" gs_attribute_value:location.y;
 			}
-		}
-	}
-	
-	/*
-	 * Receive a request from a logistic provider to restock another building
-	 */
-	action receiveRestockRequest(Order order){
-		// We must update the stock and take care if we don't send a too big quantity (according to the real stock of this building) 
-		float sendedQuantity <- 0.0;
-		int i <- 0;
-		bool found <- false;
-		
-		// Find the right stock
-		loop while: i < length(stocks) and !found {
-			Stock stock <- stocks[i];
-			if stock.fdm = order.fdm and stock.product = order.product {				
-				if((stock.quantity -  order.quantity) > 0){
-					sendedQuantity <- order.quantity;
-				}
-				else{
-					sendedQuantity <- stock.quantity;
-				}
-				stock.quantity <- stock.quantity - sendedQuantity;
-				found <- true;
-			}
-			i <- i + 1;
-		}
-		
-		// We create a new batch which can move from this warehouse to another building
-		create Batch number: 1 {
-			self.product <- order.product;
-			self.quantity <- sendedQuantity;		
-			self.target <- order.building.location;
-			self.location <- myself.location;
-			self.color <- order.color;
-			self.breakBulk <- self.computeBreakBulk(myself.totalSurface);
-			self.fdm <- order.fdm;
 		}
 	}
 	

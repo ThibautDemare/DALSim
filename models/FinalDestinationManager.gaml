@@ -16,7 +16,7 @@ import "./Stock.gaml"
 import "./GraphStreamConnection.gaml"
 import "./Parameters.gaml"
 
-species FinalDestinationManager parent: Role{
+species FinalDestinationManager {
 	LogisticProvider logisticProvider;
 	Building building;
 	float huffValue;// number of customer according to huff model => this value cant be used like this because the Huff model does not take care of time.
@@ -50,100 +50,10 @@ species FinalDestinationManager parent: Role{
 			myself.building <- self;
 		}
 		
-		// Built its stocks
- /*		float freeSurface <- (building.totalSurface - building.occupiedSurface);// The free surface of the building according to the max quantity
-		float maxOccupiedSurface <- 0.0;// the occupied surface if the stock are maximum.
-		list<Stock> ls <- [];
-		int i <- 0;// useful to add an id to products
-		loop while: freeSurface > 0 {
-			create Stock number: 1 returns: s;
-			ask s {
-				// The id of the product
-				product <- i;
-				i <- i + 1;
-				
-				// If the free surface is greater than 10 percent of the total surface,
-				// then we have : 10 percent of the free surface <= maxQuantity < freeSurface
-				if(freeSurface > myself.building.totalSurface*0.1){
-					maxQuantity <- rnd(freeSurface - freeSurface*0.1)+freeSurface*0.1;
-				}
-				else{
-					// else, the maxQuantity is the remaining surface
-					maxQuantity <- freeSurface;
-				}
-				
-				// If the remaining surface is very too tiny
-				if((freeSurface-maxQuantity) < myself.building.totalSurface*0.1){
-					maxQuantity <- freeSurface;
-				}
-				
-				quantity <- rnd(maxQuantity as int) as float;
-				building <- myself.building;
-				building.occupiedSurface <- building.occupiedSurface + quantity;
-				maxOccupiedSurface <- maxOccupiedSurface + maxQuantity;
-				fdm <- myself;
-			}
-			ls <- ls + s;
-			freeSurface <- (building.totalSurface - maxOccupiedSurface);
-		}
-		building.stocks <- ls;*/
-
-// Use just one product
-/*		create Stock number: 1 returns: s;
-		ask s {
-			// The id of the product
-			product <- 0;
-			maxQuantity <- building.totalSurface;
-			quantity <- rnd(maxQuantity as int) as float;
-			building <- myself.building;
-			building.occupiedSurface <- building.occupiedSurface + quantity; 
-			fdm <- myself;
-		}
-		building.stocks <- s;*/
-
-// use exactly 4 products occupying the same surface
-/*		int i <- 0;
-		float freeSurface <- building.totalSurface;// The free surface of the building according to the max quantity
-		float surfaceByProduct <- freeSurface / 4.0;
-		float maxOccupiedSurface <- 0.0;// the occupied surface if the stock are maximum.
-		list<Stock> ls <- [];
-		loop while: i < 4 {
-			create Stock number: 1 returns: s;
-			ask s {
-				// The id of the product
-				product <- i;
-				i <- i + 1;
-				maxQuantity <- surfaceByProduct;
-				quantity <- rnd(maxQuantity as int) as float;
-				building <- myself.building;
-				building.occupiedSurface <- building.occupiedSurface + quantity;
-				fdm <- myself;
-			}
-			ls <- ls + s;
-		}
-		building.stocks <- ls;*/
-		
-// use between 2 and 6 products occupying the same surface
-		int i <- 0;
-		int nbProduct <- rnd(2)+2;
-		float freeSurface <- building.totalSurface;// The free surface of the building according to the max quantity
-		float surfaceByProduct <- freeSurface / nbProduct;
-		float maxOccupiedSurface <- 0.0;// the occupied surface if the stock are maximum.
-		list<Stock> ls <- [];
-		loop while: i < nbProduct {
-			create Stock number: 1 returns: s;
-			ask s {
-				// The id of the product
-				product <- i;
-				i <- i + 1;
-				maxQuantity <- surfaceByProduct;
-				quantity <- rnd(maxQuantity as int) as float;
-				myself.building.occupiedSurface <- myself.building.occupiedSurface + quantity;
-				fdm <- myself;
-			}
-			ls <- ls + s;
-		}
-		building.stocks <- ls;
+		//do buildRandStock;
+		//do buildOneStock;
+		//do buildFourStock;
+		do buildTwoToSixStock;
 		
 		// Connection to graphstream
 		if(use_gs){
@@ -157,6 +67,10 @@ species FinalDestinationManager parent: Role{
 		logisticProvider <- chooseLogisticProvider();
 		ask logisticProvider {
 			do getNewCustomer(myself);
+		}
+		
+		loop stock over: building.stocks {
+			stock.lp <- logisticProvider;
 		}
 		
 		//Connection to graphstream
@@ -197,7 +111,11 @@ species FinalDestinationManager parent: Role{
 	 */
 	reflex decreasingStocks  when: ((time/3600.0) mod numberOfHoursBeforeDS) = 0.0 {//the stock decrease one time by day (one cycle = 60min)
 		loop stock over: building.stocks {
-			stock.quantity <- stock.quantity - (rnd(stock.maxQuantity/decreasingRateOfStocks));
+			float consumeQuantity <- 0.0;
+			loop while: consumeQuantity = 0 {
+				consumeQuantity <- rnd(stock.maxQuantity/decreasingRateOfStocks);
+			}
+			stock.quantity <- stock.quantity - consumeQuantity;
 			if(stock.quantity < 0){
 				stock.quantity <-  0.0;
 			}
@@ -239,30 +157,6 @@ species FinalDestinationManager parent: Role{
 	}
 	
 	/**
-	 * Check for all product if it needs to be restock.
-	 * If yes, an order is made to the logistic provider
-	 */
-	reflex testOrdersNeeded when: ((time/3600.0) mod numberOfHoursBeforeTON) = 0.0 { //An order is possible one time by day. 
-		loop stock over: building.stocks {
-			if stock.quantity < minimumStockFinalDestPercentage*stock.maxQuantity and stock.ordered=false {
-				stock.ordered <- true;
-				create Order number: 1 returns: b {
-					self.product <- stock.product;
-					self.quantity <- stock.maxQuantity-stock.quantity;
-					self.building <- myself.building;
-					self.logisticProvider <- myself.logisticProvider;
-					fdm <- myself;
-				}
-				
-				ask logisticProvider {
-					do receiveOrder(first(b));
-				}
-
-			}
-		}
-	}
-	
-	/**
 	 * The more the logistic provider is close, the more he has a chance to be selected.
 	 */
 	LogisticProvider chooseLogisticProvider {
@@ -273,5 +167,105 @@ species FinalDestinationManager parent: Role{
 	
 	aspect base { 
 		draw square(2°km) color: rgb("DarkOrange") ;
-	} 
+	}
+	
+	action buildRandStock{
+		// Built its stocks
+ 		float freeSurface <- (building.totalSurface - building.occupiedSurface);// The free surface of the building according to the max quantity
+		float maxOccupiedSurface <- 0.0;// the occupied surface if the stock are maximum.
+		list<Stock> ls <- [];
+		int i <- 0;// useful to add an id to products
+		loop while: freeSurface > 0 {
+			create Stock number: 1 returns: s;
+			ask s {
+				// The id of the product
+				product <- i;
+				i <- i + 1;
+				
+				// If the free surface is greater than 10 percent of the total surface,
+				// then we have : 10 percent of the free surface <= maxQuantity < freeSurface
+				if(freeSurface > myself.building.totalSurface*0.1){
+					maxQuantity <- rnd(freeSurface - freeSurface*0.1)+freeSurface*0.1;
+				}
+				else{
+					// else, the maxQuantity is the remaining surface
+					maxQuantity <- freeSurface;
+				}
+				
+				// If the remaining surface is very too tiny
+				if((freeSurface-maxQuantity) < myself.building.totalSurface*0.1){
+					maxQuantity <- freeSurface;
+				}
+				
+				quantity <- rnd(maxQuantity as int) as float;
+				myself.building.occupiedSurface <- myself.building.occupiedSurface + quantity;
+				maxOccupiedSurface <- maxOccupiedSurface + maxQuantity;
+				fdm <- myself;
+			}
+			ls <- ls + s;
+			freeSurface <- (building.totalSurface - maxOccupiedSurface);
+		}
+		building.stocks <- ls;
+	}
+
+	action buildOneStock {
+		// Use just one product
+		create Stock number: 1 returns: s;
+		ask s {
+			// The id of the product
+			product <- 0;
+			maxQuantity <- myself.building.totalSurface;
+			quantity <- rnd(maxQuantity as int) as float;
+			myself.building.occupiedSurface <- myself.building.occupiedSurface + quantity; 
+			fdm <- myself;
+		}
+		building.stocks <- s;
+	}
+
+	action buildFourStock {
+		// use exactly 4 products occupying the same surface
+		int i <- 0;
+		float freeSurface <- building.totalSurface;// The free surface of the building according to the max quantity
+		float surfaceByProduct <- freeSurface / 4.0;
+		float maxOccupiedSurface <- 0.0;// the occupied surface if the stock are maximum.
+		list<Stock> ls <- [];
+		loop while: i < 4 {
+			create Stock number: 1 returns: s;
+			ask s {
+				// The id of the product
+				product <- i;
+				i <- i + 1;
+				maxQuantity <- surfaceByProduct;
+				quantity <- rnd(maxQuantity as int) as float;
+				myself.building.occupiedSurface <- myself.building.occupiedSurface + quantity;
+				fdm <- myself;
+			}
+			ls <- ls + s;
+		}
+		building.stocks <- ls;
+	}
+
+	action buildTwoToSixStock {	
+		// use between 2 and 6 products occupying the same surface
+		int i <- 0;
+		int nbProduct <- rnd(2)+2;
+		float freeSurface <- building.totalSurface;// The free surface of the building according to the max quantity
+		float surfaceByProduct <- freeSurface / nbProduct;
+		float maxOccupiedSurface <- 0.0;// the occupied surface if the stock are maximum.
+		list<Stock> ls <- [];
+		loop while: i < nbProduct {
+			create Stock number: 1 returns: s;
+			ask s {
+				// The id of the product
+				product <- i;
+				i <- i + 1;
+				maxQuantity <- surfaceByProduct;
+				quantity <- rnd(maxQuantity as int) as float;
+				myself.building.occupiedSurface <- myself.building.occupiedSurface + quantity;
+				fdm <- myself;
+			}
+			ls <- ls + s;
+		}
+		building.stocks <- ls;
+	}
 }
