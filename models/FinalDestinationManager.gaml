@@ -111,7 +111,11 @@ species FinalDestinationManager {
 	 */
 	reflex decreasingStocks  when: ((time/3600.0) mod numberOfHoursBeforeDS) = 0.0 {//the stock decrease one time by day (one cycle = 60min)
 		loop stock over: building.stocks {
-			stock.quantity <- stock.quantity - (rnd(stock.maxQuantity/decreasingRateOfStocks));
+			float consumeQuantity <- 0.0;
+			loop while: consumeQuantity = 0 {
+				consumeQuantity <- rnd(stock.maxQuantity/decreasingRateOfStocks);
+			}
+			stock.quantity <- stock.quantity - consumeQuantity;
 			if(stock.quantity < 0){
 				stock.quantity <-  0.0;
 			}
