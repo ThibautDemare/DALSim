@@ -199,6 +199,12 @@ species LogisticProvider {
 			}
 			supplyChain <- first(sc);
 			first(rt).supplyChain <- supplyChain;
+			
+			if(use_gs){
+				if(use_r9){
+					gs_add_node_attribute gs_sender_id:"supply_chain" gs_node_id:provider.name gs_attribute_name:"type" gs_attribute_value:"provider";
+				}
+			}
 		}
 		
 		/*
@@ -211,7 +217,12 @@ species LogisticProvider {
 			position <- 3;
 		}
 		supplyChain.leafs <- supplyChain.leafs + fdmLeaf[0];
-		
+		if(use_gs){
+			if(use_r9){
+				gs_add_node_attribute gs_sender_id:"supply_chain" gs_node_id:fdm.name gs_attribute_name:"type" gs_attribute_value:"final_dest";
+			}
+		}
+			
 		/*
 		 * connect this leaf to a close warehouse
 		 */
@@ -245,11 +256,23 @@ species LogisticProvider {
 				(fdmLeaf[0] as SupplyChainElement).fathers <- [] + self;
 			}
 			sceCloseWarehouse <- sceBuild[0];
+			
+			if(use_gs){
+				if(use_r9){
+					gs_add_node_attribute gs_sender_id:"supply_chain" gs_node_id:sceCloseWarehouse.building.name gs_attribute_name:"type" gs_attribute_value:"close_warehouse";
+				}
+			}
 		}
 		else{
 			// We must update the fathers of the leaf and the sons of the close warehouse
 			sceCloseWarehouse.sons <- sceCloseWarehouse.sons + fdmLeaf[0];
 			(fdmLeaf[0] as SupplyChainElement).fathers <- [] + sceCloseWarehouse;
+		}
+		
+		if(use_gs){
+			if(use_r9){
+				gs_add_edge gs_sender_id:"supply_chain" gs_edge_id:(fdm.name + sceCloseWarehouse.building.name) gs_node_id_from:fdm.name gs_node_id_to:sceCloseWarehouse.building.name gs_is_directed:false;
+			}
 		}
 		
 		/*
@@ -282,6 +305,13 @@ species LogisticProvider {
 			}
 			sceLarge <- sceBuild[0];
 			supplyChain.root.sons <- supplyChain.root.sons + sceLarge;
+			
+			if(use_gs){
+				if(use_r9){
+					gs_add_node_attribute gs_sender_id:"supply_chain" gs_node_id:sceLarge.building.name gs_attribute_name:"type" gs_attribute_value:"large_warehouse";
+					gs_add_edge gs_sender_id:"supply_chain" gs_edge_id:(sceLarge.building.name + provider.name) gs_node_id_from:sceLarge.building.name gs_node_id_to:provider.name gs_is_directed:false;
+				}
+			}
 		}
 		// and then this father become the real father of this close warehouse
 		found <- false;
@@ -308,15 +338,11 @@ species LogisticProvider {
 			sceLarge.sons <- sceLarge.sons + sceCloseWarehouse;
 		}
 		
-		/*
 		if(use_gs){
 			if(use_r9){
-				gs_add_node_attribute gs_sender_id:"supply_chain" gs_node_id:large.name gs_attribute_name:"type" gs_attribute_value:"large_warehouse";
-				gs_add_node_attribute gs_sender_id:"supply_chain" gs_node_id:average.name gs_attribute_name:"type" gs_attribute_value:"average_warehouse";
-				gs_add_node_attribute gs_sender_id:"supply_chain" gs_node_id:small.name gs_attribute_name:"type" gs_attribute_value:"small_warehouse";
-				gs_add_node_attribute gs_sender_id:"supply_chain" gs_node_id:fdm.building.name gs_attribute_name:"type" gs_attribute_value:"final_dest";
+				gs_add_edge gs_sender_id:"supply_chain" gs_edge_id:(sceCloseWarehouse.building.name + sceLarge.building.name) gs_node_id_from:sceCloseWarehouse.building.name gs_node_id_to:sceLarge.building.name gs_is_directed:false;
 			}
-		}/**/
+		}
 	}
 	
 	/**
