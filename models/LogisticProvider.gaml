@@ -64,23 +64,98 @@ species LogisticProvider {
 		int i <- 0;
 		SupplyChainElement sceLeaf <- nil;
 		loop while: i<length(supplyChain.leafs) and sceLeaf = nil {
-			if(fdm = ((supplyChain.leafs[i] as SupplyChainElement).building )){
+			if(fdm.building = ((supplyChain.leafs[i] as SupplyChainElement).building )){
 				sceLeaf <- supplyChain.leafs[i];
 			}
 			i <- i + 1;
 		}
-		
+		// Delete the stocks which belong to the FDM, in the warehouses of the supply chain
+		// Also, find the SCE which are not still used
+		list<SupplyChainElement> sceToDelete <- [];
 		loop sceClose over: sceLeaf.fathers {
 			Building b1 <- (sceClose as SupplyChainElement).building;
 			do deleteStock(fdm, b1);
 			
+			if(isUseless(sceClose.building)){
+				sceToDelete <- sceToDelete + sceClose;
+			}
+			
 			loop sceLarge over: sceClose.fathers {
 				Building b2 <- (sceLarge as SupplyChainElement).building;
 				do deleteStock(fdm, b2);
+				
+				if(isUseless(sceLarge.building)){
+					sceToDelete <- sceToDelete + sceLarge;
+				}
+			}
+		}
+		
+		// And finally remove these useless SCE from the SC
+		do removeSCE(sceToDelete);
+	}
+	
+	/**
+	 * Remove a SupplyChainElement from the SupplyChain of the current LogisticProvider
+	 */
+	action removeSCE(list<SupplyChainElement> sceToDelete){
+		loop while: !empty(sceToDelete){
+			SupplyChainElement sce <- first(sceToDelete);
+			// Delete this sce in his fathers
+			loop father over:sce.fathers {
+				int j <- 0;
+				bool found <- false;
+				loop while: j < length(father.sons) and !found {
+					if(father.sons[j] = sce){
+						found <- true;
+					}
+					else {
+						j <- j + 1;
+					}
+				}
+				remove index: j from: father.sons;
+			}
+			// Delete this sce in his sons
+			loop son over:sce.sons {
+				int j <- 0;
+				bool found <- false;
+				loop while: j < length(son.fathers) and !found {
+					if(son.fathers[j] = sce){
+						found <- true;
+					}
+					else {
+						j <- j + 1;
+					}
+				}
+				remove index: j from: son.fathers;
+			}
+			remove index:0 from: sceToDelete;
+			ask sce {
+				do die;
 			}
 		}
 	}
 	
+	/**
+	 * Check if a building have still some stock managed by the current logistic provider.
+	 * If there is not, it means that the building is useless in the supply chain.
+	 */
+	bool isUseless(Building b){
+		// Watch if this warehouse is useful or not
+		int j <- 0;
+		bool isUseless <- true;
+		loop while: j < length(b.stocks) and isUseless {
+			Stock stock <- b.stocks[j];
+			if(stock.lp = self){
+				isUseless <- false;
+			}
+			j <- j + 1;
+		}
+		return isUseless;
+	}
+	
+	/**
+	 * Delete all the stocks of a given FinalDestinationManager in a given building
+	 */
 	action deleteStock(FinalDestinationManager fdm, Building b){
 		loop stockFdm over: (fdm.building as Building).stocks {	
 			int i <- 0;
@@ -206,11 +281,32 @@ species LogisticProvider {
 				fathers <- [] + myself.supplyChain.root;
 			}
 			sceLarge <- sceBuild[0];
+			supplyChain.root.sons <- supplyChain.root.sons + sceLarge;
 		}
 		// and then this father become the real father of this close warehouse
-		sceCloseWarehouse.fathers <- sceCloseWarehouse.fathers + sceLarge;
-		sceLarge.sons <- sceLarge.sons + sceCloseWarehouse;
+		found <- false;
+		i <- 0;
+		loop while: i<length(sceCloseWarehouse.fathers) and !found {
+			if(sceCloseWarehouse.fathers[i] = sceLarge){
+				found <- true;
+			}
+			i <- i + 1;
+		}
+		if(!found){
+			sceCloseWarehouse.fathers <- sceCloseWarehouse.fathers + sceLarge;
+		}
 		
+		found <- false;
+		i <- 0;
+		loop while: i<length(sceLarge.sons) and !found {
+			if(sceLarge.sons[i] = sceCloseWarehouse){
+				found <- true;
+			}
+			i <- i + 1;
+		}
+		if(!found){
+			sceLarge.sons <- sceLarge.sons + sceCloseWarehouse;
+		}
 		
 		/*
 		if(use_gs){
