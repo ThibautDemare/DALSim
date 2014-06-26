@@ -88,6 +88,12 @@ species LogisticProvider {
 					sceToDelete <- sceToDelete + sceLarge;
 				}
 			}
+			
+			if(use_gs){
+				if(use_r9){
+					gs_remove_edge gs_sender_id:"supply_chain" gs_edge_id:(fdm.name + sceClose.building.name);
+				}
+			}
 		}
 		
 		// And finally remove these useless SCE from the SC
@@ -113,6 +119,12 @@ species LogisticProvider {
 					}
 				}
 				remove index: j from: father.sons;
+				
+				if(use_gs){
+					if(use_r9){
+						gs_remove_edge gs_sender_id:"supply_chain" gs_edge_id:(sce.building.name + father.building.name);
+					}
+				}
 			}
 			// Delete this sce in his sons
 			loop son over:sce.sons {
@@ -127,6 +139,12 @@ species LogisticProvider {
 					}
 				}
 				remove index: j from: son.fathers;
+				
+				if(use_gs){
+					if(use_r9){
+						gs_remove_edge gs_sender_id:"supply_chain" gs_edge_id:(son.building.name + sce.building.name);
+					}
+				}
 			}
 			remove index:0 from: sceToDelete;
 			ask sce {
