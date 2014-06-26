@@ -91,7 +91,7 @@ species Building {
 					bool foundBatch <- false;
 					int j <- 0;
 					loop while: j < length(leavingBatches) and !foundBatch {
-						if( (leavingBatches[j] as Batch).target = order.building.location){
+						if( (leavingBatches[j] as Batch).target = order.building.location and order.position = (leavingBatches[j] as Batch).position){
 							foundBatch <- true;
 						}
 						else {

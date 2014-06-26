@@ -50,7 +50,7 @@ global {
 	/**
 	 * 
 	 */
-	reflex updateBatch  when:(time/3600.0) > 200{
+	reflex updateBatch  {
 		// Init to zero
 		totalNumberOfBatch <- 0;
 		numberOfBatchProviderToLarge <- 0;
