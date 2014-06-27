@@ -24,6 +24,8 @@ experiment exp_save_results type: gui {
 	output {
 	file name: "results" type: text data: ""+ ((time/3600.0) as int) + "; " +
 		stockInWarehouse + ";" + stockInFinalDest + ";" +
+		cumulativeNumberOfBatchProviderToLarge + ";" + cumulativeNumberOfBatchLargeToClose + ";" + cumulativeNumberOfBatchCloseToFinal + ";" +
+		cumulativeStockOnRoadsProviderToLarge + ";" + cumulativeStockOnRoadsLargeToClose + ";" + cumulativeStockOnRoadsCloseToFinal + ";" +
 		totalNumberOfBatch + ";" + numberOfBatchProviderToLarge + ";" + numberOfBatchLargeToClose + ";" + numberOfBatchCloseToFinal + ";" + 
 		stockOnRoads + ";" + stockOnRoadsProviderToLarge + ";" + stockOnRoadsLargeToClose + ";" + stockOnRoadsCloseToFinal;
 	}
