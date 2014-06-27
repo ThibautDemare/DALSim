@@ -395,7 +395,7 @@ species LogisticProvider {
 		// I assume that there is always at least one warehouse which have a free space greater than the occupied surface of the stock to outsource.
 		// According to results, it doesn't seem foolish.
 		loop while:( (lsw[f] as Building).totalSurface - (lsw[f] as Building).occupiedSurface ) < (fdm.building as Building).occupiedSurface {
-			f <- ((rnd(10000)/10000)^6)*(length(lsw)-1);
+			f <- ((rnd(10000)/10000)^32)*(length(lsw)-1);
 		}
 		return lsw[f];/**/
 		//return one_of(average_warehouse);
