@@ -9,7 +9,7 @@ model Warehouse
 import "./Building.gaml"
 import "./GraphStreamConnection.gaml"
 
-species Warehouse parent: Building{
+species Warehouse parent: RestockingBuilding{
 	float huffValue;
 	string color;
 	int department;

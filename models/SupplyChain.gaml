@@ -30,7 +30,7 @@ species SupplyChainElement {
 		// First, we add the orders made by the son in order to process its later
 		if(!empty(sonOrders)){
 			loop sonOrder over: sonOrders {
-				ask b {
+				ask b as RestockingBuilding {
 					do addOrder(sonOrder);
 				}
 			}

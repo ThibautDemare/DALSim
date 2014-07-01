@@ -15,7 +15,6 @@ species Building {
 	list<Stock> stocks;
 	float totalSurface;
 	float occupiedSurface;
-	list<Order> currentOrders <- [];
 	
 	/*
 	 * Receive a batch
@@ -50,6 +49,10 @@ species Building {
 			}
  		}
 	}
+}
+
+species RestockingBuilding parent: Building {
+	list<Order> currentOrders <- [];
 	
 	action addOrder(Order order){
 		currentOrders <- currentOrders + order;
