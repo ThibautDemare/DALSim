@@ -32,3 +32,9 @@ Data of the graphic must be saved on a CSV file => done
 stockInRoads must be unbundle by type of batch for data on file => done
 
 When a final dest manager change of logistic provider, his associated supply chain must be removed too = done
+
+A stock and a supply chain belong to a FinalDestinationManager. Need to update in consequences the management of warehouse according to this method.
+Moreover, when a FinalDest change of LogisticProvider, the LogisticProvider need to update in consequences the usedWarehouses list.
+When the LogisticProvider test if an order is needed, he must find the right supply chain
+
+update supply chain network when logistic provider loose a final dest manager
