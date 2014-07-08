@@ -22,12 +22,21 @@ experiment exp_no_output type: gui {
 
 experiment exp_save_results type: gui {
 	output {
-	file name: "results" type: text data: ""+ ((time/3600.0) as int) + "; " +
-		stockInWarehouse + ";" + stockInFinalDest + ";" +
-		cumulativeNumberOfBatchProviderToLarge + ";" + cumulativeNumberOfBatchLargeToClose + ";" + cumulativeNumberOfBatchCloseToFinal + ";" +
-		cumulativeStockOnRoadsProviderToLarge + ";" + cumulativeStockOnRoadsLargeToClose + ";" + cumulativeStockOnRoadsCloseToFinal + ";" +
-		totalNumberOfBatch + ";" + numberOfBatchProviderToLarge + ";" + numberOfBatchLargeToClose + ";" + numberOfBatchCloseToFinal + ";" + 
-		stockOnRoads + ";" + stockOnRoadsProviderToLarge + ";" + stockOnRoadsLargeToClose + ";" + stockOnRoadsCloseToFinal;
+		file name: "stocks_warehouses" type: text data: ""+ ((time/3600.0) as int) + "; " +stockInWarehouse;
+		
+		file name: "stocks_final_dests" type: text data: ""+ ((time/3600.0) as int) + "; " + ";" + stockInFinalDest + ";";
+		
+		file name: "cumulative_number_batches" type: text data: ""+ ((time/3600.0) as int) + "; " + 
+			cumulativeNumberOfBatchProviderToLarge + ";" + cumulativeNumberOfBatchLargeToClose + ";" + cumulativeNumberOfBatchCloseToFinal + ";";
+			
+		file name: "cumulative_stock_on_roads" type: text data: ""+ ((time/3600.0) as int) + "; " + 
+			cumulativeStockOnRoadsProviderToLarge + ";" + cumulativeStockOnRoadsLargeToClose + ";" + cumulativeStockOnRoadsCloseToFinal + ";";
+		
+		file name: "number_batches" type: text data: ""+ ((time/3600.0) as int) + "; " + 
+			totalNumberOfBatch + ";" + numberOfBatchProviderToLarge + ";" + numberOfBatchLargeToClose + ";" + numberOfBatchCloseToFinal + ";";
+			
+		file name: "stock_on_roads" type: text data: ""+ ((time/3600.0) as int) + "; " + 
+			stockOnRoads + ";" + stockOnRoadsProviderToLarge + ";" + stockOnRoadsLargeToClose + ";" + stockOnRoadsCloseToFinal;
 	}
 }
 
