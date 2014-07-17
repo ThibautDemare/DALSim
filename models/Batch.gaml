@@ -18,6 +18,7 @@ species Batch skills:[moving]{
 	int breakBulk <- 0;
 	int position;
 	FinalDestinationManager fdm;
+	Building dest;
 	
 	reflex move when: target != nil and breakBulk = 0 {
 		do goto(target: target, speed: speed, on: road_network, recompute_path: false);

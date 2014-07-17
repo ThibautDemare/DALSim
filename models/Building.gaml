@@ -24,11 +24,11 @@ species Building {
 		if( !(empty (entering_batch))) {
 			ask entering_batch {
 				//If the batch is at the right adress
-				if( self.target = myself.location ){
+				if( self.dest = myself){
 					self.breakBulk <- self.computeBreakBulk(myself.totalSurface);
 					target <- nil;
 				}
-				else if (target = nil and self.breakBulk = 0) {
+				else if (target = nil and self.breakBulk = 0 and self.dest = myself) {
 					loop while: !empty(self.stocks){
 						Stock stockBatch <- first(self.stocks);
 						loop stockBuilding over: myself.stocks {
@@ -114,6 +114,7 @@ species RestockingBuilding parent: Building {
 							self.breakBulk <- self.computeBreakBulk(myself.totalSurface);
 							self.fdm <- order.fdm;
 							self.position <- order.position;
+							self.dest <- order.building;
 						}
 						lb <- first(rlb);
 						leavingBatches <- leavingBatches + lb;
