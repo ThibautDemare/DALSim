@@ -9,14 +9,21 @@ model Observer
 import "./FinalDestinationManager.gaml"
 import "./Batch.gaml"
 import "./Warehouse.gaml"
+import "./Building.gaml"
 import "./Parameters.gaml"
 import "./Stock.gaml"
 
 global {
+	int numberofEmptyStockInFinalDests <- 0;
+	int numberOfEmptyStockInWarehouses <- 0;
+	
 	float stockInFinalDest <- 0.0;
+	float freeSurfaceInFinalDest <- 0.0;
 	float stockInWarehouse <- 0.0;
+	float freeSurfaceInWarehouse <- 0.0;
 	
 	int totalNumberOfBatch <- 0;
+	int cumulativeNumberOfBatch <- 0;
 	int numberOfBatchProviderToLarge <- 0;
 	int cumulativeNumberOfBatchProviderToLarge <- 0;
 	int numberOfBatchLargeToClose <- 0;
@@ -25,6 +32,7 @@ global {
 	int cumulativeNumberOfBatchCloseToFinal <- 0;
 	
 	float stockOnRoads <- 0.0;
+	float cumulativeStockOnRoads <- 0.0;
 	float stockOnRoadsProviderToLarge <- 0.0;
 	float cumulativeStockOnRoadsProviderToLarge <- 0.0;
 	float stockOnRoadsLargeToClose <- 0.0;
@@ -32,18 +40,46 @@ global {
 	float stockOnRoadsCloseToFinal <- 0.0;
 	float cumulativeStockOnRoadsCloseToFinal <- 0.0;
 	
-	reflex updateStockInBuildings when:((time/3600.0) mod numberOfHoursBeforeTRN) = 0{
+	reflex updateStockInBuildings {
+		do computeStockInFinalDests;
+		do computeStockInWarehouses;
+	}
+	
+	action computeStockInFinalDests{
 		stockInFinalDest <- 0.0;
+		freeSurfaceInFinalDest <- 0.0;
+		numberofEmptyStockInFinalDests <- 0;
+		float totalNumberOfStock <- 0.0;
 		ask FinalDestinationManager {
+			float tempStock <- 0.0;
 			ask self.building.stocks {
 				stockInFinalDest <- stockInFinalDest + self.quantity;
+				tempStock <- tempStock + self.quantity;
+				totalNumberOfStock <- totalNumberOfStock + 1;
+				if(self.quantity = 0){
+					numberofEmptyStockInFinalDests <- numberofEmptyStockInFinalDests + 1;
+				}
 			}
+			freeSurfaceInFinalDest <- freeSurfaceInFinalDest + (surface - tempStock);
 		}
+	}
+	
+	action computeStockInWarehouses {
 		stockInWarehouse <- 0.0;
+		freeSurfaceInWarehouse <- 0.0;
+		numberOfEmptyStockInWarehouses <- 0;
+		float totalNumberOfStock <- 0.0;
 		ask Warehouse {
+			float tempStock <- 0.0;
 			ask self.stocks {
 				stockInWarehouse <- stockInWarehouse + self.quantity;
+				tempStock <- tempStock + self.quantity;
+				totalNumberOfStock <- totalNumberOfStock + 1;
+				if(self.quantity = 0){
+					numberOfEmptyStockInWarehouses <- numberOfEmptyStockInWarehouses + 1;
+				}
 			}
+			freeSurfaceInWarehouse <- freeSurfaceInWarehouse + (totalSurface - tempStock);
 		}
 	}
 	
@@ -81,8 +117,10 @@ global {
 				cumulativeStockOnRoadsCloseToFinal <- cumulativeStockOnRoadsCloseToFinal + self.overallQuantity;
 			}
 			totalNumberOfBatch <- totalNumberOfBatch + 1;
+			cumulativeNumberOfBatch <- cumulativeNumberOfBatch + 1;
 			
 		}
 		stockOnRoads <- stockOnRoadsProviderToLarge + stockOnRoadsLargeToClose + stockOnRoadsCloseToFinal;
+		cumulativeStockOnRoads <- cumulativeStockOnRoads + stockOnRoads;
 	}
 }

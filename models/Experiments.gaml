@@ -22,15 +22,15 @@ experiment exp_no_output type: gui {
 
 experiment exp_save_results type: gui {
 	output {
-		file name: "stocks_warehouses" type: text data: ""+ ((time/3600.0) as int) + "; " +stockInWarehouse;
+		file name: "stocks_warehouses" type: text data: ""+ ((time/3600.0) as int) + "; " +stockInWarehouse + ";" + freeSurfaceInWarehouse + ";";
 		
-		file name: "stocks_final_dests" type: text data: ""+ ((time/3600.0) as int) + "; " + ";" + stockInFinalDest + ";";
+		file name: "stocks_final_dests" type: text data: ""+ ((time/3600.0) as int) + "; " + ";" + stockInFinalDest + ";" + freeSurfaceInFinalDest + ";";
 		
 		file name: "cumulative_number_batches" type: text data: ""+ ((time/3600.0) as int) + "; " + 
-			cumulativeNumberOfBatchProviderToLarge + ";" + cumulativeNumberOfBatchLargeToClose + ";" + cumulativeNumberOfBatchCloseToFinal + ";";
+			cumulativeNumberOfBatch + ";" + cumulativeNumberOfBatchProviderToLarge + ";" + cumulativeNumberOfBatchLargeToClose + ";" + cumulativeNumberOfBatchCloseToFinal + ";";
 			
 		file name: "cumulative_stock_on_roads" type: text data: ""+ ((time/3600.0) as int) + "; " + 
-			cumulativeStockOnRoadsProviderToLarge + ";" + cumulativeStockOnRoadsLargeToClose + ";" + cumulativeStockOnRoadsCloseToFinal + ";";
+			cumulativeStockOnRoads + ";" + cumulativeStockOnRoadsProviderToLarge + ";" + cumulativeStockOnRoadsLargeToClose + ";" + cumulativeStockOnRoadsCloseToFinal + ";";
 		
 		file name: "number_batches" type: text data: ""+ ((time/3600.0) as int) + "; " + 
 			totalNumberOfBatch + ";" + numberOfBatchProviderToLarge + ";" + numberOfBatchLargeToClose + ";" + numberOfBatchCloseToFinal + ";";
@@ -92,6 +92,7 @@ experiment exp_chart type: gui {
 		
 		display chart_cumulative_number_of_batch refresh_every: 1 {
 			chart  "Cumulative number of batches" type: series {
+				data "Cumulative number of batch" value: cumulativeNumberOfBatch color: rgb('blue') ;
 				data "Cumulative number of batch going from the provider to a large warehouse" value: cumulativeNumberOfBatchProviderToLarge color: rgb('blue') ;
 				data "Cumulative number of batch going from a large warehouse to an average one" value: cumulativeNumberOfBatchLargeToClose color: rgb('green') ;
 				data "Cumulative number of batch going from a small warehouse to a final destination" value: cumulativeNumberOfBatchCloseToFinal color: rgb('red') ;
@@ -109,20 +110,36 @@ experiment exp_chart type: gui {
 		
 		display chart_cumulative_stock_on_roads refresh_every: 1 {
 			chart  "Cumulative stock quantity within batches" type: series {
+				data "Cumulative quantity of goods within batches" value: cumulativeStockOnRoads color: rgb('blue') ;
 				data "Cumulative quantity of goods within batches going from the provider to a large warehouse" value: cumulativeStockOnRoadsProviderToLarge color: rgb('blue') ;
 				data "Cumulative quantity of goods within batches going from a large warehouse to a average one" value: cumulativeStockOnRoadsLargeToClose color: rgb('green') ;
 				data "Cumulative quantity of goods within batches going from a small warehouse to a final destination" value: cumulativeStockOnRoadsCloseToFinal color: rgb('red') ;
 			}
 		}/**/
 		
-		/*display chart_average_stock_in_final_dest refresh_every: 1 {
+		/*display chart_total_stock_in_final_dest refresh_every: 1 {
 			chart  "Stock quantity in final destinations" type: series {
-				data "Average stock quantity in final destinations" value: stockInFinalDest color: rgb('green') ;
+				data "Total stock quantity in final destinations" value: stockInFinalDest color: rgb('green') ;
+				data "Total free surface in final destinations" value: freeSurfaceInFinalDest color: rgb('blue') ;
 			}
 		}/**/
-		/*display chart_average_stock_in_warehouse refresh_every: 1 {
+		
+		/*display chart_total_stock_in_warehouse refresh_every: 1 {
 			chart  "Stock quantity in warehouses" type: series {
-				data "Average stock quantity in warehouses" value: stockInWarehouse color: rgb('orange') ;
+				data "Total stock quantity in warehouses" value: stockInWarehouse color: rgb('orange') ;
+				data "Total free surface in warehouses" value: freeSurfaceInWarehouse color: rgb('blue') ;
+			}
+		}/**/
+		
+		display chart_number_empty_stock_final_dest refresh_every: 1 {
+			chart  "Number of empty stock in final destinations" type: series {
+				data "Number of empty stock in final destinations" value: numberofEmptyStockInFinalDests color: rgb('green') ;
+			}
+		}/**/
+		
+		display chart_number_empty_stock_warehouses refresh_every: 1 {
+			chart  "Number of empty stock in warehouses" type: series {
+				data "Number of empty stock in warehouses" value: numberOfEmptyStockInWarehouses color: rgb('green') ;
 			}
 		}/**/
 	}
