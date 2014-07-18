@@ -388,11 +388,11 @@ species LogisticProvider {
 	}
 	
 	/**
-	 * Return a small warehouse according to the position of the final destination : the more the warehouse is close to the final destination, the more he have a chance to be selected.
+	 * Return a small warehouse according to the position of the final destination : the more the warehouse is close to the final destination, the more he has a chance to be selected.
 	 */
 	Warehouse findCloseWarehouse(FinalDestinationManager fdm, int sizeOfStock){
 		list<Warehouse> lsw <- Warehouse sort_by (fdm distance_to each);
-		int f <- ((rnd(10000)/10000)^6)*(length(lsw)-1);
+		int f <- ((rnd(10000)/10000)^32)*(length(lsw)-1);
 		// I assume that there is always at least one warehouse which have a free space greater than the occupied surface of the stock to outsource.
 		// According to results, it doesn't seem foolish.
 		loop while:
@@ -404,15 +404,15 @@ species LogisticProvider {
 	}
 	
 	/**
-	 * Return a large warehouse according to the position of the final destination : the more the warehouse has a big free surface, the more he have a chance to be selected.
+	 * Return a large warehouse : the more the warehouse has a big free surface, the more he has a chance to be selected.
 	 */
 	Warehouse findLargeWarehouse(FinalDestinationManager fdm, int sizeOfStock){
 		list<Warehouse> llw <- Warehouse sort_by (each.totalSurface-each.occupiedSurface);
-		int f <- ((rnd(10000)/10000)^6)*(length(llw)-1);
+		int f <- ((rnd(10000)/10000)^32)*(length(llw)-1);
 		// I assume that there is always at least one warehouse which have a free space greater than the occupied surface of the stock to outsource.
 		// According to results, it doesn't seem foolish.
 		loop while:( (llw[(length(llw)-1) - f] as Building).totalSurface - (llw[(length(llw)-1) - f] as Building).occupiedSurface ) < ((fdm.building as Building).occupiedSurface * sizeOfStock) {
-			f <- ((rnd(10000)/10000)^6)*(length(llw)-1);
+			f <- ((rnd(10000)/10000)^32)*(length(llw)-1);
 		}
 		return llw[(length(llw)-1) - f];/**/
 		//return one_of(large_warehouse);
