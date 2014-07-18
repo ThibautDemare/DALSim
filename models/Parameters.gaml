@@ -29,6 +29,9 @@ global {
 	float numberOfHoursBeforeTRN <- 24.0;
 	// The numbers of hours between each calls to the reflex "processOrders"
 	float numberofHoursBeforePO <- 24.0;
+	
+	int sizeOfStockLocalWarehouse <- 2.0;
+	int sizeOfStockLargeWarehouse <- 4.0;
 	/**
 	 * The final destinations are separated in 4 ordered sets. To each final destinations of these sets, we associate a decreasing rate of 
 	 * stocks according to the number of customer computed by the Huff model. The more the customers there are, the more the decreasing 

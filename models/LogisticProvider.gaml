@@ -245,8 +245,8 @@ species LogisticProvider {
 		 * connect this leaf to a close warehouse
 		 */
 		// First we find an appropriate local warehouse
-		Warehouse closeWarehouse <- findCloseWarehouse(fdm);
-		do initStock(closeWarehouse, fdm);
+		Warehouse closeWarehouse <- findCloseWarehouse(fdm, sizeOfStockLocalWarehouse);
+		do initStock(closeWarehouse, fdm, sizeOfStockLocalWarehouse);
 		
 		// And next, we look if there is already this warehouse in the supply chain
 		SupplyChainElement sceCloseWarehouse <- nil;
@@ -302,7 +302,7 @@ species LogisticProvider {
 		int i <- 0;
 		loop while: i<length(supplyChain.root.sons) and !found {
 			sceLarge <- supplyChain.root.sons[i];
-			if( ((sceLarge.building as Building).totalSurface - (sceLarge.building as Building).occupiedSurface ) >= (fdm.building as Building).occupiedSurface ){
+			if( ((sceLarge.building as Building).totalSurface - (sceLarge.building as Building).occupiedSurface ) >= ((fdm.building as Building).occupiedSurface * sizeOfStockLargeWarehouse) ){
 				found <- true;
 			}
 			i <- i + 1;
@@ -311,8 +311,8 @@ species LogisticProvider {
 		if(!found){
 			// we must create one SCE
 			// we find an appropriate large warehouse
-			Warehouse largeWarehouse <- findLargeWarehouse(fdm);
-			do initStock(largeWarehouse, fdm);
+			Warehouse largeWarehouse <- findLargeWarehouse(fdm, sizeOfStockLargeWarehouse);
+			do initStock(largeWarehouse, fdm, sizeOfStockLargeWarehouse);
 			// and create a SCE
 			create SupplyChainElement number:1 returns:sceBuild {
 				self.supplyChain <- myself.supplyChain;
@@ -366,13 +366,13 @@ species LogisticProvider {
 	/**
 	 * We assume that the warehouse have already a stock when we initialize a new supply chain
 	 */
-	action initStock(Warehouse warehouse, FinalDestinationManager fdm){
+	action initStock(Warehouse warehouse, FinalDestinationManager fdm, int sizeOfStock){
 		loop stockFdm over: (fdm.building as Building).stocks {
 			// We create the stock agent
 			create Stock number:1 returns:s {
 				self.product <- stockFdm.product;
-				self.quantity <- stockFdm.maxQuantity;
-				self.maxQuantity <- stockFdm.maxQuantity;
+				self.quantity <- rnd(stockFdm.maxQuantity * sizeOfStock) as float;
+				self.maxQuantity <- stockFdm.maxQuantity * sizeOfStock;
 				self.status <- 0;
 				self.fdm <- fdm;
 				self.lp <- myself;
@@ -382,19 +382,20 @@ species LogisticProvider {
 			warehouse.stocks <- warehouse.stocks + s[0];
 			
 			// Finally we update the occupied surface
-			warehouse.occupiedSurface <- warehouse.occupiedSurface + stockFdm.maxQuantity;
+			warehouse.occupiedSurface <- warehouse.occupiedSurface + (s[0] as Stock).maxQuantity;
 		}
 	}
 	
 	/**
 	 * Return a small warehouse according to the position of the final destination : the more the warehouse is close to the final destination, the more he have a chance to be selected.
 	 */
-	Warehouse findCloseWarehouse(FinalDestinationManager fdm){
+	Warehouse findCloseWarehouse(FinalDestinationManager fdm, int sizeOfStock){
 		list<Warehouse> lsw <- Warehouse sort_by (fdm distance_to each);
 		int f <- ((rnd(10000)/10000)^6)*(length(lsw)-1);
 		// I assume that there is always at least one warehouse which have a free space greater than the occupied surface of the stock to outsource.
 		// According to results, it doesn't seem foolish.
-		loop while:( (lsw[f] as Building).totalSurface - (lsw[f] as Building).occupiedSurface ) < (fdm.building as Building).occupiedSurface {
+		loop while:
+				( (lsw[f] as Building).totalSurface - (lsw[f] as Building).occupiedSurface)	< (fdm.building as Building).occupiedSurface * sizeOfStock {
 			f <- ((rnd(10000)/10000)^32)*(length(lsw)-1);
 		}
 		return lsw[f];/**/
@@ -404,12 +405,12 @@ species LogisticProvider {
 	/**
 	 * Return a large warehouse according to the position of the final destination : the more the warehouse has a big free surface, the more he have a chance to be selected.
 	 */
-	Warehouse findLargeWarehouse(FinalDestinationManager fdm){
+	Warehouse findLargeWarehouse(FinalDestinationManager fdm, int sizeOfStock){
 		list<Warehouse> llw <- Warehouse sort_by (each.totalSurface-each.occupiedSurface);
 		int f <- ((rnd(10000)/10000)^6)*(length(llw)-1);
 		// I assume that there is always at least one warehouse which have a free space greater than the occupied surface of the stock to outsource.
 		// According to results, it doesn't seem foolish.
-		loop while:( (llw[(length(llw)-1) - f] as Building).totalSurface - (llw[(length(llw)-1) - f] as Building).occupiedSurface ) < (fdm.building as Building).occupiedSurface {
+		loop while:( (llw[(length(llw)-1) - f] as Building).totalSurface - (llw[(length(llw)-1) - f] as Building).occupiedSurface ) < ((fdm.building as Building).occupiedSurface * sizeOfStock) {
 			f <- ((rnd(10000)/10000)^6)*(length(llw)-1);
 		}
 		return llw[(length(llw)-1) - f];/**/
@@ -423,7 +424,7 @@ species LogisticProvider {
 	 * - Let ->CB be the vector between the large warehouse and the average one.
 	 * So, we are trying to find B which minimize ||(->AB) + (->CB)||.
 	 */
-	Warehouse findAverageWarehouse(Warehouse small, Warehouse large, FinalDestinationManager fdm){
+	Warehouse findAverageWarehouse(Warehouse small, Warehouse large, FinalDestinationManager fdm, int sizeOfStock){
 		list<Warehouse> law <- Warehouse;
 		float min_euclidean_norm <-  -(2-252)*21023;// The max float value
 		int min_index <- -1;
@@ -433,7 +434,7 @@ species LogisticProvider {
 		float x_l <- large.location.x;
 		float y_l <- large.location.y;
 		loop while: i < length(law) {
-			if( ((law[i] as Building).totalSurface - (law[i] as Building).occupiedSurface ) > (fdm.building as Building).occupiedSurface ){
+			if( ((law[i] as Building).totalSurface - (law[i] as Building).occupiedSurface ) > (fdm.building as Building).occupiedSurface * sizeOfStock ){
 				float x_a <- (law[i] as Warehouse).location.x;
 				float y_a <- (law[i] as Warehouse).location.y;
 				float euclidean_norm <- sqrt( ((x_a-x_s) + (x_a-x_l))^2 + ((y_a-y_s) + (y_a-y_l))^2 );
