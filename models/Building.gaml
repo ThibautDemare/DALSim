@@ -25,14 +25,14 @@ species Building {
 			ask entering_batch {
 				//If the batch is at the right adress
 				if( target != nil and self.dest = myself){
-					//self.breakBulk <- self.computeBreakBulk(myself.totalSurface);
+					self.breakBulk <- self.computeBreakBulk(myself.totalSurface);
 					target <- nil;
 				}
 				else if (target = nil and self.breakBulk = 0 and self.dest = myself) {
 					loop while: !empty(self.stocks){
 						Stock stockBatch <- first(self.stocks);
 						loop stockBuilding over: myself.stocks {
-							if( stockBuilding.fdm = self.fdm and stockBuilding.product = stockBatch.product ){
+							if( stockBuilding.fdm = stockBatch.fdm and stockBuilding.product = stockBatch.product ){
 								stockBuilding.status <- 0;
 								stockBuilding.quantity <- stockBuilding.quantity + stockBatch.quantity;
 							}
@@ -88,6 +88,7 @@ species RestockingBuilding parent: Building {
 					create Stock number:1 returns:sendedStock {
 						self.product <- order.product;
 						self.quantity <- sendedQuantity;
+						self.fdm <- order.fdm;
 					}
 					
 					// Looking for a batch which go to the same building
@@ -112,7 +113,6 @@ species RestockingBuilding parent: Building {
 							self.target <- order.building.location;
 							self.location <- myself.location;
 							self.breakBulk <- self.computeBreakBulk(myself.totalSurface);
-							self.fdm <- order.fdm;
 							self.position <- order.position;
 							self.dest <- order.building;
 						}
@@ -125,7 +125,7 @@ species RestockingBuilding parent: Building {
 				}
 				i <- i + 1;
 			}
-						
+
 			// This order is useless now. We kill it before process the next one
 			remove index: 0 from:currentOrders;
 			ask order {

@@ -304,6 +304,7 @@ species LogisticProvider {
 			sceLarge <- supplyChain.root.sons[i];
 			if( ((sceLarge.building as Building).totalSurface - (sceLarge.building as Building).occupiedSurface ) >= ((fdm.building as Building).occupiedSurface * sizeOfStockLargeWarehouse) ){
 				found <- true;
+				do initStock( (sceLarge.building as Warehouse), fdm, sizeOfStockLargeWarehouse);
 			}
 			i <- i + 1;
 		}
@@ -371,7 +372,7 @@ species LogisticProvider {
 			// We create the stock agent
 			create Stock number:1 returns:s {
 				self.product <- stockFdm.product;
-				self.quantity <- rnd(stockFdm.maxQuantity * sizeOfStock) as float;
+				self.quantity <- stockFdm.maxQuantity * sizeOfStock;
 				self.maxQuantity <- stockFdm.maxQuantity * sizeOfStock;
 				self.status <- 0;
 				self.fdm <- fdm;

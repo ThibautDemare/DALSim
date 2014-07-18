@@ -40,6 +40,7 @@ species Provider parent: RestockingBuilding{
 			create Stock number:1 returns:sendedStock {
 				self.product <- order.product;
 				self.quantity <- order.quantity;
+				self.fdm <- order.fdm;
 			}
 			
 			// Looking for a batch which go to the same building
@@ -64,7 +65,6 @@ species Provider parent: RestockingBuilding{
 					self.target <- order.building.location;
 					self.location <- myself.location;
 					self.breakBulk <- self.computeBreakBulk(myself.totalSurface);
-					self.fdm <- order.fdm;
 					self.position <- order.position;
 					self.dest <- order.building;
 				}

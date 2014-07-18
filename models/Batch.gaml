@@ -17,7 +17,6 @@ species Batch skills:[moving]{
 	float speed <- 70.0 °km/°h;
 	int breakBulk <- 0;
 	int position;
-	FinalDestinationManager fdm;
 	Building dest;
 	
 	reflex move when: target != nil and breakBulk = 0 {
