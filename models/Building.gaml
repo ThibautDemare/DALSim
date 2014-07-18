@@ -24,8 +24,8 @@ species Building {
 		if( !(empty (entering_batch))) {
 			ask entering_batch {
 				//If the batch is at the right adress
-				if( self.dest = myself){
-					self.breakBulk <- self.computeBreakBulk(myself.totalSurface);
+				if( target != nil and self.dest = myself){
+					//self.breakBulk <- self.computeBreakBulk(myself.totalSurface);
 					target <- nil;
 				}
 				else if (target = nil and self.breakBulk = 0 and self.dest = myself) {
@@ -94,7 +94,7 @@ species RestockingBuilding parent: Building {
 					bool foundBatch <- false;
 					int j <- 0;
 					loop while: j < length(leavingBatches) and !foundBatch {
-						if( (leavingBatches[j] as Batch).target = order.building.location and order.position = (leavingBatches[j] as Batch).position){
+						if( (leavingBatches[j] as Batch).dest = order.building and order.position = (leavingBatches[j] as Batch).position){
 							foundBatch <- true;
 						}
 						else {

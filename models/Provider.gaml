@@ -46,7 +46,7 @@ species Provider parent: RestockingBuilding{
 			bool foundBatch <- false;
 			int j <- 0;
 			loop while: j < length(leavingBatches) and !foundBatch {
-				if( (leavingBatches[j] as Batch).target = order.building.location  and order.position = (leavingBatches[j] as Batch).position){
+				if( (leavingBatches[j] as Batch).dest = order.building  and order.position = (leavingBatches[j] as Batch).position){
 					foundBatch <- true;
 				}
 				else {
@@ -66,6 +66,7 @@ species Provider parent: RestockingBuilding{
 					self.breakBulk <- self.computeBreakBulk(myself.totalSurface);
 					self.fdm <- order.fdm;
 					self.position <- order.position;
+					self.dest <- order.building;
 				}
 				lb <- first(rlb);
 				leavingBatches <- leavingBatches + lb;
