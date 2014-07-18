@@ -236,7 +236,7 @@ species FinalDestinationManager {
 				product <- i;
 				i <- i + 1;
 				maxQuantity <- surfaceByProduct;
-				quantity <- rnd(maxQuantity as int) as float;
+				quantity <- rnd(maxQuantity) as float;
 				myself.building.occupiedSurface <- myself.building.occupiedSurface + quantity;
 				fdm <- myself;
 			}
