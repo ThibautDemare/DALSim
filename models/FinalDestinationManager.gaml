@@ -198,7 +198,7 @@ species FinalDestinationManager {
 				}
 				
 				quantity <- rnd(maxQuantity as int) as float;
-				myself.building.occupiedSurface <- myself.building.occupiedSurface + quantity;
+				myself.building.occupiedSurface <- myself.building.occupiedSurface + maxQuantity;
 				maxOccupiedSurface <- maxOccupiedSurface + maxQuantity;
 				fdm <- myself;
 			}
@@ -216,7 +216,7 @@ species FinalDestinationManager {
 			product <- 0;
 			maxQuantity <- myself.building.totalSurface;
 			quantity <- rnd(maxQuantity as int) as float;
-			myself.building.occupiedSurface <- myself.building.occupiedSurface + quantity; 
+			myself.building.occupiedSurface <- myself.building.occupiedSurface + maxQuantity; 
 			fdm <- myself;
 		}
 		building.stocks <- s;
@@ -237,7 +237,7 @@ species FinalDestinationManager {
 				i <- i + 1;
 				maxQuantity <- surfaceByProduct;
 				quantity <- rnd(maxQuantity) as float;
-				myself.building.occupiedSurface <- myself.building.occupiedSurface + quantity;
+				myself.building.occupiedSurface <- myself.building.occupiedSurface + maxQuantity;
 				fdm <- myself;
 			}
 			ls <- ls + s;
@@ -261,7 +261,7 @@ species FinalDestinationManager {
 				i <- i + 1;
 				maxQuantity <- surfaceByProduct;
 				quantity <- rnd(maxQuantity as int) as float;
-				myself.building.occupiedSurface <- myself.building.occupiedSurface + quantity;
+				myself.building.occupiedSurface <- myself.building.occupiedSurface + maxQuantity;
 				fdm <- myself;
 			}
 			ls <- ls + s;

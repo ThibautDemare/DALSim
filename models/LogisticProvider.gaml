@@ -393,10 +393,11 @@ species LogisticProvider {
 	Warehouse findCloseWarehouse(FinalDestinationManager fdm, int sizeOfStock){
 		list<Warehouse> lsw <- Warehouse sort_by (fdm distance_to each);
 		int f <- ((rnd(10000)/10000)^32)*(length(lsw)-1);
-		// I assume that there is always at least one warehouse which have a free space greater than the occupied surface of the stock to outsource.
+		// I assume that there is always at least one warehouse which has a free space greater than the occupied surface of the stock to outsource.
 		// According to results, it doesn't seem foolish.
 		loop while:
-				( (lsw[f] as Building).totalSurface - (lsw[f] as Building).occupiedSurface)	< (fdm.building as Building).occupiedSurface * sizeOfStock {
+				( (lsw[f] as Building).totalSurface - (lsw[f] as Building).occupiedSurface) <= 0 or
+				( (lsw[f] as Building).totalSurface - (lsw[f] as Building).occupiedSurface - (fdm.building as Building).occupiedSurface * sizeOfStock)	< 0 {
 			f <- ((rnd(10000)/10000)^32)*(length(lsw)-1);
 		}
 		return lsw[f];/**/
@@ -409,9 +410,14 @@ species LogisticProvider {
 	Warehouse findLargeWarehouse(FinalDestinationManager fdm, int sizeOfStock){
 		list<Warehouse> llw <- Warehouse sort_by (each.totalSurface-each.occupiedSurface);
 		int f <- ((rnd(10000)/10000)^32)*(length(llw)-1);
-		// I assume that there is always at least one warehouse which have a free space greater than the occupied surface of the stock to outsource.
+		// I assume that there is always at least one warehouse which has a free space greater than the occupied surface of the stock to outsource.
 		// According to results, it doesn't seem foolish.
-		loop while:( (llw[(length(llw)-1) - f] as Building).totalSurface - (llw[(length(llw)-1) - f] as Building).occupiedSurface ) < ((fdm.building as Building).occupiedSurface * sizeOfStock) {
+		loop while:
+				( (llw[(length(llw)-1) - f] as Building).totalSurface - (llw[(length(llw)-1) - f] as Building).occupiedSurface ) <= 0 or
+				(   (llw[(length(llw)-1) - f] as Building).totalSurface - 
+					(llw[(length(llw)-1) - f] as Building).occupiedSurface - 
+					((fdm.building as Building).occupiedSurface * sizeOfStock)
+				) < 0 {
 			f <- ((rnd(10000)/10000)^32)*(length(llw)-1);
 		}
 		return llw[(length(llw)-1) - f];/**/
