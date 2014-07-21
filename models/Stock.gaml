@@ -8,11 +8,22 @@ model Stock
 
 import "./Building.gaml"
 
-species Stock schedules:[]{
+species Stock {
 	int product;
 	float quantity;
 	float maxQuantity;
 	int status <- false;
 	FinalDestinationManager fdm;
 	LogisticProvider lp;
+	int stepWithNoStock <- 0;
+	Building building;
+	
+	reflex updateStepWithNoStock {
+		if(quantity = 0){
+			stepWithNoStock <- stepWithNoStock + 1;
+		}
+		else{
+			stepWithNoStock <- 0;
+		}
+	}
 }
