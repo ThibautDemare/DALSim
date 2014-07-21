@@ -252,9 +252,9 @@ species LogisticProvider {
 		SupplyChainElement sceCloseWarehouse <- nil;
 		bool found <- false;
 		int i <- 0;
-		loop while: i<length( (supplyChain.root as SupplyChainElement).sons) and sceCloseWarehouse != nil {
+		loop while: i<length( (supplyChain.root as SupplyChainElement).sons) and sceCloseWarehouse = nil {
 			int j <- 0;
-			loop while: j<length( (supplyChain.root.sons[i] as SupplyChainElement).sons) and sceCloseWarehouse != nil {
+			loop while: j<length( (supplyChain.root.sons[i] as SupplyChainElement).sons) and sceCloseWarehouse = nil {
 				if(closeWarehouse = ((supplyChain.root.sons[i] as SupplyChainElement).sons[j] as SupplyChainElement).building){
 					sceCloseWarehouse <- (supplyChain.root.sons[i] as SupplyChainElement).sons[j];
 				}
@@ -317,10 +317,10 @@ species LogisticProvider {
 			// and create a SCE
 			create SupplyChainElement number:1 returns:sceBuild {
 				self.supplyChain <- myself.supplyChain;
-				position <- 1;
-				building <- largeWarehouse;
-				sons <- [];
-				fathers <- [] + myself.supplyChain.root;
+				self.position <- 1;
+				self.building <- largeWarehouse;
+				self.sons <- [];
+				self.fathers <- [] + myself.supplyChain.root;
 			}
 			sceLarge <- sceBuild[0];
 			supplyChain.root.sons <- supplyChain.root.sons + sceLarge;
@@ -377,6 +377,7 @@ species LogisticProvider {
 				self.status <- 0;
 				self.fdm <- fdm;
 				self.lp <- myself;
+				self.building <- warehouse;
 			}
 			
 			// and add it to the list of stocks in the warehouse
