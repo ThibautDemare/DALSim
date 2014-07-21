@@ -44,33 +44,7 @@ species FinalDestinationManager {
 			location <- myself.location;
 			totalSurface <- myself.surface;
 			occupiedSurface <- 0.0;
-		}
-		
-		ask buildings {
 			myself.building <- self;
-		}
-		
-		//do buildRandStock;
-		//do buildOneStock;
-		//do buildFourStock;
-		do buildTwoToSixStock;
-		
-		// Connection to graphstream
-		if(use_gs){
-			if(use_r9){
-				gs_add_node gs_sender_id:"supply_chain" gs_node_id:name;
-				gs_add_node_attribute gs_sender_id:"supply_chain" gs_node_id:name gs_attribute_name:"x" gs_attribute_value:location.x;
-				gs_add_node_attribute gs_sender_id:"supply_chain" gs_node_id:name gs_attribute_name:"y" gs_attribute_value:location.y;
-			}
-		}
-		
-		logisticProvider <- chooseLogisticProvider();
-		ask logisticProvider {
-			do getNewCustomer(myself);
-		}
-		
-		loop stock over: building.stocks {
-			stock.lp <- logisticProvider;
 		}
 		
 		//Connection to graphstream
@@ -103,6 +77,28 @@ species FinalDestinationManager {
 				gs_add_node_attribute gs_sender_id:"neighborhood_logistic_final" gs_node_id:name gs_attribute_name:"region" gs_attribute_value:region;
 				gs_add_node_attribute gs_sender_id:"neighborhood_logistic_final" gs_node_id:name gs_attribute_name:"department" gs_attribute_value:department;
 			}
+			
+			if(use_r9){
+				gs_add_node gs_sender_id:"supply_chain" gs_node_id:name;
+				gs_add_node_attribute gs_sender_id:"supply_chain" gs_node_id:name gs_attribute_name:"x" gs_attribute_value:location.x;
+				gs_add_node_attribute gs_sender_id:"supply_chain" gs_node_id:name gs_attribute_name:"y" gs_attribute_value:location.y;
+			}
+		}
+	}
+	
+	action second_init{
+		//do buildRandStock;
+		//do buildOneStock;
+		//do buildFourStock;
+		do buildTwoToSixStock;
+		
+		logisticProvider <- chooseLogisticProvider();
+		ask logisticProvider {
+			do getNewCustomer(myself);
+		}
+		
+		loop stock over: building.stocks {
+			stock.lp <- logisticProvider;
 		}
 	}
 	
