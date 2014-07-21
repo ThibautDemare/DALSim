@@ -33,8 +33,9 @@ species Provider parent: RestockingBuilding{
 	reflex processOrders when: !empty(currentOrders){
 		list<Batch> leavingBatches <- [];
 		// We empty progressively the list of orders after have processed them
-		loop while: !empty(currentOrders) {
-			Order order <- first(currentOrders);
+		int i <- 0;
+		loop while: i<length(currentOrders) {
+			Order order <- currentOrders[i];
 			
 			// And create a Stock agent which will move within a Batch
 			create Stock number:1 returns:sendedStock {
@@ -55,7 +56,7 @@ species Provider parent: RestockingBuilding{
 				}
 			}
 			Batch lb <- nil;
-			// We there is a such Batch, we update it
+			// There is a such Batch, we update it
 			if(foundBatch){
 				lb <- leavingBatches[j];
 			}
@@ -75,12 +76,12 @@ species Provider parent: RestockingBuilding{
 			lb.overallQuantity <- lb.overallQuantity + order.quantity;
 			lb.stocks <- lb.stocks + sendedStock;
 
-			// This order is useless now. We kill it before process the next one
-			remove index: 0 from:currentOrders;
+			i <- i + 1;
 			ask order {
 				do die;
 			}
 		}
+		currentOrders <- [];
 	}
 	
 	aspect base { 

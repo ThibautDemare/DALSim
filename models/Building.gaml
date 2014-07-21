@@ -64,14 +64,15 @@ species RestockingBuilding parent: Building {
 	reflex processOrders when: !empty(currentOrders) and ((time/3600.0) mod numberofHoursBeforePO) = 0.0 and (time/3600.0) > 0{
 		list<Batch> leavingBatches <- [];
 		// We empty progressively the list of orders after have processed them
-		loop while: !empty(currentOrders) {
-			Order order <- first(currentOrders);
+		int k <- 0;
+		loop while: k<length(currentOrders) {
+			Order order <- currentOrders[k];
 			// We compare the product and the owner of each stock to the product and owner of this current order
 			bool foundStock <- false;
 			int i <- 0;
 			loop while: i < length(stocks) and !foundStock {
 				Stock stock <- stocks[i];
-				// If we find the right stock, we had the corresponding quantity within a batch 
+				// If we find the right stock, we had the corresponding quantity within a batch
 				if stock.fdm = order.fdm and stock.product = order.product {
 					foundStock <- true;
 					order.reference.status <- 3;
@@ -103,7 +104,7 @@ species RestockingBuilding parent: Building {
 						}
 					}
 					Batch lb <- nil;
-					// We there is a such Batch, we update it
+					// There is a such Batch, we update it
 					if(foundBatch){
 						lb <- leavingBatches[j];
 					}
@@ -126,11 +127,11 @@ species RestockingBuilding parent: Building {
 				i <- i + 1;
 			}
 
-			// This order is useless now. We kill it before process the next one
-			remove index: 0 from:currentOrders;
 			ask order {
 				do die;
 			}
+			k <- k + 1;
 		}
+		currentOrders <- [];
 	}
 }
