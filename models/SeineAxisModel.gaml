@@ -11,6 +11,7 @@ import "./LogisticProvider.gaml"
 import "./Provider.gaml"
 import "./FinalDestinationManager.gaml"
 import "./Batch.gaml"
+import "./Stock.gaml"
 import "./Building.gaml"
 import "./Observer.gaml"
 import "./Experiments.gaml"
@@ -20,7 +21,15 @@ import "./Parameters.gaml"
 /*
  * Init global variables and agents
  */
-global {
+global schedules: [world] + 
+				shuffle(FinalDestinationManager) + 
+				shuffle(LogisticProvider)+
+				shuffle(Provider) + 
+				shuffle(Warehouse) +
+				shuffle(Building) +
+				Batch + 
+				Stock {
+	
 	//This data comes from "EuroRegionalMap" (EuroGeographics)
 	file roads_shapefile <- file("../../BD_SIG/Used/Roads/roads_speed_length.shp");
 	graph road_network;
@@ -98,6 +107,16 @@ global {
 		// Init the decreasing rate of consumption
 		do init_decreasingRateOfStocks;
 		
+	}
+	
+	/*
+	 * A part of the initialization of the final destinations managers must be made here.
+	 * Indeed, we must schedule the FDM according to their surface (larger before). But the scheduling can't be made in the classic init.
+	 */
+	reflex second_init when: time = 0 {
+		ask FinalDestinationManager sort_by (-1*each.surface){
+			do second_init;
+		}
 	}
 }
 
