@@ -61,7 +61,7 @@ species RestockingBuilding parent: Building {
 	/*
 	 * Receive a request from a logistic provider to restock another building
 	 */
-	reflex processOrders when: !empty(currentOrders) {
+	reflex processOrders when: !empty(currentOrders) and ((time/3600.0) mod numberofHoursBeforePO) = 0.0 and (time/3600.0) > 0{
 		list<Batch> leavingBatches <- [];
 		// We empty progressively the list of orders after have processed them
 		int k <- 0;
