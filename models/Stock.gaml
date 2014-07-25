@@ -16,14 +16,17 @@ species Stock schedules: [] {
 	FinalDestinationManager fdm;
 	LogisticProvider lp;
 	int stepWithNoStock <- 0;
+	int stepWithStock <- 0;
 	Building building;
 	
 	reflex updateStepWithNoStock {
 		if(quantity = 0){
 			stepWithNoStock <- stepWithNoStock + 1;
+			stepWithStock <- 0;
 		}
 		else{
 			stepWithNoStock <- 0;
+			stepWithStock <- stepWithStock + 1;
 		}
 	}
 }
