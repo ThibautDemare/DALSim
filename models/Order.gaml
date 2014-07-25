@@ -8,7 +8,7 @@ model Order
 
 import "./LogisticProvider.gaml"
 
-species Order {
+species Order schedules: [] {
 	int product;
 	float quantity;
 	Building building;

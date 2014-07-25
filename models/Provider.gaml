@@ -13,7 +13,7 @@ import "./Building.gaml"
 import "./GraphStreamConnection.gaml"
 import "./Order.gaml"
 
-species Provider parent: RestockingBuilding{
+species Provider parent: RestockingBuilding schedules: [] {
 	
 	init {
 		if(use_gs){

@@ -11,7 +11,7 @@ import "./Stock.gaml"
 import "./Order.gaml"
 import "./Parameters.gaml"
 		
-species Building {
+species Building schedules: [] {
 	list<Stock> stocks;
 	float totalSurface;
 	float occupiedSurface;
@@ -51,7 +51,7 @@ species Building {
 	}
 }
 
-species RestockingBuilding parent: Building {
+species RestockingBuilding parent: Building schedules: [] {
 	list<Order> currentOrders <- [];
 	
 	action addOrder(Order order){

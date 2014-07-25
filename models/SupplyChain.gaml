@@ -11,13 +11,13 @@ import "./Building.gaml"
 import "./Order.gaml"
 import "./Stock.gaml"
 
-species SupplyChain {
+species SupplyChain schedules: [] {
 	LogisticProvider logisticProvider;
 	SupplyChainElement root;
 	list<SupplyChainElement> leafs <- [];
 }
 
-species SupplyChainElement {
+species SupplyChainElement schedules: [] {
 	SupplyChain supplyChain;
 	Building building;
 	list<SupplyChainElement> fathers;

@@ -16,7 +16,7 @@ import "./Stock.gaml"
 import "./GraphStreamConnection.gaml"
 import "./Parameters.gaml"
 
-species FinalDestinationManager {
+species FinalDestinationManager schedules: [] {
 	LogisticProvider logisticProvider;
 	Building building;
 	float huffValue;// number of customer according to huff model => this value cant be used like this because the Huff model does not take care of time.

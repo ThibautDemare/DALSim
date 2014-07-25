@@ -17,7 +17,7 @@ import "./SeineAxisModel.gaml"
 import "./GraphStreamConnection.gaml"
 import "./Parameters.gaml"
 
-species LogisticProvider {
+species LogisticProvider schedules: [] {
 	SupplyChain supplyChain <- nil;
 	string color;
 	int department;

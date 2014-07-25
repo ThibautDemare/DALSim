@@ -8,7 +8,7 @@ model Road
 
 import "./Batch.gaml"
 
-species Road {
+species Road schedules: [] {
 	geometry display_shape <- shape + 2.0;
 	float speed;
 	float length;
