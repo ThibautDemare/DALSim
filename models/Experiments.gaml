@@ -24,7 +24,7 @@ experiment exp_save_results type: gui {
 	output {
 		file name: "stocks_warehouses" type: text data: ""+ ((time/3600.0) as int) + "; " +stockInWarehouse + ";" + freeSurfaceInWarehouse + ";";
 		
-		file name: "stocks_final_dests" type: text data: ""+ ((time/3600.0) as int) + "; " + ";" + stockInFinalDest + ";" + freeSurfaceInFinalDest + ";";
+		file name: "stocks_final_dests" type: text data: ""+ ((time/3600.0) as int) + "; " +stockInFinalDest + ";" + freeSurfaceInFinalDest + ";";
 		
 		file name: "cumulative_number_batches" type: text data: ""+ ((time/3600.0) as int) + "; " + 
 			cumulativeNumberOfBatch + ";" + cumulativeNumberOfBatchProviderToLarge + ";" + cumulativeNumberOfBatchLargeToClose + ";" + cumulativeNumberOfBatchCloseToFinal + ";";
@@ -34,9 +34,15 @@ experiment exp_save_results type: gui {
 		
 		file name: "number_batches" type: text data: ""+ ((time/3600.0) as int) + "; " + 
 			totalNumberOfBatch + ";" + numberOfBatchProviderToLarge + ";" + numberOfBatchLargeToClose + ";" + numberOfBatchCloseToFinal + ";";
-			
+
 		file name: "stock_on_roads" type: text data: ""+ ((time/3600.0) as int) + "; " + 
-			stockOnRoads + ";" + stockOnRoadsProviderToLarge + ";" + stockOnRoadsLargeToClose + ";" + stockOnRoadsCloseToFinal;
+			stockOnRoads + ";" + stockOnRoadsProviderToLarge + ";" + stockOnRoadsLargeToClose + ";" + stockOnRoadsCloseToFinal + ";";
+
+		file name: "number_empty_stock_final_dest" type: text data: ""+ ((time/3600.0) as int) + "; " + 
+			numberofEmptyStockInFinalDests + ";";
+
+		file name: "number_empty_stock_warehouses" type: text data: ""+ ((time/3600.0) as int) + "; " + 
+			numberOfEmptyStockInWarehouses + ";";
 	}
 }
 
@@ -126,7 +132,7 @@ experiment exp_chart type: gui {
 		
 		/*display chart_total_stock_in_warehouse refresh_every: 1 {
 			chart  "Stock quantity in warehouses" type: series {
-				data "Total stock quantity in warehouses" value: stockInWarehouse color: rgb('orange') ;
+				data "Total stock quantity in warehouses" value: stockInWarehouse color: rgb('green') ;
 				data "Total free surface in warehouses" value: freeSurfaceInWarehouse color: rgb('blue') ;
 			}
 		}/**/
