@@ -42,10 +42,6 @@ global schedules: [world] +
 	file warehouse_shapefile_average <- file("../../BD_SIG/Used/Warehouses/warehouses_average.shp");
 	file warehouse_shapefile_large <- file("../../BD_SIG/Used/Warehouses/warehouses_large.shp");
 	
-	list<Warehouse> small_warehouse;
-	list<Warehouse> average_warehouse;
-	list<Warehouse> large_warehouse;
-	
 	// Final destination (for instance : shop)
 	string destination_path <- "../../BD_SIG/Used/FinalDestination/";
 	string destination_file_name <- "FinalDestinationManager";
@@ -94,9 +90,6 @@ global schedules: [world] +
 		create Warehouse from: warehouse_shapefile_small returns: sw with: [huffValue::read("huff") as float, totalSurface::read("surface") as float, color::read("color") as string];
 		create Warehouse from: warehouse_shapefile_average returns: aw with: [huffValue::read("huff") as float, totalSurface::read("surface") as float, color::read("color") as string];
 		create Warehouse from: warehouse_shapefile_large returns: lw with: [huffValue::read("huff") as float, totalSurface::read("surface") as float, color::read("color") as string];
-		small_warehouse <- sw;
-		average_warehouse <- aw;
-		large_warehouse <- lw;
 		
 		//  Logistic providers
 		create LogisticProvider from: logistic_provider_shapefile;
