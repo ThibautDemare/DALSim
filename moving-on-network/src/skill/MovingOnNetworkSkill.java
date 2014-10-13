@@ -16,7 +16,6 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 
-import msi.gama.common.interfaces.IKeyword;
 import msi.gama.common.interfaces.ILocated;
 import msi.gama.common.util.GeometryUtils;
 import msi.gama.metamodel.agent.IAgent;
@@ -37,23 +36,21 @@ import msi.gama.runtime.GAMA;
 import msi.gama.runtime.IScope;
 import msi.gama.runtime.exceptions.GamaRuntimeException;
 import msi.gama.util.GamaList;
-import msi.gama.util.graph.GamaGraph;
 import msi.gama.util.graph.GraphUtilsGraphStream;
 import msi.gama.util.graph.IGraph;
 import msi.gama.util.graph._Edge;
 import msi.gama.util.graph._Vertex;
-import msi.gama.util.path.GamaSpatialPath;
 import msi.gaml.operators.Cast;
 import msi.gaml.skills.Skill;
 import msi.gaml.types.IType;
 
 @doc("This skill is intended to move an agent on a network according to speed and length attributes on the edges. When The agent is not already on the graph, we assume that the length is an euclidean length and we use a default speed given by the user.")
 @vars({
-	@var(name = IKeywordAdditional.LENGTH_ATTRIBUTE, type = IType.STRING, doc = @doc("The attribute giving the length of the edge. Becareful : this variable is shared by all moving agent.")),
-	@var(name = IKeywordAdditional.SPEED_ATTRIBUTE, type = IType.STRING, doc = @doc("The attribute giving the default speed. Becareful : this variable is shared by all moving agent.")),
-	@var(name = IKeywordAdditional.DEFAULT_SPEED, type = IType.FLOAT, doc = @doc("The speed outside the graph.")),
+	@var(name = IKeywordMoNAdditional.LENGTH_ATTRIBUTE, type = IType.STRING, doc = @doc("The attribute giving the length of the edge. Becareful : this variable is shared by all moving agent.")),
+	@var(name = IKeywordMoNAdditional.SPEED_ATTRIBUTE, type = IType.STRING, doc = @doc("The attribute giving the default speed. Becareful : this variable is shared by all moving agent.")),
+	@var(name = IKeywordMoNAdditional.DEFAULT_SPEED, type = IType.FLOAT, doc = @doc("The speed outside the graph.")),
 })
-@skill(name = IKeywordAdditional.MOVING_ON_NETWORK)
+@skill(name = IKeywordMoNAdditional.MOVING_ON_NETWORK)
 public class MovingOnNetworkSkill extends Skill {
 	private static Dijkstra dijkstra = null;
 	private Path currentGsPath = null;
@@ -69,10 +66,10 @@ public class MovingOnNetworkSkill extends Skill {
 	 * Constructor
 	 */
 
-	@setter(IKeywordAdditional.GRAPH)
+	@setter(IKeywordMoNAdditional.GRAPH)
 	public void setGraph(final IAgent agent, final IGraph gamaGraph) {
 		if(graph == null){
-			graph = GraphUtilsGraphStream.getGraphstreamGraphFromGamaGraph(gamaGraph);
+			graph = getGraphstreamGraphFromGamaGraph(gamaGraph);
 			MovingOnNetworkSkill.gamaGraph = gamaGraph;
 		}
 	}
@@ -81,34 +78,34 @@ public class MovingOnNetworkSkill extends Skill {
 	 * Getters and setters
 	 */
 
-	@getter(IKeywordAdditional.LENGTH_ATTRIBUTE)
+	@getter(IKeywordMoNAdditional.LENGTH_ATTRIBUTE)
 	public String getLengthAttribute(final IAgent agent) {
-		return (String) agent.getAttribute(IKeywordAdditional.LENGTH_ATTRIBUTE);
+		return (String) agent.getAttribute(IKeywordMoNAdditional.LENGTH_ATTRIBUTE);
 	}
 
-	@setter(IKeywordAdditional.LENGTH_ATTRIBUTE)
+	@setter(IKeywordMoNAdditional.LENGTH_ATTRIBUTE)
 	public void setLengthAttribute(final IAgent agent, final String s) {
-		agent.setAttribute(IKeywordAdditional.LENGTH_ATTRIBUTE, s);
+		agent.setAttribute(IKeywordMoNAdditional.LENGTH_ATTRIBUTE, s);
 	}
 
-	@getter(IKeywordAdditional.SPEED_ATTRIBUTE)
+	@getter(IKeywordMoNAdditional.SPEED_ATTRIBUTE)
 	public String getSpeedAttribute(final IAgent agent) {
-		return (String) agent.getAttribute(IKeywordAdditional.SPEED_ATTRIBUTE);
+		return (String) agent.getAttribute(IKeywordMoNAdditional.SPEED_ATTRIBUTE);
 	}
 
-	@setter(IKeywordAdditional.SPEED_ATTRIBUTE)
+	@setter(IKeywordMoNAdditional.SPEED_ATTRIBUTE)
 	public void setSpeedAttribute(final IAgent agent, final String s) {
-		agent.setAttribute(IKeywordAdditional.SPEED_ATTRIBUTE, s);
+		agent.setAttribute(IKeywordMoNAdditional.SPEED_ATTRIBUTE, s);
 	}
 
-	@getter(IKeywordAdditional.DEFAULT_SPEED)
+	@getter(IKeywordMoNAdditional.DEFAULT_SPEED)
 	public Float getDefaultSpeed(final IAgent agent) {
-		return (Float) agent.getAttribute(IKeywordAdditional.DEFAULT_SPEED);
+		return (Float) agent.getAttribute(IKeywordMoNAdditional.DEFAULT_SPEED);
 	}
 
-	@setter(IKeywordAdditional.DEFAULT_SPEED)
+	@setter(IKeywordMoNAdditional.DEFAULT_SPEED)
 	public void setDefaultSpeed(final IAgent agent, final Float s) {
-		agent.setAttribute(IKeywordAdditional.DEFAULT_SPEED, s);
+		agent.setAttribute(IKeywordMoNAdditional.DEFAULT_SPEED, s);
 	}
 
 	/*
