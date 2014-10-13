@@ -97,7 +97,7 @@ public class DisplayGraph {
 				false, 
 				false
 		};
-		// Which final_destination shapefile have been use graph we want to display
+		// Which final_destination shapefile have been use
 		boolean display_final = true;
 		boolean[] displays_final = {
 				true, 
