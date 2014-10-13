@@ -63,7 +63,7 @@ public class MovingOnNetworkSkill extends Skill {
 	private boolean agentOutside = true;
 
 	/*
-	 * Constructor
+	 * Getters and setters
 	 */
 
 	@setter(IKeywordMoNAdditional.GRAPH)
@@ -73,10 +73,6 @@ public class MovingOnNetworkSkill extends Skill {
 			MovingOnNetworkSkill.gamaGraph = gamaGraph;
 		}
 	}
-
-	/*
-	 * Getters and setters
-	 */
 
 	@getter(IKeywordMoNAdditional.LENGTH_ATTRIBUTE)
 	public String getLengthAttribute(final IAgent agent) {
