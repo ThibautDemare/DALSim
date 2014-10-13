@@ -46,8 +46,8 @@ import msi.gaml.types.IType;
 
 @doc("This skill is intended to move an agent on a network according to speed and length attributes on the edges. When The agent is not already on the graph, we assume that the length is an euclidean length and we use a default speed given by the user.")
 @vars({
-	@var(name = IKeywordMoNAdditional.LENGTH_ATTRIBUTE, type = IType.STRING, doc = @doc("The attribute giving the length of the edge. Becareful : this variable is shared by all moving agent.")),
-	@var(name = IKeywordMoNAdditional.SPEED_ATTRIBUTE, type = IType.STRING, doc = @doc("The attribute giving the default speed. Becareful : this variable is shared by all moving agent.")),
+	@var(name = IKeywordMoNAdditional.LENGTH_ATTRIBUTE, type = IType.STRING, doc = @doc("The attribute giving the length of the edge. Be careful : this variable is shared by all moving agent.")),
+	@var(name = IKeywordMoNAdditional.SPEED_ATTRIBUTE, type = IType.STRING, doc = @doc("The attribute giving the default speed. Be careful : this variable is shared by all moving agent.")),
 	@var(name = IKeywordMoNAdditional.DEFAULT_SPEED, type = IType.FLOAT, doc = @doc("The speed outside the graph.")),
 })
 @skill(name = IKeywordMoNAdditional.MOVING_ON_NETWORK)
@@ -112,7 +112,7 @@ public class MovingOnNetworkSkill extends Skill {
 			name = "goto",
 			args = {
 					@arg(name = "target", type = { IType.AGENT, IType.POINT, IType.GEOMETRY }, optional = false, doc = @doc("the location or entity towards which to move.")),
-					@arg(name = "on", type = IType.GRAPH, optional = true, doc = @doc("the agent moves inside this graph")),
+					@arg(name = "on", type = IType.GRAPH, optional = true, doc = @doc("the agent moves inside this graph."))
 			},
 			doc =
 			@doc(value = "moves the agent towards the target passed in the arguments.", returns = "the path followed by the agent.", examples = { "do goto target: (one_of road).location on: road_network;" })
@@ -120,7 +120,7 @@ public class MovingOnNetworkSkill extends Skill {
 	public GamaList gotoAction(final IScope scope) throws GamaRuntimeException {
 		final IAgent agent = getCurrentAgent(scope);
 
-		// If the user does not have given the "on" argument, so he must have set the graph before (if not, we throw an error)
+		// If the user has not given the "on" argument, so he must have set the graph before (if not, we throw an error)
 		if(graph == null){
 			final Object on = scope.getArg("on", IType.GRAPH);
 			if(on == null){
@@ -243,7 +243,7 @@ public class MovingOnNetworkSkill extends Skill {
 			 * Third step : move the agent on this point
 			 */
 			double dist = Math.hypot(xc - x_dest, yc - y_dest);
-			double time = dist * getDefaultSpeed(agent);
+			double time = dist * getDefaultSpeed(agent);// We use the default speed because the agent is not yet on the network
 			if(remainingTime >= time){
 				currentLocation.setLocation(x_dest, y_dest);
 				agentOutside = false;
@@ -259,22 +259,24 @@ public class MovingOnNetworkSkill extends Skill {
 	private GamaList movingInside(final IScope scope, final IAgent agent){
 		if(!agentOutside && remainingTime > 0){
 			GamaPoint currentLocation = (GamaPoint) agent.getLocation().copy(scope);
-			// Need to reach the next Node
+			// The agent needs to reach the next Node
 			moveAlongEdge(currentLocation, remainingTime, currentGsPath.peekEdge());
 
-			// Follow the path on the graph, node by node
+			// It follows the path on the graph, node by node
 			GamaList gl = new GamaList();
 			while(remainingTime > 0 && !currentGsPath.empty()){
 				Edge edge = currentGsPath.peekEdge();
 				double time = edge.getNumber(getLengthAttribute(agent)) * edge.getNumber(getSpeedAttribute(agent));
 				remainingTime -= time;
 
+				// currentGsPath.size()== 1 when the agent is at the end of the path,
+				// therefore it must stop before the next node in order to leave the network
 				if(currentGsPath.size()== 1 || (remainingTime - time) < 0){
-					// The moving agent stop between two nodes somewhere on the edge
+					// The moving agent stops between two nodes somewhere on the edge
 					// Compute the location of this "somewhere"
 					moveAlongEdge(currentLocation, remainingTime, edge);
 
-					if(currentGsPath.size()== 1){
+					if(currentGsPath.size()== 1 && (remainingTime - time) > 0){
 						// The first case
 						// We don't stop moving but we pop the current edge of the path
 						currentGsPath.popEdge();
@@ -283,7 +285,7 @@ public class MovingOnNetworkSkill extends Skill {
 					}
 
 					if(remainingTime < 0){
-						// The second case (or the next one)
+						// The second case
 						// We stop moving but we do not pop the current edge of the path
 						remainingTime = 0;
 					}
