@@ -63,11 +63,12 @@ public class MovingOnNetworkSkill extends Skill {
 	public static String length_attribute = null;
 	public static String speed_attribute = null;
 	private double remainingTime = 0;
-	
+	private boolean agentOutside = true;
+
 	/*
 	 * Constructor
 	 */
-	
+
 	@setter(IKeywordAdditional.GRAPH)
 	public void setGraph(final IAgent agent, final IGraph gamaGraph) {
 		if(graph == null){
@@ -75,11 +76,11 @@ public class MovingOnNetworkSkill extends Skill {
 			MovingOnNetworkSkill.gamaGraph = gamaGraph;
 		}
 	}
-	
+
 	/*
 	 * Getters and setters
 	 */
-	
+
 	@getter(IKeywordAdditional.LENGTH_ATTRIBUTE)
 	public String getLengthAttribute(final IAgent agent) {
 		return (String) agent.getAttribute(IKeywordAdditional.LENGTH_ATTRIBUTE);
@@ -100,22 +101,32 @@ public class MovingOnNetworkSkill extends Skill {
 		agent.setAttribute(IKeywordAdditional.SPEED_ATTRIBUTE, s);
 	}
 
+	@getter(IKeywordAdditional.DEFAULT_SPEED)
+	public Float getDefaultSpeed(final IAgent agent) {
+		return (Float) agent.getAttribute(IKeywordAdditional.DEFAULT_SPEED);
+	}
+
+	@setter(IKeywordAdditional.DEFAULT_SPEED)
+	public void setDefaultSpeed(final IAgent agent, final Float s) {
+		agent.setAttribute(IKeywordAdditional.DEFAULT_SPEED, s);
+	}
+
 	/*
 	 * Actions/methods
 	 */
-	
+
 	@action(
-		name = "goto", 
-		args = {
-			@arg(name = "target", type = { IType.AGENT, IType.POINT, IType.GEOMETRY }, optional = false, doc = @doc("the location or entity towards which to move.")),
-			@arg(name = "on", type = IType.GRAPH, optional = true, doc = @doc("the agent moves inside this graph")),
-		},
-		doc = 
+			name = "goto",
+			args = {
+					@arg(name = "target", type = { IType.AGENT, IType.POINT, IType.GEOMETRY }, optional = false, doc = @doc("the location or entity towards which to move.")),
+					@arg(name = "on", type = IType.GRAPH, optional = true, doc = @doc("the agent moves inside this graph")),
+			},
+			doc =
 			@doc(value = "moves the agent towards the target passed in the arguments.", returns = "the path followed by the agent.", examples = { "do goto target: (one_of road).location on: road_network;" })
-	)
+			)
 	public GamaList gotoAction(final IScope scope) throws GamaRuntimeException {
 		final IAgent agent = getCurrentAgent(scope);
-		
+
 		// If the user does not have given the "on" argument, so he must have set the graph before (if not, we throw an error)
 		if(graph == null){
 			final Object on = scope.getArg("on", IType.GRAPH);
@@ -136,33 +147,31 @@ public class MovingOnNetworkSkill extends Skill {
 		}
 		// The path has been computed, we need to know how many time the agent has in order to make the move.
 		remainingTime = scope.getClock().getStep();
-		
+
 		// Move the agent from outside the network to inside (when he is not already on the network).
 		movingFromOutsideToInside(scope, agent);
-		
+
 		// Move the agent inside the network (and get the agent edges that the agent has traveled) (when the agent is already on the network and can still move).
 		GamaList gl = movingInside(scope, agent);
-		
+
 		// Move the agent from inside the network to outside (when the target must and can leave the network).
 		movingInsideToOutside();
-		
+
 		return gl;
 	}
 
 	private void movingFromOutsideToInside(final IScope scope, final IAgent agent){
-		if(remainingTime > 0){
+		if(agentOutside && remainingTime > 0){
 			/*
 			 *  First step : find the closest segment to the agent
 			 *  Indeed, one edge of the path could be made with more than one segment
 			 */
 			// The position of the agent
 			GamaPoint currentLocation = (GamaPoint) agent.getLocation().copy(scope);
-			Point currentPointLocation = (Point) currentLocation.getInnerGeometry();
-			
+			Point currentPointLocation = (Point) agent.getLocation().copy(scope).getInnerGeometry();
 			// The closest road
-			Edge gsRoad = currentGsPath.peekEdge();
-			IAgent gamaRoad = gsRoad.getAttribute("ama_agent");
-			
+			IAgent gamaRoad = currentGsPath.peekEdge().getAttribute("gama_agent");
+
 			// Find the closest segment among the road's
 			double distAgentToNetwork = Double.MAX_VALUE;
 			Coordinate coords[] = gamaRoad.getInnerGeometry().getCoordinates();
@@ -178,39 +187,100 @@ public class MovingOnNetworkSkill extends Skill {
 					indexBestSegment = i;
 				}
 			}
+
+			/*
+			 * Second step : Find the closest point on this segment
+			 */
+			// Get coordinates of these different points
+			double xa = coords[indexBestSegment].x;
+			double ya = coords[indexBestSegment].y;
+			double xb = coords[indexBestSegment+1].x;
+			double yb = coords[indexBestSegment+1].y;
+			double xc = currentPointLocation.getX();
+			double yc = currentPointLocation.getY();
+
+			// Compute coordinates of vectors
+			// CA Vector
+			double ACy = yc - ya;
+			double ACx = xc - xa;
+			// AB vector
+			double ABy = yb - ya;
+			double ABx = xb - xa;
+			// CB vector
+			double BCy = yc - yb;
+			double BCx = xc - xb;
+			// BA vector
+			double BAy = ya - yb;
+			double BAx = xa - xb;
+
+			// Compute the angles
+			// The angle between ->AC and ->AB
+			double CAB = Math.toDegrees(Math.atan2(ACy, ACx)-Math.atan2(ABy, ABx));
+			// The angle between ->BC and ->BA
+			double CBA = Math.toDegrees(Math.atan2(BCy, BCx)-Math.atan2(BAy, BAx));
+
+			// Let A and B the nodes of this segment and C be the currentLocation
+			// If one of the angles CAB or CBA  is obtuse ( ie.  90 < CAB < 180 or 90 < CBA < 180)
+			// 	then the next location is on the segment between C and A (or C and B)
+			double x_dest;
+			double y_dest;
+			if(CAB > 90 ){
+				// Between C and A
+				x_dest = xa;
+				y_dest = ya;
+			}
+			else if(CBA > 90){
+				// Between C and B
+				x_dest = xb;
+				y_dest = yb;
+			}
+			else {
+				// Let H be the orthographic projection of C on AB (thus we have : (CH) _|_ (AB) )
+				// The next location is on the segment between C and H
+				// Compute unit vector
+				double xv = (xb-xa);
+				double yv = (yb- ya);
+				// Compute distance
+				double AH = ( (xc-xa)*xv + (yc-ya)*yv ) / ( Math.sqrt(xv*xv +yv*yv) );
+				x_dest = xa + ( AH / (Math.sqrt(xv*xv +yv*yv)) ) * xv;
+				y_dest = ya + ( AH / (Math.sqrt(xv*xv +yv*yv)) ) * yv;
+			}
 			
 			/*
-			 * Second step : move the agent to this closest segment
-			 * Let A and B the nodes of this segment and C be the currentLocation
-			 * If the distance from C to this segment = distance between C and A or between C and B
-			 * 		then the next location is on the segment between C and A (or C and B)
-			 * else
-			 * 		then :
-			 * 		Let C' be the orthographic projection of C on AB
-			 * 		The next location is on the segment between C and C'
+			 * Third step : move the agent on this point
 			 */
+			double dist = Math.hypot(xc - x_dest, yc - y_dest);
+			double time = dist * getDefaultSpeed(agent);
+			if(remainingTime >= time){
+				currentLocation.setLocation(x_dest, y_dest);
+				agentOutside = false;
+			}
+			else{
+				// TODO : but actually, it must never be used...
+			}
 			
+			remainingTime -= time;
 		}
 	}
 
 	private GamaList movingInside(final IScope scope, final IAgent agent){
-		if(remainingTime > 0){
+		if(!agentOutside && remainingTime > 0){
 			GamaPoint currentLocation = (GamaPoint) agent.getLocation().copy(scope);
 			// Need to reach the next Node
 			moveAlongEdge(currentLocation, remainingTime, currentGsPath.peekEdge());
-			
+
 			// Follow the path on the graph, node by node
 			GamaList gl = new GamaList();
 			while(remainingTime > 0 && !currentGsPath.empty()){
 				Edge edge = currentGsPath.peekEdge();
 				double time = edge.getNumber(getLengthAttribute(agent)) * edge.getNumber(getSpeedAttribute(agent));
 				remainingTime -= time;
-				
-				if(currentGsPath.size()== 1 || remainingTime < 0){
+
+				if(currentGsPath.size()== 1 || (remainingTime - time) < 0){
 					// The moving agent stop between two nodes somewhere on the edge
 					// Compute the location of this "somewhere"
 					moveAlongEdge(currentLocation, remainingTime, edge);
-					
+
 					if(currentGsPath.size()== 1){
 						// The first case
 						// We don't stop moving but we pop the current edge of the path
@@ -218,7 +288,7 @@ public class MovingOnNetworkSkill extends Skill {
 						// We add the gama agent associated to this edge
 						gl.add(edge.getArray("gama_agent"));
 					}
-					
+
 					if(remainingTime < 0){
 						// The second case (or the next one)
 						// We stop moving but we do not pop the current edge of the path
@@ -233,9 +303,9 @@ public class MovingOnNetworkSkill extends Skill {
 					// Set the location of the agent to the next node
 					currentLocation = edge.getOpposite(currentGsPath.peekNode());
 				}
-				
+
 			}
-			
+
 			//We set the location of the agent in order to make the move
 			agent.setLocation(currentLocation);
 			// We return the list of edges that the agent has traveled.
@@ -246,9 +316,12 @@ public class MovingOnNetworkSkill extends Skill {
 	}
 
 	private void movingInsideToOutside(){
+		if(!agentOutside && remainingTime > 0){
+			
+		}
 		// TODO
 	}
-	
+
 	/**
 	 * Move the agent along an edge. There are two possibilities to stop the agent on this edges :
 	 * - firstly, there is not enough remaining time to reach the end of this edge.
@@ -263,7 +336,7 @@ public class MovingOnNetworkSkill extends Skill {
 		final Coordinate coords[] = shape.getInnerGeometry().getCoordinates();
 		// TODO
 	}
-	
+
 	private ILocation findTargetLocation(final IScope scope) {
 		final Object target = scope.getArg("target", IType.NONE);
 		ILocation result = null;
@@ -278,7 +351,7 @@ public class MovingOnNetworkSkill extends Skill {
 			dijkstra = new Dijkstra(Dijkstra.Element.EDGE, "result", "gama_time");
 			dijkstra.init(graph);
 		}
-		
+
 		/*
 		 *  Find the graphstream source and target node
 		 */
@@ -291,14 +364,14 @@ public class MovingOnNetworkSkill extends Skill {
 		IAgent gamaTargetEdge = gt.getAgentClosestTo(scope, target, In.edgesOf(gt.getPlaces()));
 		Edge gsTargetEdge = (Edge)gamaTargetEdge.getAttribute("graphstream_edge");
 		Node targetNode = gsTargetEdge.getNode0();
-				
+
 		/*
 		 *  Compute and get the path
 		 */
 		dijkstra.setSource(sourceNode);
 		dijkstra.compute();
 		Path path = dijkstra.getPath(targetNode);
-		
+
 		/*
 		 * Add closest edge(s)
 		 */
@@ -306,14 +379,14 @@ public class MovingOnNetworkSkill extends Skill {
 		if(!path.contains(gsSourceEdge)){
 			path.add(gsSourceEdge);
 		}
-		
+
 		// Add closest target edge to the path if it is missing
 		if(!path.contains(gsTargetEdge)){
 			path.add(gsTargetEdge);
 		}
 		return path;
 	}
-	
+
 	/**
 	 * Takes a gama graph as an input, returns a graphstream graph as
 	 * close as possible. Preserves double links (multi graph).
@@ -353,8 +426,8 @@ public class MovingOnNetworkSkill extends Skill {
 			_Edge edge = (_Edge) gamaGraph._internalEdgeMap().get(edgeObj);
 			try {
 				Edge e = // We call the function where we give the nodes object directly, is it more efficient than give the string id? Because, if no, we don't need the "gamaNode2graphStreamNode" map...
-					g.addEdge(edgeObj.toString(), gamaNode2graphStreamNode.get(edge.getSource()), gamaNode2graphStreamNode.get(edge.getTarget()),
-							gamaGraph.isDirected() );// till now,vdirectionality of an edge depends on the whole gama graph
+						g.addEdge(edgeObj.toString(), gamaNode2graphStreamNode.get(edge.getSource()), gamaNode2graphStreamNode.get(edge.getTarget()),
+								gamaGraph.isDirected() );// till now,vdirectionality of an edge depends on the whole gama graph
 				if ( edgeObj instanceof IAgent ) {
 					IAgent a = (IAgent) edgeObj;
 					// a know e
@@ -369,12 +442,12 @@ public class MovingOnNetworkSkill extends Skill {
 				}
 			} catch (EdgeRejectedException e) {
 				GAMA.reportError(GamaRuntimeException
-					.warning("an edge was rejected during the transformation, probably because it was a double one"),
-					true);
+						.warning("an edge was rejected during the transformation, probably because it was a double one"),
+						true);
 			} catch (IdAlreadyInUseException e) {
 				GAMA.reportError(GamaRuntimeException
-					.warning("an edge was rejected during the transformation, probably because it was a double one"),
-					true);
+						.warning("an edge was rejected during the transformation, probably because it was a double one"),
+						true);
 			}
 
 		}
@@ -382,15 +455,15 @@ public class MovingOnNetworkSkill extends Skill {
 		// some basic tests for integrity
 		if ( gamaGraph.getVertices().size() != g.getNodeCount() ) {
 			GAMA.reportError(
-				GamaRuntimeException.warning("The exportation ran without error, but an integrity test failed: " +
-					"the number of vertices is not correct(" + g.getNodeCount() + " instead of " +
-					gamaGraph.getVertices().size() + ")"), true);
+					GamaRuntimeException.warning("The exportation ran without error, but an integrity test failed: " +
+							"the number of vertices is not correct(" + g.getNodeCount() + " instead of " +
+							gamaGraph.getVertices().size() + ")"), true);
 		}
 		if ( gamaGraph.getEdges().size() != g.getEdgeCount() ) {
 			GAMA.reportError(
-				GamaRuntimeException.warning("The exportation ran without error, but an integrity test failed: " +
-					"the number of edges is not correct(" + g.getEdgeCount() + " instead of " +
-					gamaGraph.getEdges().size() + ")"), true);
+					GamaRuntimeException.warning("The exportation ran without error, but an integrity test failed: " +
+							"the number of edges is not correct(" + g.getEdgeCount() + " instead of " +
+							gamaGraph.getEdges().size() + ")"), true);
 		}
 
 		return g;
