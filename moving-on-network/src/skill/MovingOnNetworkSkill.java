@@ -46,9 +46,10 @@ import msi.gaml.types.IType;
 
 @doc("This skill is intended to move an agent on a network according to speed and length attributes on the edges. When The agent is not already on the graph, we assume that the length is an euclidean length and we use a default speed given by the user.")
 @vars({
-	@var(name = IKeywordMoNAdditional.LENGTH_ATTRIBUTE, type = IType.STRING, doc = @doc("The attribute giving the length of the edge. Be careful : this variable is shared by all moving agent.")),
-	@var(name = IKeywordMoNAdditional.SPEED_ATTRIBUTE, type = IType.STRING, doc = @doc("The attribute giving the default speed. Be careful : this variable is shared by all moving agent.")),
-	@var(name = IKeywordMoNAdditional.DEFAULT_SPEED, type = IType.FLOAT, doc = @doc("The speed outside the graph.")),
+	@var(name = IKeywordMoNAdditional.LENGTH_ATTRIBUTE, type = IType.STRING, init = "'length'", doc = @doc("The attribute giving the length of the edge. Be careful : this variable is shared by all moving agent.")),
+	@var(name = IKeywordMoNAdditional.SPEED_ATTRIBUTE, type = IType.STRING, init = "'speed'", doc = @doc("The attribute giving the default speed. Be careful : this variable is shared by all moving agent.")),
+	@var(name = IKeywordMoNAdditional.DEFAULT_SPEED, type = IType.FLOAT, init = "19.4444", doc = @doc("The speed outside the graph ((in meter/second). Default : 70km/h.")),
+	@var(name = IKeywordMoNAdditional.GRAPH, type = IType.GRAPH, doc = @doc("The graph or network on which the agent moves.")),
 })
 @skill(name = IKeywordMoNAdditional.MOVING_ON_NETWORK)
 public class MovingOnNetworkSkill extends Skill {
@@ -68,9 +69,14 @@ public class MovingOnNetworkSkill extends Skill {
 
 	@setter(IKeywordMoNAdditional.GRAPH)
 	public void setGraph(final IAgent agent, final IGraph gamaGraph) {
-		if(graph == null){
+		if(gamaGraph != null && (graph == null || graph.getEdge(0).getAttribute("gama_time").equals("NaN"))){ // If the graph is null or if its edges do not contain a right value of gama_time
 			graph = getGraphstreamGraphFromGamaGraph(gamaGraph);
 			MovingOnNetworkSkill.gamaGraph = gamaGraph;
+		}
+		else {
+			dijkstra = null;
+			graph = null;
+			MovingOnNetworkSkill.gamaGraph = null;
 		}
 	}
 
@@ -81,6 +87,7 @@ public class MovingOnNetworkSkill extends Skill {
 
 	@setter(IKeywordMoNAdditional.LENGTH_ATTRIBUTE)
 	public void setLengthAttribute(final IAgent agent, final String s) {
+		length_attribute = s;
 		agent.setAttribute(IKeywordMoNAdditional.LENGTH_ATTRIBUTE, s);
 	}
 
@@ -91,16 +98,17 @@ public class MovingOnNetworkSkill extends Skill {
 
 	@setter(IKeywordMoNAdditional.SPEED_ATTRIBUTE)
 	public void setSpeedAttribute(final IAgent agent, final String s) {
+		speed_attribute = s;
 		agent.setAttribute(IKeywordMoNAdditional.SPEED_ATTRIBUTE, s);
 	}
 
 	@getter(IKeywordMoNAdditional.DEFAULT_SPEED)
-	public Float getDefaultSpeed(final IAgent agent) {
-		return (Float) agent.getAttribute(IKeywordMoNAdditional.DEFAULT_SPEED);
+	public Double getDefaultSpeed(final IAgent agent) {
+		return (Double) agent.getAttribute(IKeywordMoNAdditional.DEFAULT_SPEED);
 	}
 
 	@setter(IKeywordMoNAdditional.DEFAULT_SPEED)
-	public void setDefaultSpeed(final IAgent agent, final Float s) {
+	public void setDefaultSpeed(final IAgent agent, final double s) {
 		agent.setAttribute(IKeywordMoNAdditional.DEFAULT_SPEED, s);
 	}
 
@@ -111,23 +119,48 @@ public class MovingOnNetworkSkill extends Skill {
 	@action(
 			name = "goto",
 			args = {
-					@arg(name = "target", type = { IType.AGENT, IType.POINT, IType.GEOMETRY }, optional = false, doc = @doc("the location or entity towards which to move.")),
-					@arg(name = "on", type = IType.GRAPH, optional = true, doc = @doc("the agent moves inside this graph."))
+					@arg(name = IKeywordMoNAdditional.TARGET, type = { IType.AGENT, IType.POINT, IType.GEOMETRY }, optional = false, doc = @doc("the location or entity towards which to move.")),
+					@arg(name = IKeywordMoNAdditional.ON, type = IType.GRAPH, optional = true, doc = @doc("the agent moves inside this graph.")),
+					@arg(name = IKeywordMoNAdditional.LENGTH_ATTRIBUTE, type = IType.STRING, optional = true, doc = @doc("the name of the variable containing the length of an edge.")),
+					@arg(name = IKeywordMoNAdditional.SPEED_ATTRIBUTE, type = IType.STRING, optional = true, doc = @doc("the name of the varaible containing the speed on an edge."))
 			},
 			doc =
 			@doc(value = "moves the agent towards the target passed in the arguments.", returns = "the path followed by the agent.", examples = { "do goto target: (one_of road).location on: road_network;" })
 			)
 	public GamaList gotoAction(final IScope scope) throws GamaRuntimeException {
 		final IAgent agent = getCurrentAgent(scope);
+		
+		//System.out.println("Goto et graph = " + graph);
+		//System.out.println("Attributes : \n"+agent.getAttributes());
 
+		// If the user has not given the length argument, so he must have set it before (if not, we throw an error)
+		if(length_attribute == null){
+			final Object la = scope.getArg(IKeywordMoNAdditional.LENGTH_ATTRIBUTE, IType.STRING);
+			if(la == null){
+				throw GamaRuntimeException.error("You have not declare a length attribute.");
+			}
+			setLengthAttribute(agent, (String)la);
+		}
+		
+		// If the user has not given the speed argument, so he must have set it before (if not, we throw an error)
+		if(speed_attribute == null){
+			final Object sa = scope.getArg(IKeywordMoNAdditional.LENGTH_ATTRIBUTE, IType.STRING);
+	
+			if(sa == null){
+				throw GamaRuntimeException.error("You have not declare a speed attribute.");
+			}
+			setSpeedAttribute(agent, (String)sa);
+		}
+		
 		// If the user has not given the "on" argument, so he must have set the graph before (if not, we throw an error)
-		if(graph == null){
+		if(graph == null || length_attribute == null || speed_attribute == null){
 			final Object on = scope.getArg("on", IType.GRAPH);
 			if(on == null){
 				throw GamaRuntimeException.error("You have not declare a graph on which the agent can move.");
 			}
 			setGraph(agent, (IGraph)on);
 		}
+		
 		// The source is the current location of the current agent
 		final ILocation source = agent.getLocation().copy(scope);
 		// The target is the location of the thing passing through argument (an agent or a point or a geometry)
@@ -329,7 +362,12 @@ public class MovingOnNetworkSkill extends Skill {
 		// Get the geometry
 		IShape shape = ((IAgent)(e.getAttribute("gama_agent"))).getGeometry();
 		final Coordinate coords[] = shape.getInnerGeometry().getCoordinates();
-		// TODO
+
+//		for ( int i = 0; i < coords.length - 1; i++ ) {
+//			tempCoord[0] = coords[i];
+//			tempCoord[1] = coords[i + 1];
+//			
+//		}
 	}
 
 	private ILocation findTargetLocation(final IScope scope) {
@@ -370,6 +408,9 @@ public class MovingOnNetworkSkill extends Skill {
 		/*
 		 * Add closest edge(s)
 		 */
+		
+		System.out.println("Length :"+path.getPathWeight("gama_time"));
+		
 		// Add closest source edge to the path if it is missing
 		if(!path.contains(gsSourceEdge)){
 			path.add(gsSourceEdge);
@@ -379,6 +420,7 @@ public class MovingOnNetworkSkill extends Skill {
 		if(!path.contains(gsTargetEdge)){
 			path.add(gsTargetEdge);
 		}
+
 		return path;
 	}
 
@@ -403,8 +445,7 @@ public class MovingOnNetworkSkill extends Skill {
 				n.addAttribute("gama_agent", a);
 				for ( Object key : a.getAttributes().keySet() ) {
 					Object value = GraphUtilsGraphStream.preprocessGamaValue(a.getAttributes().get(key));
-					// standard attribute
-					n.setAttribute(key.toString(), value.toString());
+					n.addAttribute(key.toString(), value.toString());
 				}
 			}
 
@@ -422,17 +463,24 @@ public class MovingOnNetworkSkill extends Skill {
 			try {
 				Edge e = // We call the function where we give the nodes object directly, is it more efficient than give the string id? Because, if no, we don't need the "gamaNode2graphStreamNode" map...
 						g.addEdge(edgeObj.toString(), gamaNode2graphStreamNode.get(edge.getSource()), gamaNode2graphStreamNode.get(edge.getTarget()),
-								gamaGraph.isDirected() );// till now,vdirectionality of an edge depends on the whole gama graph
+								gamaGraph.isDirected() );// till now, directionality of an edge depends on the whole gama graph
 				if ( edgeObj instanceof IAgent ) {
 					IAgent a = (IAgent) edgeObj;
 					// a know e
 					a.setAttribute("graphstream_edge", e);
 					// and e know a
 					e.addAttribute("gama_agent", a);
+					//System.out.println("length_attribute = "+length_attribute);
+					//System.out.println("speed_attribute = "+speed_attribute);
 					for ( Object key : a.getAttributes().keySet() ) {
 						Object value = GraphUtilsGraphStream.preprocessGamaValue(a.getAttributes().get(key));
-						e.setAttribute(key.toString(), value.toString());
+						//System.out.println("un attribut : key.toString() = "+key.toString()+" et value.toString() = "+value.toString());
+						//System.out.println("length_attribute != key.toString() ? "+ length_attribute.equals(key.toString()));
+						e.addAttribute(key.toString(), value.toString());
 					}
+					//System.out.println("e.getNumber(length_attribute) = "+e.getAttribute(length_attribute) );
+					//System.out.println("e.getNumber(speed_attribute) = "+e.getAttribute(speed_attribute));
+					//System.out.println("e.getNumber(length_attribute) * e.getNumber(speed_attribute) = "+e.getNumber(length_attribute) * e.getNumber(speed_attribute));
 					e.addAttribute("gama_time", e.getNumber(length_attribute) * e.getNumber(speed_attribute));
 				}
 			} catch (EdgeRejectedException e) {
@@ -460,7 +508,7 @@ public class MovingOnNetworkSkill extends Skill {
 							"the number of edges is not correct(" + g.getEdgeCount() + " instead of " +
 							gamaGraph.getEdges().size() + ")"), true);
 		}
-
+		
 		return g;
 	}
 }
