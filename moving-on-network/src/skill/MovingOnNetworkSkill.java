@@ -1,6 +1,7 @@
 package skill;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.graphstream.algorithm.Dijkstra;
@@ -54,14 +55,16 @@ import msi.gaml.types.IType;
 @skill(name = IKeywordMoNAdditional.MOVING_ON_NETWORK)
 public class MovingOnNetworkSkill extends Skill {
 	private static Dijkstra dijkstra = null;
-	private Path currentGsPath = null;
+	private List<Edge> currentGsPathEdge = null;
+	private List<Node> currentGsPathNode = null;
 	private ILocation currentTarget = null;// We use this variable to know if we already have computed the shortest path
 	private static Graph graph = null;
 	private static IGraph gamaGraph = null;
 	public static String length_attribute = null;
 	public static String speed_attribute = null;
 	private double remainingTime = 0;
-	private boolean agentOutside = true;
+	private boolean agentFromOutsideToInside = true;
+	private boolean agentFromInsideToOutside = false;
 
 	/*
 	 * Getters and setters
@@ -76,6 +79,8 @@ public class MovingOnNetworkSkill extends Skill {
 		else {
 			dijkstra = null;
 			graph = null;
+			agentFromOutsideToInside = true;
+			agentFromInsideToOutside = false;
 			MovingOnNetworkSkill.gamaGraph = null;
 		}
 	}
@@ -168,7 +173,7 @@ public class MovingOnNetworkSkill extends Skill {
 
 		if(currentTarget != target){
 			// Need to compute the path
-			currentGsPath = computeShortestPath(scope, source, target);
+			computeShortestPath(scope, source, target);
 			currentTarget = target;
 		}
 		// The path has been computed, we need to know how many time the agent has in order to make the move.
@@ -181,13 +186,13 @@ public class MovingOnNetworkSkill extends Skill {
 		GamaList gl = movingInside(scope, agent);
 
 		// Move the agent from inside the network to outside (when the target must and can leave the network).
-		movingInsideToOutside();
+		movingFromInsideToOutside();
 
 		return gl;
 	}
 
 	private void movingFromOutsideToInside(final IScope scope, final IAgent agent){
-		if(agentOutside && remainingTime > 0){
+		if(agentFromOutsideToInside && remainingTime > 0){
 			/*
 			 *  First step : find the closest segment to the agent
 			 *  Indeed, one edge of the path could be made with more than one segment
@@ -196,7 +201,7 @@ public class MovingOnNetworkSkill extends Skill {
 			GamaPoint currentLocation = (GamaPoint) agent.getLocation().copy(scope);
 			Point currentPointLocation = (Point) agent.getLocation().copy(scope).getInnerGeometry();
 			// The closest road
-			IAgent gamaRoad = currentGsPath.peekEdge().getAttribute("gama_agent");
+			IAgent gamaRoad = currentGsPathEdge.get(0).getAttribute("gama_agent");
 
 			// Find the closest segment among the road's
 			double distAgentToNetwork = Double.MAX_VALUE;
@@ -276,13 +281,17 @@ public class MovingOnNetworkSkill extends Skill {
 			 * Third step : move the agent on this point
 			 */
 			double dist = Math.hypot(xc - x_dest, yc - y_dest);
-			double time = dist * getDefaultSpeed(agent);// We use the default speed because the agent is not yet on the network
+			double time = dist / getDefaultSpeed(agent);// We use the default speed because the agent is not yet on the network
+
 			if(remainingTime >= time){
 				currentLocation.setLocation(x_dest, y_dest);
-				agentOutside = false;
+				agent.setLocation(currentLocation);
+				agentFromOutsideToInside = false;
 			}
 			else{
-				// TODO : but actually, it must never be used...
+				// TODO : in this case the agent does not reach the dest but it approaches 
+				currentLocation.setLocation(x_dest, y_dest);
+				agent.setLocation(currentLocation);
 			}
 			
 			remainingTime -= time;
@@ -290,31 +299,32 @@ public class MovingOnNetworkSkill extends Skill {
 	}
 
 	private GamaList movingInside(final IScope scope, final IAgent agent){
-		if(!agentOutside && remainingTime > 0){
+		if(!agentFromInsideToOutside && !agentFromOutsideToInside && remainingTime > 0){
 			GamaPoint currentLocation = (GamaPoint) agent.getLocation().copy(scope);
 			// The agent needs to reach the next Node
-			moveAlongEdge(currentLocation, remainingTime, currentGsPath.peekEdge());
+			moveAlongEdge(currentLocation, remainingTime, currentGsPathEdge.get(0));
 
 			// It follows the path on the graph, node by node
 			GamaList gl = new GamaList();
-			while(remainingTime > 0 && !currentGsPath.empty()){
-				Edge edge = currentGsPath.peekEdge();
+			while(remainingTime > 0 && !currentGsPathEdge.isEmpty()){
+				Edge edge = currentGsPathEdge.get(0);
 				double time = edge.getNumber(getLengthAttribute(agent)) * edge.getNumber(getSpeedAttribute(agent));
 				remainingTime -= time;
 
 				// currentGsPath.size()== 1 when the agent is at the end of the path,
 				// therefore it must stop before the next node in order to leave the network
-				if(currentGsPath.size()== 1 || (remainingTime - time) < 0){
+				if(currentGsPathEdge.size()== 1 || (remainingTime - time) < 0){
 					// The moving agent stops between two nodes somewhere on the edge
 					// Compute the location of this "somewhere"
 					moveAlongEdge(currentLocation, remainingTime, edge);
 
-					if(currentGsPath.size()== 1 && (remainingTime - time) > 0){
+					if(currentGsPathEdge.size()== 1 && (remainingTime - time) > 0){
 						// The first case
 						// We don't stop moving but we pop the current edge of the path
-						currentGsPath.popEdge();
+						currentGsPathEdge.remove(0);
+						currentGsPathNode.remove(0);
 						// We add the gama agent associated to this edge
-						gl.add(edge.getArray("gama_agent"));
+						gl.add(edge.getAttribute("gama_agent"));
 					}
 
 					if(remainingTime < 0){
@@ -325,11 +335,11 @@ public class MovingOnNetworkSkill extends Skill {
 				}
 				else{
 					// We continue to move the agent to the next node
-					currentGsPath.popEdge();
+					currentGsPathEdge.remove(0);
 					// We add the gama agent associated to this edge
 					gl.add(edge.getAttribute("gama_agent"));
 					// Set the location of the agent to the next node
-					currentLocation = edge.getOpposite(currentGsPath.peekNode());
+					currentLocation = edge.getOpposite(currentGsPathNode.remove(0));
 				}
 
 			}
@@ -343,11 +353,10 @@ public class MovingOnNetworkSkill extends Skill {
 		return new GamaList();
 	}
 
-	private void movingInsideToOutside(){
-		if(!agentOutside && remainingTime > 0){
-			
+	private void movingFromInsideToOutside(){
+		if(!agentFromInsideToOutside && remainingTime > 0){
+			// TODO
 		}
-		// TODO
 	}
 
 	/**
@@ -379,7 +388,7 @@ public class MovingOnNetworkSkill extends Skill {
 		return result;
 	}
 
-	private Path computeShortestPath(final IScope scope, ILocation source, ILocation target){
+	private void computeShortestPath(final IScope scope, ILocation source, ILocation target){
 		if(dijkstra == null){
 			dijkstra = new Dijkstra(Dijkstra.Element.EDGE, "result", "gama_time");
 			dijkstra.init(graph);
@@ -403,25 +412,35 @@ public class MovingOnNetworkSkill extends Skill {
 		 */
 		dijkstra.setSource(sourceNode);
 		dijkstra.compute();
-		Path path = dijkstra.getPath(targetNode);
+		Path p = dijkstra.getPath(targetNode);
 
 		/*
 		 * Add closest edge(s)
 		 */
 		
-		System.out.println("Length :"+path.getPathWeight("gama_time"));
-		
 		// Add closest source edge to the path if it is missing
-		if(!path.contains(gsSourceEdge)){
-			path.add(gsSourceEdge);
+		if(!p.contains(gsSourceEdge)){
+			sourceNode = gsSourceEdge.getNode1();
+			dijkstra.setSource(sourceNode);
+			dijkstra.compute();
+			p = dijkstra.getPath(targetNode);
 		}
 
 		// Add closest target edge to the path if it is missing
-		if(!path.contains(gsTargetEdge)){
-			path.add(gsTargetEdge);
+		if(!p.contains(gsTargetEdge)){
+			targetNode = gsTargetEdge.getNode1();
+			p = dijkstra.getPath(targetNode);
 		}
 
-		return path;
+		// just for debug ================================================>
+		for(Edge e : p.getEachEdge()){
+			IAgent a = (IAgent) e.getAttribute("gama_agent");
+			a.setAttribute("color", "red");
+		}
+		// <===============================================================
+				
+		currentGsPathEdge = p.getEdgePath();
+		currentGsPathNode = p.getNodePath();
 	}
 
 	/**
