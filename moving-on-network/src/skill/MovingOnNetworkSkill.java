@@ -54,17 +54,23 @@ import msi.gaml.types.IType;
 })
 @skill(name = IKeywordMoNAdditional.MOVING_ON_NETWORK)
 public class MovingOnNetworkSkill extends Skill {
+	/*
+	 * Static variables
+	 */
 	private static Dijkstra dijkstra = null;
-	private List<Edge> currentGsPathEdge = null;
-	private List<Node> currentGsPathNode = null;
-	private ILocation currentTarget = null;// We use this variable to know if we already have computed the shortest path
 	private static Graph graph = null;
 	private static IGraph gamaGraph = null;
-	public static String length_attribute = null;
-	public static String speed_attribute = null;
-	private double remainingTime = 0;
-	private boolean agentFromOutsideToInside = true;
-	private boolean agentFromInsideToOutside = false;
+	private static String length_attribute = null;
+	private static String speed_attribute = null;
+
+	/*
+	 * Non-static variables
+	 */
+	private double remainingTime;
+	private boolean agentFromOutsideToInside;
+	private boolean agentFromInsideToOutside;
+	private List<Edge> currentGsPathEdge;
+	private List<Node> currentGsPathNode;
 
 	/*
 	 * Getters and setters
@@ -79,8 +85,6 @@ public class MovingOnNetworkSkill extends Skill {
 		else {
 			dijkstra = null;
 			graph = null;
-			agentFromOutsideToInside = true;
-			agentFromInsideToOutside = false;
 			MovingOnNetworkSkill.gamaGraph = null;
 		}
 	}
@@ -134,9 +138,26 @@ public class MovingOnNetworkSkill extends Skill {
 			)
 	public GamaList gotoAction(final IScope scope) throws GamaRuntimeException {
 		final IAgent agent = getCurrentAgent(scope);
-		
-		//System.out.println("Goto et graph = " + graph);
-		//System.out.println("Attributes : \n"+agent.getAttributes());
+
+		agentFromOutsideToInside = true;
+		if(agent.hasAttribute("agentFromOutsideToInside"))
+			agentFromOutsideToInside = (Boolean) agent.getAttribute("agentFromOutsideToInside");
+
+		agentFromInsideToOutside = false;
+		if(agent.hasAttribute("agentFromInsideToOutside"))
+			agentFromInsideToOutside = (Boolean) agent.getAttribute("agentFromInsideToOutside");
+
+		currentGsPathEdge = null;
+		if(agent.hasAttribute("currentGsPathEdge"))
+			currentGsPathEdge = (List<Edge>) agent.getAttribute("currentGsPathEdge");
+
+		List<Node> currentGsPathNode = null;
+		if(agent.hasAttribute("currentGsPathNode"))
+			currentGsPathNode = (List<Node>) agent.getAttribute("currentGsPathNode");
+
+		ILocation currentTarget = null;// We use this variable to know if we already have computed the shortest path
+		if(agent.hasAttribute("currentTarget"))
+			currentTarget = (ILocation) agent.getAttribute("currentTarget");
 
 		// If the user has not given the length argument, so he must have set it before (if not, we throw an error)
 		if(length_attribute == null){
@@ -146,17 +167,17 @@ public class MovingOnNetworkSkill extends Skill {
 			}
 			setLengthAttribute(agent, (String)la);
 		}
-		
+
 		// If the user has not given the speed argument, so he must have set it before (if not, we throw an error)
 		if(speed_attribute == null){
 			final Object sa = scope.getArg(IKeywordMoNAdditional.LENGTH_ATTRIBUTE, IType.STRING);
-	
+
 			if(sa == null){
 				throw GamaRuntimeException.error("You have not declare a speed attribute.");
 			}
 			setSpeedAttribute(agent, (String)sa);
 		}
-		
+
 		// If the user has not given the "on" argument, so he must have set the graph before (if not, we throw an error)
 		if(graph == null || length_attribute == null || speed_attribute == null){
 			final Object on = scope.getArg("on", IType.GRAPH);
@@ -165,7 +186,7 @@ public class MovingOnNetworkSkill extends Skill {
 			}
 			setGraph(agent, (IGraph)on);
 		}
-		
+
 		// The source is the current location of the current agent
 		final ILocation source = agent.getLocation().copy(scope);
 		// The target is the location of the thing passing through argument (an agent or a point or a geometry)
@@ -187,6 +208,12 @@ public class MovingOnNetworkSkill extends Skill {
 
 		// Move the agent from inside the network to outside (when the target must and can leave the network).
 		movingFromInsideToOutside();
+
+		agent.setAttribute("agentFromOutsideToInside", agentFromOutsideToInside);
+		agent.setAttribute("agentFromInsideToOutside", agentFromInsideToOutside);
+		agent.setAttribute("currentGsPathEdge", currentGsPathEdge);
+		agent.setAttribute("currentGsPathNode", currentGsPathNode);
+		agent.setAttribute("currentTarget", currentTarget);
 
 		return gl;
 	}
@@ -292,6 +319,7 @@ public class MovingOnNetworkSkill extends Skill {
 				// TODO : in this case the agent does not reach the dest but it approaches 
 				currentLocation.setLocation(x_dest, y_dest);
 				agent.setLocation(currentLocation);
+				agentFromOutsideToInside = false;
 			}
 			
 			remainingTime -= time;
