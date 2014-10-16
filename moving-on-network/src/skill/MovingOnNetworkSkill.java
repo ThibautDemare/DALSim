@@ -138,7 +138,7 @@ public class MovingOnNetworkSkill extends Skill {
 			)
 	public GamaList gotoAction(final IScope scope) throws GamaRuntimeException {
 		final IAgent agent = getCurrentAgent(scope);
-
+		
 		agentFromOutsideToInside = true;
 		if(agent.hasAttribute("agentFromOutsideToInside"))
 			agentFromOutsideToInside = (Boolean) agent.getAttribute("agentFromOutsideToInside");
@@ -273,21 +273,21 @@ public class MovingOnNetworkSkill extends Skill {
 
 			// Compute the angles
 			// The angle between ->AC and ->AB
-			double CAB = Math.toDegrees(Math.atan2(ACy, ACx)-Math.atan2(ABy, ABx));
+			double CAB = Math.abs( Math.toDegrees(Math.atan2(ACy, ACx)-Math.atan2(ABy, ABx)) );
 			// The angle between ->BC and ->BA
-			double CBA = Math.toDegrees(Math.atan2(BCy, BCx)-Math.atan2(BAy, BAx));
+			double CBA = Math.abs( Math.toDegrees(Math.atan2(BCy, BCx)-Math.atan2(BAy, BAx)) );
 
 			// Let A and B the nodes of this segment and C be the currentLocation
 			// If one of the angles CAB or CBA  is obtuse ( ie.  90 < CAB < 180 or 90 < CBA < 180)
 			// 	then the next location is on the segment between C and A (or C and B)
 			double x_dest;
 			double y_dest;
-			if(CAB > 90 ){
+			if(CAB >= 90 ){
 				// Between C and A
 				x_dest = xa;
 				y_dest = ya;
 			}
-			else if(CBA > 90){
+			else if(CBA >= 90){
 				// Between C and B
 				x_dest = xb;
 				y_dest = yb;
@@ -316,10 +316,11 @@ public class MovingOnNetworkSkill extends Skill {
 				agentFromOutsideToInside = false;
 			}
 			else{
-				// TODO : in this case the agent does not reach the dest but it approaches 
-				currentLocation.setLocation(x_dest, y_dest);
+				double coef = remainingTime / time;
+				double x_inter = xc + (x_dest - xc) * coef;
+				double y_inter = yc + (y_dest - yc) * coef;
+				currentLocation.setLocation(x_inter, y_inter);
 				agent.setLocation(currentLocation);
-				agentFromOutsideToInside = false;
 			}
 			
 			remainingTime -= time;
@@ -367,7 +368,7 @@ public class MovingOnNetworkSkill extends Skill {
 					// We add the gama agent associated to this edge
 					gl.add(edge.getAttribute("gama_agent"));
 					// Set the location of the agent to the next node
-					currentLocation = edge.getOpposite(currentGsPathNode.remove(0));
+					currentLocation = edge.getOpposite(currentGsPathNode.remove(0)).getAttribute("gama_agent");
 				}
 
 			}
