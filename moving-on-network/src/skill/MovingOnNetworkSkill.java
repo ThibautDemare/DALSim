@@ -151,7 +151,7 @@ public class MovingOnNetworkSkill extends Skill {
 		if(agent.hasAttribute("currentGsPathEdge"))
 			currentGsPathEdge = (List<Edge>) agent.getAttribute("currentGsPathEdge");
 
-		List<Node> currentGsPathNode = null;
+		currentGsPathNode = null;
 		if(agent.hasAttribute("currentGsPathNode"))
 			currentGsPathNode = (List<Node>) agent.getAttribute("currentGsPathNode");
 
@@ -196,6 +196,7 @@ public class MovingOnNetworkSkill extends Skill {
 			// Need to compute the path
 			computeShortestPath(scope, source, target);
 			currentTarget = target;
+			currentGsPathNode.remove(0);// The first node is useless
 		}
 		// The path has been computed, we need to know how many time the agent has in order to make the move.
 		remainingTime = scope.getClock().getStep();
@@ -287,8 +288,7 @@ public class MovingOnNetworkSkill extends Skill {
 			GamaList gl = new GamaList();
 			while(remainingTime > 0 && !currentGsPathEdge.isEmpty()){
 				Edge edge = currentGsPathEdge.get(0);
-				double time = edge.getNumber(getLengthAttribute(agent)) * edge.getNumber(getSpeedAttribute(agent));
-				remainingTime -= time;
+				double time = edge.getNumber(getLengthAttribute(agent)) / edge.getNumber(getSpeedAttribute(agent));
 
 				// currentGsPath.size()== 1 when the agent is at the end of the path,
 				// therefore it must stop before the next node in order to leave the network
@@ -318,7 +318,9 @@ public class MovingOnNetworkSkill extends Skill {
 					// We add the gama agent associated to this edge
 					gl.add(edge.getAttribute("gama_agent"));
 					// Set the location of the agent to the next node
-					currentLocation = edge.getOpposite(currentGsPathNode.remove(0)).getAttribute("gama_agent");
+					currentLocation = currentGsPathNode.remove(0).getAttribute("gama_agent");
+
+					remainingTime -= time;
 				}
 
 			}
