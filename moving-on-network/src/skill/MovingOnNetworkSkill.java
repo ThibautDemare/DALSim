@@ -204,7 +204,7 @@ public class MovingOnNetworkSkill extends Skill {
 		movingFromOutsideToInside(scope, agent);
 
 		// Move the agent inside the network (and get the agent edges that the agent has traveled) (when the agent is already on the network and can still move).
-		GamaList gl = movingInside(scope, agent);
+		GamaList gl = movingInside(scope, agent, target);
 
 		// Move the agent from inside the network to outside (when the target must and can leave the network).
 		movingFromInsideToOutside();
@@ -250,75 +250,25 @@ public class MovingOnNetworkSkill extends Skill {
 			 * Second step : Find the closest point on this segment
 			 */
 			// Get coordinates of these different points
-			double xa = coords[indexBestSegment].x;
-			double ya = coords[indexBestSegment].y;
-			double xb = coords[indexBestSegment+1].x;
-			double yb = coords[indexBestSegment+1].y;
+			Coordinate dest = getClosestLocation(new Coordinate(currentPointLocation.getX(), currentPointLocation.getY()), coords[indexBestSegment], coords[indexBestSegment+1]);
 			double xc = currentPointLocation.getX();
 			double yc = currentPointLocation.getY();
 
-			// Compute coordinates of vectors
-			// CA Vector
-			double ACy = yc - ya;
-			double ACx = xc - xa;
-			// AB vector
-			double ABy = yb - ya;
-			double ABx = xb - xa;
-			// CB vector
-			double BCy = yc - yb;
-			double BCx = xc - xb;
-			// BA vector
-			double BAy = ya - yb;
-			double BAx = xa - xb;
-
-			// Compute the angles
-			// The angle between ->AC and ->AB
-			double CAB = Math.abs( Math.toDegrees(Math.atan2(ACy, ACx)-Math.atan2(ABy, ABx)) );
-			// The angle between ->BC and ->BA
-			double CBA = Math.abs( Math.toDegrees(Math.atan2(BCy, BCx)-Math.atan2(BAy, BAx)) );
-
-			// Let A and B the nodes of this segment and C be the currentLocation
-			// If one of the angles CAB or CBA  is obtuse ( ie.  90 < CAB < 180 or 90 < CBA < 180)
-			// 	then the next location is on the segment between C and A (or C and B)
-			double x_dest;
-			double y_dest;
-			if(CAB >= 90 ){
-				// Between C and A
-				x_dest = xa;
-				y_dest = ya;
-			}
-			else if(CBA >= 90){
-				// Between C and B
-				x_dest = xb;
-				y_dest = yb;
-			}
-			else {
-				// Let H be the orthographic projection of C on AB (thus we have : (CH) _|_ (AB) )
-				// The next location is on the segment between C and H
-				// Compute unit vector
-				double xv = (xb-xa);
-				double yv = (yb- ya);
-				// Compute distance
-				double AH = ( (xc-xa)*xv + (yc-ya)*yv ) / ( Math.sqrt(xv*xv +yv*yv) );
-				x_dest = xa + ( AH / (Math.sqrt(xv*xv +yv*yv)) ) * xv;
-				y_dest = ya + ( AH / (Math.sqrt(xv*xv +yv*yv)) ) * yv;
-			}
-			
 			/*
 			 * Third step : move the agent on this point
 			 */
-			double dist = Math.hypot(xc - x_dest, yc - y_dest);
+			double dist = Math.hypot(xc - dest.x, yc - dest.y);
 			double time = dist / getDefaultSpeed(agent);// We use the default speed because the agent is not yet on the network
 
 			if(remainingTime >= time){
-				currentLocation.setLocation(x_dest, y_dest);
+				currentLocation.setLocation(dest.x, dest.y);
 				agent.setLocation(currentLocation);
 				agentFromOutsideToInside = false;
 			}
 			else{
 				double coef = remainingTime / time;
-				double x_inter = xc + (x_dest - xc) * coef;
-				double y_inter = yc + (y_dest - yc) * coef;
+				double x_inter = xc + (dest.x - xc) * coef;
+				double y_inter = yc + (dest.y - yc) * coef;
 				currentLocation.setLocation(x_inter, y_inter);
 				agent.setLocation(currentLocation);
 			}
@@ -327,11 +277,11 @@ public class MovingOnNetworkSkill extends Skill {
 		}
 	}
 
-	private GamaList movingInside(final IScope scope, final IAgent agent){
+	private GamaList movingInside(final IScope scope, final IAgent agent, final ILocation target){
 		if(!agentFromInsideToOutside && !agentFromOutsideToInside && remainingTime > 0){
 			GamaPoint currentLocation = (GamaPoint) agent.getLocation().copy(scope);
 			// The agent needs to reach the next Node
-			moveAlongEdge(currentLocation, remainingTime, currentGsPathEdge.get(0));
+			moveAlongEdge(scope, agent, target, remainingTime, currentGsPathEdge.get(0));
 
 			// It follows the path on the graph, node by node
 			GamaList gl = new GamaList();
@@ -345,7 +295,7 @@ public class MovingOnNetworkSkill extends Skill {
 				if(currentGsPathEdge.size()== 1 || (remainingTime - time) < 0){
 					// The moving agent stops between two nodes somewhere on the edge
 					// Compute the location of this "somewhere"
-					moveAlongEdge(currentLocation, remainingTime, edge);
+					moveAlongEdge(scope, agent, target, remainingTime, edge);
 
 					if(currentGsPathEdge.size()== 1 && (remainingTime - time) > 0){
 						// The first case
@@ -396,16 +346,160 @@ public class MovingOnNetworkSkill extends Skill {
 	 * @param remainingT
 	 * @param e
 	 */
-	private void moveAlongEdge(ILocation currentLoc, double remainingT, Edge e){
-		// Get the geometry
+	private void moveAlongEdge(final IScope scope, final IAgent agent, final ILocation target, double remainingTime, Edge e){
+		GamaPoint currentLocation = (GamaPoint) agent.getLocation().copy(scope);
+
+		// Get the geometry of the edge
 		IShape shape = ((IAgent)(e.getAttribute("gama_agent"))).getGeometry();
 		final Coordinate coords[] = shape.getInnerGeometry().getCoordinates();
+		// And find the segment where the agent is
+		int i = 0;
+		boolean findSegment = false;
+		while( !findSegment && i < coords.length - 1 ) {
+			if(belongsToSegment(coords[i], coords[i + 1], new Coordinate(currentLocation.getX(), currentLocation.getY()))) {
+				findSegment = true;
+			}
+			i++;
+		}
 
-//		for ( int i = 0; i < coords.length - 1; i++ ) {
-//			tempCoord[0] = coords[i];
-//			tempCoord[1] = coords[i + 1];
-//			
-//		}
+		// Determine in which way we must browse the list of segments
+		boolean incrementWay = true;
+		ILocation locNextNode = ((IAgent)currentGsPathNode.get(1).getAttribute("gama_agent")).getLocation();
+		if(coords[coords.length-1].x != locNextNode.getX() || coords[coords.length-1].x != locNextNode.getY()){
+			incrementWay = false;
+			i++;
+		}
+
+		// Determine if the agent must stop before the end of the edge because he must leave the network
+		// If yes, we look for the segment that the agent must leave
+		int indexClosestSegmentToTarget = -1;
+		if(e.equals(currentGsPathEdge.get(currentGsPathEdge.size()-1))){
+			double distTargetToNetwork = Double.MAX_VALUE;
+			Coordinate[] tempCoord = new Coordinate[2];
+			for ( int j = 0; i < coords.length - 1; i++ ) {
+				tempCoord[0] = coords[j];
+				tempCoord[1] = coords[j + 1];
+				LineString segment = GeometryUtils.FACTORY.createLineString(tempCoord);
+				double distS = segment.distance(target.getInnerGeometry());
+				if ( distS < distTargetToNetwork ) {
+					distTargetToNetwork = distS;
+					indexClosestSegmentToTarget = j;
+				}
+			}
+		}
+
+		// Browse the segment and move progressively the agent on the edge
+		while(remainingTime > 0 && i >= 0 && i < coords.length){
+			Coordinate dest;
+			if(indexClosestSegmentToTarget != -1 && (i == indexClosestSegmentToTarget || (i-1) == indexClosestSegmentToTarget) ){
+				dest = getClosestLocation(new Coordinate(target.getX(), target.getY()), coords[i], coords[i+1]);
+			}
+			else {
+				dest = coords[i];
+			}
+			// Compute the time needed to go to the next side of the segment
+			double x_agent = currentLocation.getX();
+			double y_agent = currentLocation.getY();
+
+			double dist = Math.hypot(x_agent - dest.x, y_agent - dest.y);
+			double time = dist / e.getNumber(speed_attribute);
+
+			// Move the agent
+			if(remainingTime >= time){
+				currentLocation.setLocation(dest.x, dest.y);
+				agent.setLocation(currentLocation);
+				agentFromOutsideToInside = false;
+			}
+			else{
+				double coef = remainingTime / time;
+				double x_inter = x_agent + (dest.x - x_agent) * coef;
+				double y_inter = y_agent + (dest.y - y_agent) * coef;
+				currentLocation.setLocation(x_inter, y_inter);
+				agent.setLocation(currentLocation);
+			}
+			// Update the remaining time
+			remainingTime -= time;
+
+			// Increment or decrement i according to the way that we browse the list of segments
+			if(incrementWay)
+				i++;
+			else
+				i--;
+		}
+
+	}
+
+	/**
+	 * Check if the point C is on the segment delimited by point A and C
+	 * @param a The coordinate of the point A
+	 * @param b The coordinate of the point B
+	 * @param c The coordinate of the point C
+	 * @return true if C belongs to the segment AB, false otherwise.
+	 */
+	private boolean belongsToSegment(Coordinate a, Coordinate b, Coordinate c){
+		double ca = Math.hypot(c.x - a.x, c.y - a.y);
+		double cb = Math.hypot(c.x - b.x, c.y - b.y);
+		double ba = Math.hypot(b.x - a.x, b.y - a.y);
+		return ca + cb == ba;
+	}
+
+	private Coordinate getClosestLocation(Coordinate coordOutNetwork, Coordinate a, Coordinate b){
+		// Get coordinates of these different points
+		double xa = a.x;
+		double ya = a.y;
+		double xb = b.x;
+		double yb = b.y;
+		double xc = coordOutNetwork.x;
+		double yc = coordOutNetwork.y;
+
+		// Compute coordinates of vectors
+		// CA Vector
+		double ACy = yc - ya;
+		double ACx = xc - xa;
+		// AB vector
+		double ABy = yb - ya;
+		double ABx = xb - xa;
+		// CB vector
+		double BCy = yc - yb;
+		double BCx = xc - xb;
+		// BA vector
+		double BAy = ya - yb;
+		double BAx = xa - xb;
+
+		// Compute the angles
+		// The angle between ->AC and ->AB
+		double CAB = Math.abs( Math.toDegrees(Math.atan2(ACy, ACx)-Math.atan2(ABy, ABx)) );
+		// The angle between ->BC and ->BA
+		double CBA = Math.abs( Math.toDegrees(Math.atan2(BCy, BCx)-Math.atan2(BAy, BAx)) );
+
+		// Let A and B the nodes of this segment and C be the currentLocation
+		// If one of the angles CAB or CBA  is obtuse ( ie.  90 < CAB < 180 or 90 < CBA < 180)
+		// 	then the next location is on the segment between C and A (or C and B)
+		double x_dest;
+		double y_dest;
+		if(CAB >= 90 ){
+			// Between C and A
+			x_dest = xa;
+			y_dest = ya;
+		}
+		else if(CBA >= 90){
+			// Between C and B
+			x_dest = xb;
+			y_dest = yb;
+		}
+		else {
+			// Let H be the orthographic projection of C on AB (thus we have : (CH) _|_ (AB) )
+			// The next location is on the segment between C and H
+			// Compute unit vector
+			double xv = (xb-xa);
+			double yv = (yb- ya);
+			// Compute distance
+			double AH = ( (xc-xa)*xv + (yc-ya)*yv ) / ( Math.sqrt(xv*xv +yv*yv) );
+			x_dest = xa + ( AH / (Math.sqrt(xv*xv +yv*yv)) ) * xv;
+			y_dest = ya + ( AH / (Math.sqrt(xv*xv +yv*yv)) ) * yv;
+		}
+
+		return new Coordinate(x_dest, y_dest);
 	}
 
 	private ILocation findTargetLocation(final IScope scope) {
