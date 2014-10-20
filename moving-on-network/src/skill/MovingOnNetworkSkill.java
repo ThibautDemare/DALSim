@@ -208,7 +208,7 @@ public class MovingOnNetworkSkill extends Skill {
 		GamaList gl = movingInside(scope, agent, target);
 
 		// Move the agent from inside the network to outside (when the target must and can leave the network).
-		movingFromInsideToOutside();
+		movingFromInsideToOutside(scope, agent, target);
 
 		agent.setAttribute("agentFromOutsideToInside", agentFromOutsideToInside);
 		agent.setAttribute("agentFromInsideToOutside", agentFromInsideToOutside);
@@ -338,9 +338,32 @@ public class MovingOnNetworkSkill extends Skill {
 		return new GamaList();
 	}
 
-	private void movingFromInsideToOutside(){
+	private void movingFromInsideToOutside(final IScope scope, final IAgent agent, final ILocation target){
 		if(!agentFromInsideToOutside && remainingTime > 0){
-			// TODO
+			GamaPoint currentLocation = (GamaPoint) agent.getLocation().copy(scope);
+			// Compute the time needed to go to the next side of the segment
+			double x_agent = currentLocation.getX();
+			double y_agent = currentLocation.getY();
+
+			double x_target = target.getX();
+			double y_target = target.getY();
+
+			double dist = Math.hypot(x_agent - x_target, y_agent - y_target);
+			double time = dist / getDefaultSpeed(agent);
+
+			// Move the agent
+			if(remainingTime >= time){
+				currentLocation.setLocation(x_target, y_target);
+				agent.setLocation(currentLocation);
+				agentFromInsideToOutside = false;
+			}
+			else{
+				double coef = remainingTime / time;
+				double x_inter = x_agent + (x_target - x_agent) * coef;
+				double y_inter = y_agent + (y_target - y_agent) * coef;
+				currentLocation.setLocation(x_inter, y_inter);
+				agent.setLocation(currentLocation);
+			}
 		}
 	}
 
