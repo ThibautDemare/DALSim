@@ -71,6 +71,7 @@ public class MovingOnNetworkSkill extends Skill {
 	private boolean agentFromInsideToOutside;
 	private List<Edge> currentGsPathEdge;
 	private List<Node> currentGsPathNode;
+	private ILocation currentTarget;
 
 	/*
 	 * Getters and setters
@@ -139,53 +140,7 @@ public class MovingOnNetworkSkill extends Skill {
 	public GamaList gotoAction(final IScope scope) throws GamaRuntimeException {
 		final IAgent agent = getCurrentAgent(scope);
 
-		agentFromOutsideToInside = true;
-		if(agent.hasAttribute("agentFromOutsideToInside"))
-			agentFromOutsideToInside = (Boolean) agent.getAttribute("agentFromOutsideToInside");
-
-		agentFromInsideToOutside = false;
-		if(agent.hasAttribute("agentFromInsideToOutside"))
-			agentFromInsideToOutside = (Boolean) agent.getAttribute("agentFromInsideToOutside");
-
-		currentGsPathEdge = null;
-		if(agent.hasAttribute("currentGsPathEdge"))
-			currentGsPathEdge = (List<Edge>) agent.getAttribute("currentGsPathEdge");
-
-		currentGsPathNode = null;
-		if(agent.hasAttribute("currentGsPathNode"))
-			currentGsPathNode = (List<Node>) agent.getAttribute("currentGsPathNode");
-
-		ILocation currentTarget = null;// We use this variable to know if we already have computed the shortest path
-		if(agent.hasAttribute("currentTarget"))
-			currentTarget = (ILocation) agent.getAttribute("currentTarget");
-
-		// If the user has not given the length argument, so he must have set it before (if not, we throw an error)
-		if(length_attribute == null){
-			final Object la = scope.getArg(IKeywordMoNAdditional.LENGTH_ATTRIBUTE, IType.STRING);
-			if(la == null){
-				throw GamaRuntimeException.error("You have not declare a length attribute.");
-			}
-			setLengthAttribute(agent, (String)la);
-		}
-
-		// If the user has not given the speed argument, so he must have set it before (if not, we throw an error)
-		if(speed_attribute == null){
-			final Object sa = scope.getArg(IKeywordMoNAdditional.LENGTH_ATTRIBUTE, IType.STRING);
-
-			if(sa == null){
-				throw GamaRuntimeException.error("You have not declare a speed attribute.");
-			}
-			setSpeedAttribute(agent, (String)sa);
-		}
-
-		// If the user has not given the "on" argument, so he must have set the graph before (if not, we throw an error)
-		if(graph == null || length_attribute == null || speed_attribute == null){
-			final Object on = scope.getArg("on", IType.GRAPH);
-			if(on == null){
-				throw GamaRuntimeException.error("You have not declare a graph on which the agent can move.");
-			}
-			setGraph(agent, (IGraph)on);
-		}
+		init(scope, agent);
 
 		// The source is the current location of the current agent
 		final ILocation source = agent.getLocation().copy(scope);
@@ -217,6 +172,57 @@ public class MovingOnNetworkSkill extends Skill {
 		agent.setAttribute("currentTarget", currentTarget);
 
 		return gl;
+	}
+
+	private void init(final IScope scope, final IAgent agent) {
+		agentFromOutsideToInside = true;
+		if(agent.hasAttribute("agentFromOutsideToInside"))
+			agentFromOutsideToInside = (Boolean) agent.getAttribute("agentFromOutsideToInside");
+
+		agentFromInsideToOutside = false;
+		if(agent.hasAttribute("agentFromInsideToOutside"))
+			agentFromInsideToOutside = (Boolean) agent.getAttribute("agentFromInsideToOutside");
+
+		currentGsPathEdge = null;
+		if(agent.hasAttribute("currentGsPathEdge"))
+			currentGsPathEdge = (List<Edge>) agent.getAttribute("currentGsPathEdge");
+
+		currentGsPathNode = null;
+		if(agent.hasAttribute("currentGsPathNode"))
+			currentGsPathNode = (List<Node>) agent.getAttribute("currentGsPathNode");
+
+		currentTarget = null;// We use this variable to know if we already have computed the shortest path
+		if(agent.hasAttribute("currentTarget"))
+			currentTarget = (ILocation) agent.getAttribute("currentTarget");
+
+		// If the user has not given the length argument, so he must have set it before (if not, we throw an error)
+		if(length_attribute == null){
+			final Object la = scope.getArg(IKeywordMoNAdditional.LENGTH_ATTRIBUTE, IType.STRING);
+			if(la == null){
+				throw GamaRuntimeException.error("You have not declare a length attribute.");
+			}
+			setLengthAttribute(agent, (String)la);
+		}
+
+		// If the user has not given the speed argument, so he must have set it before (if not, we throw an error)
+		if(speed_attribute == null){
+			final Object sa = scope.getArg(IKeywordMoNAdditional.LENGTH_ATTRIBUTE, IType.STRING);
+
+			if(sa == null){
+				throw GamaRuntimeException.error("You have not declare a speed attribute.");
+			}
+			setSpeedAttribute(agent, (String)sa);
+		}
+
+		// If the user has not given the "on" argument, so he must have set the graph before (if not, we throw an error)
+		if(graph == null || length_attribute == null || speed_attribute == null){
+			final Object on = scope.getArg("on", IType.GRAPH);
+			if(on == null){
+				throw GamaRuntimeException.error("You have not declare a graph on which the agent can move.");
+			}
+			setGraph(agent, (IGraph)on);
+		}
+
 	}
 
 	private void movingFromOutsideToInside(final IScope scope, final IAgent agent){
