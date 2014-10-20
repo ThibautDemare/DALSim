@@ -364,6 +364,7 @@ public class MovingOnNetworkSkill extends Skill {
 				currentLocation.setLocation(x_inter, y_inter);
 				agent.setLocation(currentLocation);
 			}
+			remainingTime -= time;
 		}
 	}
 
