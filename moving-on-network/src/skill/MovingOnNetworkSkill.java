@@ -541,11 +541,9 @@ public class MovingOnNetworkSkill extends Skill {
 
 	private ILocation findTargetLocation(final IScope scope) {
 		final Object target = scope.getArg("target", IType.NONE);
-		ILocation result = null;
-		if ( target != null && target instanceof ILocated ) {
-			result = ((ILocated) target).getLocation();
-		}
-		return result;
+		if ( target != null && target instanceof ILocated )
+			return ((ILocated) target).getLocation();
+		return null;
 	}
 
 	private void computeShortestPath(final IScope scope, ILocation source, ILocation target){
