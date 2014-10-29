@@ -311,16 +311,21 @@ public class MovingOnNetworkSkill extends Skill {
 				gl.add(currentGsPathEdge.get(0).getAttribute("gama_agent"));
 
 			// Does the agent need to reach the next Node?
-			ILocation locNextNode = new GamaPoint( currentGsPathNode.get(0).getNumber("x"), currentGsPathNode.get(0).getNumber("y"));
 			if(!agentOnANode){
 				moveAlongEdge(scope, agent, target, currentGsPathEdge.get(0));
-				if(currentGsPathEdge.size()== 1 && remainingTime > 0){
+				// Moreover, if the agent is at the last part of its path, and if he has some remaining time, then, it means that he will leave the network
+				if(currentGsPathEdge.size()== 1 && remainingTime >= 0){
 					// Thus, we pop the current edge of the path and the node (the last ones)
 					gl.add(currentGsPathEdge.remove(0).getAttribute("gama_agent"));
 					currentGsPathNode.remove(0);
 					agentFromInsideToOutside = true;
 					agentInside = false;
 				}
+			}
+
+			if(currentGsPathNode.isEmpty()){
+				agentFromInsideToOutside = true;
+				agentInside = false;
 			}
 
 			while(remainingTime > 0 && !currentGsPathEdge.isEmpty()){
@@ -334,7 +339,7 @@ public class MovingOnNetworkSkill extends Skill {
 					// Move the agent to this "somewhere"
 					moveAlongEdge(scope, agent, target, edge);
 					// Moreover, if the agent is at the last part of its path, and if he has some remaining time, then, it means that he will leave the network
-					if(currentGsPathEdge.size()== 1 && remainingTime > 0){
+					if(currentGsPathEdge.size()== 1 && remainingTime >= 0){
 						// Thus, we pop the current edge of the path and the node (the last ones)
 						currentGsPathEdge.remove(0);
 						currentGsPathNode.remove(0);
@@ -343,7 +348,9 @@ public class MovingOnNetworkSkill extends Skill {
 					}
 				}
 				else{
+					agentOnANode = true;
 					// We continue to move the agent to the next node
+					((IAgent)edge.getAttribute("gama_agent")).setAttribute("color", "blue");
 					currentGsPathEdge.remove(0);
 					// Set the location of the agent to the next node
 					if(currentGsPathNode.get(0).hasAttribute("gama_agent"))
