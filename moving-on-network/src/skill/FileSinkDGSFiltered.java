@@ -9,6 +9,58 @@ import java.util.Locale;
 
 import org.graphstream.graph.CompoundAttribute;
 
+/**
+ * <p>
+ * File output for the DGS (Dynamic Graph Stream) file format. It includes also the possibility to filter dynamic events such as :
+ * <ul>
+ * 		<li>
+ *   		Addition or deletion of nodes or edges.
+ * 		</li>
+ * 		<li>
+ *   		Addition/deletion/modification of attributes of nodes, edges or the graph itself.
+ * 		</li>
+ * 		<li>
+ *   		A step event.
+ * 		</li>
+ * </ul>
+ * </p>
+ *
+ * <p>
+ * For instance :
+ * </p>
+ *
+ * <pre>
+ * Graph graph = new SingleGraph("My_Graph");
+ * FileSinkDGSFiltered fileSink = new FileSinkDGSFiltered();
+ * graph.addSink(fileSink);
+ *
+ * // No need to save the attribute "attr1" of any edges
+ * fileSink.addEdgeAttributeFiltered("attr1");
+ * // No need to save graph attributes
+ * fileSink.setNoFilterGraphAttributeAdded(false);
+ *
+ * // Start to listen event
+ * fileSink.begin("./my_graph.dgs");
+ *
+ * // Make some modifications on the graph and generate events
+ * graph.stepBegins(0); // this event will be saved
+ * graph.addAttribute("attr2", 2); // this event will not be saved
+ * Node a = graph.addNode("A"); // this event will be saved
+ * a.addAttribute("attr3", 3); // this event will be saved
+ *
+ * // and now, no more need to save modification on nodes attributes
+ * fileSink.setNoFilterNodeAttributeChanged(false);
+ *
+ * Node b = graph.addNode("B"); // this event will be saved
+ * b.addAttribute("attr4", 4); // this event will not be saved
+ *
+ * Edge ab = graph.addEdge("AB", a, b); // this event will be saved
+ * ab.addAttribute("attr1", 1); // this event will not be saved
+ * ab.addAttribute("attr5", 5); // this event will be saved
+ *
+ * fileSink.end();
+ * </pre>
+ */
 public class FileSinkDGSFiltered extends FileSinkBaseFiltered {
 
 	// Attribute

@@ -4,6 +4,19 @@ import java.util.ArrayList;
 
 import org.graphstream.stream.file.FileSinkBase;
 
+
+/**
+ * Base implementation for filtered graph output to files.
+ *
+ * <p>
+ * This class provides the list of possible filters which could be used by the final user to write graphs into files using a specific file format. 
+ * Thus, it allows to create an output stream where the dynamic events of addition/deletion/modification can be filtered.
+ * </p>
+ *
+ * <p>
+ * Since it extends FileSinkBase, you have to override the same methods in order to implement an output.
+ * </p>
+ */
 public abstract class FileSinkBaseFiltered extends FileSinkBase {
 	/*
 	 * List of possible filters
@@ -23,7 +36,7 @@ public abstract class FileSinkBaseFiltered extends FileSinkBase {
 	protected boolean noFilterEdgeRemoved;
 	protected boolean noFilterGraphCleared;
 	protected boolean noFilterStepBegins;
-	protected  ArrayList<String> graphAttributesFiltered;
+	protected ArrayList<String> graphAttributesFiltered;
 	protected ArrayList<String> nodeAttributesFiltered;
 	protected ArrayList<String> edgeAttributesFiltered;
 	
