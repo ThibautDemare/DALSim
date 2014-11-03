@@ -68,7 +68,7 @@ public class MovingOnNetworkSkill extends Skill {
 	private static IGraph gamaGraph = null;
 	private static String length_attribute = null;
 	private static String speed_attribute = null;
-	private static FileSinkDGS fileSink = null;
+	private static FileSinkDGSFiltered fileSink = null;
 	private static String fileName = "";
 	private static int currentCycle = 0;
 	/*
@@ -92,7 +92,7 @@ public class MovingOnNetworkSkill extends Skill {
 	public void setGraph(final IAgent agent, final IGraph gamaGraph) {
 		if(gamaGraph != null && (graph == null || graph.getEdge(0).getAttribute("gama_time").equals("NaN"))){ // If the graph is null or if its edges do not contain a right value of gama_time
 			graph = new MultiGraph("tmpGraph", true, false);
-			fileSink = new FileSinkDGS();
+			fileSink = new FileSinkDGSFiltered();
 			graph.addSink(fileSink);
 			if(fileName.equals("")){
 				fileName = "C:"+File.separator+"Users"+File.separator+"Thibaut"+File.separator+"Desktop"+File.separator
@@ -107,6 +107,21 @@ public class MovingOnNetworkSkill extends Skill {
 			}
 
 			currentCycle = 0;
+
+			// Filter useless attributes in edges
+			fileSink.addEdgeAttributeFiltered("gama_agent");
+			fileSink.addEdgeAttributeFiltered("color");
+			fileSink.addEdgeAttributeFiltered("graphstream_edge");
+			fileSink.addEdgeAttributeFiltered("gama_time");
+
+			// No need to save graph attributes
+			fileSink.setNoFilterGraphAttributeAdded(false);
+			fileSink.setNoFilterGraphAttributeChanged(false);
+			fileSink.setNoFilterGraphAttributeRemoved(false);
+
+			// and no need either of result which contains Dijsktra reference
+			fileSink.addNodeAttributeFiltered("result");
+
 			graph.stepBegins(currentCycle);
 			getGraphstreamGraphFromGamaGraph(gamaGraph, graph);
 
@@ -198,7 +213,8 @@ public class MovingOnNetworkSkill extends Skill {
 			currentCycle = scope.getClock().getCycle();
 			graph.stepBegins(currentCycle);
 			for(Edge e : graph.getEachEdge()){
-				e.setAttribute("current_marks", 0);
+				if(e.getNumber("current_marks") != 0)
+					e.setAttribute("current_marks", 0);
 			}
 		}
 
