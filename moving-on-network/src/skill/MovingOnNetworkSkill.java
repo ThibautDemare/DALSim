@@ -212,6 +212,8 @@ public class MovingOnNetworkSkill extends Skill {
 			for(Edge e : graph.getEachEdge()){
 				if(e.getNumber("current_marks") != 0)
 					e.setAttribute("current_marks", 0);
+				if(e.getNumber("current_nb_agents") != 0)
+					e.setAttribute("current_nb_agents", 0);
 			}
 		}
 
@@ -456,6 +458,8 @@ public class MovingOnNetworkSkill extends Skill {
 					agentOnANode = true;
 					currentGsPathEdge.get(0).setAttribute("cumulative_marks", currentGsPathEdge.get(0).getNumber("cumulative_marks") + mark);
 					currentGsPathEdge.get(0).setAttribute("current_marks", currentGsPathEdge.get(0).getNumber("current_marks") + mark);
+					currentGsPathEdge.get(0).setAttribute("cumulative_nb_agents", currentGsPathEdge.get(0).getNumber("cumulative_nb_agents") + 1);
+					currentGsPathEdge.get(0).setAttribute("current_nb_agents", currentGsPathEdge.get(0).getNumber("current_nb_agents") + 1);
 					currentGsPathEdge.remove(0);
 					// Set the location of the agent to the next node
 					if(currentGsPathNode.get(0).hasAttribute("gama_agent"))
@@ -521,6 +525,9 @@ public class MovingOnNetworkSkill extends Skill {
 		double mark = (Double) scope.getArg(IKeywordMoNAdditional.MARK, IType.FLOAT);
 		e.setAttribute("cumulative_marks", e.getNumber("cumulative_marks") + mark);
 		e.setAttribute("current_marks", e.getNumber("current_marks") + mark);
+		e.setAttribute("cumulative_nb_agents", e.getNumber("cumulative_nb_agents") + 1);
+		e.setAttribute("current_nb_agents", e.getNumber("current_nb_agents") + 1);
+
 		GamaPoint currentLocation = (GamaPoint) agent.getLocation().copy(scope);
 		agentOnANode = false;
 		// Get the geometry of the edge
@@ -764,6 +771,8 @@ public class MovingOnNetworkSkill extends Skill {
 					e.addAttribute("gama_time", e.getNumber(length_attribute) * e.getNumber(speed_attribute));
 					e.setAttribute("current_marks", 0.0);
 					e.setAttribute("cumulative_marks", 0.0);
+					e.setAttribute("cumulative_nb_agents", 0.0);
+					e.setAttribute("current_nb_agents", 0.0);
 					// a know e
 					a.setAttribute("graphstream_edge", e);
 				}
