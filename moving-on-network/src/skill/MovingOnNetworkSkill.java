@@ -1,5 +1,6 @@
 package skill;
 
+import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -216,6 +217,8 @@ public class MovingOnNetworkSkill extends Skill {
 				if(e.getNumber("current_nb_agents") != 0)
 					e.setAttribute("current_nb_agents", 0);
 			}
+			// Color the Gama network according to the flow let by agents
+			colorGamaGraph("current_nb_agents");
 		}
 
 		GamaList gl;
@@ -801,6 +804,36 @@ public class MovingOnNetworkSkill extends Skill {
 					GamaRuntimeException.warning("The exportation ran without error, but an integrity test failed: " +
 							"the number of edges is not correct(" + g.getEdgeCount() + " instead of " +
 							gamaGraph.getEdges().size() + ")"), true);
+		}
+	}
+
+	/**
+	 * Color the Gama graph according to the given attributes' value on the edges
+	 * @param attr The attribute containing the value allowing the coloring
+	 */
+	private void colorGamaGraph(String attr){
+		Double min = Double.POSITIVE_INFINITY;
+		Double max = Double.NEGATIVE_INFINITY;
+		// Obtain the maximum and minimum values.
+		for(Edge e: graph.getEachEdge()) {
+			double passes = e.getNumber(attr);
+			max = Math.max(max, passes);
+			if(passes > 0 && passes <min)
+				min = passes;
+		}
+		// Set the colors.
+		for(Edge e: graph.getEachEdge()) {
+			if(e.hasAttribute(attr)){
+				double passes = e.getNumber(attr);
+				double color;
+				if(max==min)
+					color = 1.;
+				else
+					color = ((passes-min)/(max-min));
+				Color c = Color.getHSBColor((float)(1./(100.*(color)+1)), 0.8f, 0.8f);
+				String s = c.getRed()+", "+c.getGreen()+", "+c.getBlue();
+				((IAgent)e.getAttribute("gama_agent")).setAttribute("color", s);
+			}
 		}
 	}
 }
