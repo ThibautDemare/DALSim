@@ -113,3 +113,29 @@ global schedules: [world] +
 	}
 }
 
+grid cell width:50 height:50  {
+	rgb color <- rgb(120, 120, 120);
+	float surface;
+	float maxSurface;
+
+	reflex coloration {
+		surface <- 0;
+		maxSurface <- 0;
+		list<Building> buildings <- (Building inside self);
+
+		loop b over: buildings {
+			ask (b as Building).stocks {
+				myself.maxSurface <- myself.maxSurface + self.maxQuantity;
+				myself.surface <- myself.surface + self.quantity;
+			}
+		}
+
+		if(maxSurface = 0){
+			color <- rgb(255, 255, 255);
+		}
+		else{
+			write "Surface = "+surface+ "et maxSurface = "+maxSurface;
+			color <- rgb(int(255 * (surface/(maxSurface - surface))), 142, 0);
+		}
+	}
+}

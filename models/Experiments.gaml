@@ -20,6 +20,15 @@ experiment exp_no_output type: gui {
 	
 }
 
+experiment exp_grid type: gui {
+	output {
+		display display_grid autosave: true refresh_every:1 {
+			grid cell transparency: 0.5;
+			species Road aspect: geom;
+		}
+	}
+}
+
 experiment exp_save_results type: gui {
 	output {
 		file name: "stocks_warehouses" type: text data: ""+ ((time/3600.0) as int) + "; " +stockInWarehouse + ";" + freeSurfaceInWarehouse + ";";
