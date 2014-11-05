@@ -745,7 +745,8 @@ public class MovingOnNetworkSkill extends Skill {
 				n.addAttribute("gama_agent", a);
 				for ( Object key : a.getAttributes().keySet() ) {
 					Object value = GraphUtilsGraphStream.preprocessGamaValue(a.getAttributes().get(key));
-					n.addAttribute(key.toString(), value.toString());
+					if(value != null)
+						n.addAttribute(key.toString(), value.toString());
 				}
 			}
 
@@ -770,7 +771,8 @@ public class MovingOnNetworkSkill extends Skill {
 					e.addAttribute("gama_agent", a);
 					for ( Object key : a.getAttributes().keySet() ) {
 						Object value = GraphUtilsGraphStream.preprocessGamaValue(a.getAttributes().get(key));
-						e.addAttribute(key.toString(), value.toString());
+						if(value != null)
+							e.addAttribute(key.toString(), value.toString());
 					}
 					e.addAttribute("gama_time", e.getNumber(length_attribute) * e.getNumber(speed_attribute));
 					e.setAttribute("current_marks", 0.0);
