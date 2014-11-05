@@ -12,8 +12,8 @@ species Road schedules: [] {
 	//geometry display_shape <- shape + 2.0;
 	float speed;
 	float length;
-	
+	string color <- "gray";
 	aspect geom {
-		draw shape color: rgb("gray");
+		draw shape color: rgb(color);
 	}
 }
