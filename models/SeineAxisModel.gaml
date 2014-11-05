@@ -31,7 +31,7 @@ global schedules: [world] +
 				Stock {
 	
 	//This data comes from "EuroRegionalMap" (EuroGeographics)
-	file roads_shapefile <- file("../../BD_SIG/Used/Roads/roads_speed_length.shp");
+	file roads_shapefile <- file("../../BD_SIG/Used/Roads/Roads_one_component/roads_v2.shp");
 	graph road_network;
 	
 	// Logistic provider
