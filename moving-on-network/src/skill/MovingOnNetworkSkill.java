@@ -86,7 +86,13 @@ public class MovingOnNetworkSkill extends Skill {
 	 */
 
 	@setter(IKeywordMoNAdditional.GRAPH)
-	public void setGraph(final IAgent agent, final IGraph gamaGraph) {
+	public void setGraph(final IScope scope, final IAgent agent, final IGraph gamaGraph) {
+		if(scope.getClock().getCycle() == 0) {
+			dijkstra = null;
+			graph = null;
+			MovingOnNetworkSkill.gamaGraph = null;
+		}
+
 		if(gamaGraph != null && (graph == null || graph.getEdge(0).getAttribute("gama_time").equals("NaN"))){ // If the graph is null or if its edges do not contain a right value of gama_time
 			graph = new MultiGraph("tmpGraph", true, false);
 			fileSink = new FileSinkDGSFiltered();
@@ -129,11 +135,6 @@ public class MovingOnNetworkSkill extends Skill {
 			}
 
 			MovingOnNetworkSkill.gamaGraph = gamaGraph;
-		}
-		else {
-			dijkstra = null;
-			graph = null;
-			MovingOnNetworkSkill.gamaGraph = null;
 		}
 	}
 
@@ -309,7 +310,7 @@ public class MovingOnNetworkSkill extends Skill {
 			if(on == null){
 				throw GamaRuntimeException.error("You have not declare a graph on which the agent can move.");
 			}
-			setGraph(agent, (IGraph)on);
+			setGraph(scope, agent, (IGraph)on);
 		}
 
 	}
