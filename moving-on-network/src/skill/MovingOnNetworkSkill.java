@@ -218,7 +218,7 @@ public class MovingOnNetworkSkill extends Skill {
 					e.setAttribute("current_nb_agents", 0);
 			}
 			// Color the Gama network according to the flow let by agents
-			colorGamaGraph("current_nb_agents");
+			colorGamaGraph("cumulative_nb_agents");
 		}
 
 		GamaList gl;
@@ -308,7 +308,7 @@ public class MovingOnNetworkSkill extends Skill {
 		}
 
 		// If the user has not given the "on" argument, so he must have set the graph before (if not, we throw an error)
-		if(graph == null || length_attribute == null || speed_attribute == null || scope.getArg("on", IType.GRAPH) != gamaGraph ){
+		if(graph == null || scope.getClock().getCycle() == 0){
 			final Object on = scope.getArg("on", IType.GRAPH);
 			if(on == null){
 				throw GamaRuntimeException.error("You have not declare a graph on which the agent can move.");
@@ -826,13 +826,11 @@ public class MovingOnNetworkSkill extends Skill {
 			if(e.hasAttribute(attr)){
 				double passes = e.getNumber(attr);
 				double color;
-				if(max==min)
-					color = 1.;
-				else
-					color = ((passes-min)/(max-min));
-				Color c = Color.getHSBColor((float)(1./(100.*(color)+1)), 0.8f, 0.8f);
-				String s = c.getRed()+", "+c.getGreen()+", "+c.getBlue();
-				((IAgent)e.getAttribute("gama_agent")).setAttribute("color", s);
+				color = ((passes-min)/(max-min));
+				Color c = Color.getHSBColor((float)(1./(100.*(color))), 0.8f, 0.8f);
+				((IAgent)e.getAttribute("gama_agent")).setAttribute("color_r", c.getRed());
+				((IAgent)e.getAttribute("gama_agent")).setAttribute("color_g", c.getGreen());
+				((IAgent)e.getAttribute("gama_agent")).setAttribute("color_b", c.getBlue());
 			}
 		}
 	}
