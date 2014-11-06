@@ -20,10 +20,19 @@ experiment exp_no_output type: gui {
 	
 }
 
-experiment exp_grid type: gui {
+experiment exp_grid_surface type: gui {
 	output {
-		display display_grid autosave: true refresh_every:1 {
-			grid cell transparency: 0.1;
+		display display_grid_surface autosave: true refresh_every:1 {
+			grid cell_surface transparency: 0.1;
+			species Road aspect: geom;
+		}
+	}
+}
+
+experiment exp_grid_stock_shortage type: gui {
+	output {
+		display display_grid_stock_shortage autosave: true refresh_every:1 {
+			grid cell_stock_shortage transparency: 0.1;
 			species Road aspect: geom;
 		}
 	}

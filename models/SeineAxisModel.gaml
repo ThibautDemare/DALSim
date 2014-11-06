@@ -113,7 +113,7 @@ global schedules: [world] +
 	}
 }
 
-grid cell width:50 height:50  {
+grid cell_surface width:50 height:50  {
 	rgb color <- rgb(120, 120, 120);
 	float surface;
 	float maxSurface;
@@ -146,6 +146,47 @@ grid cell width:50 height:50  {
 			}
 			else{
 				color <- rgb(35,139,69);
+			}
+		}
+	}
+}
+
+grid cell_stock_shortage width:50 height:50  {
+	rgb color <- rgb(120, 120, 120);
+	float nb_stock_shortage;
+	float nb_stock;
+
+	reflex coloration {
+		nb_stock_shortage <- 0;
+		nb_stock <- 0;
+		list<Building> buildings <- (Warehouse inside self) + (Building inside self);
+
+		loop b over: buildings {
+			ask (b as Building).stocks {
+				myself.nb_stock <- myself.nb_stock + 1;
+				if(self.quantity = 0){
+					myself.nb_stock_shortage <- myself.nb_stock_shortage + 1;
+				}
+			}
+		}
+
+		if(nb_stock = 0 or nb_stock_shortage = 0){
+			color <- rgb(255, 255, 255);
+		}
+		else{
+			float ratio <- nb_stock_shortage/nb_stock;
+			write ratio;
+			if(ratio < 0.03){
+				color <- rgb(102,194,164);
+			}
+			else if(ratio < 0.7){
+				color <- rgb(65,174,118);
+			}
+			else if(ratio < 0.15){
+				color <- rgb(35,139,69);
+			}
+			else{
+				color <- rgb(0,88,36);
 			}
 		}
 	}
