@@ -1,6 +1,5 @@
 package skill;
 
-import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -69,6 +68,8 @@ public class MovingOnNetworkSkill extends Skill {
 	private static FileSinkDGSFiltered fileSink = null;
 	private static String fileName = "";
 	private static int currentCycle = 0;
+	private static boolean isFirstExecution = true;
+
 	/*
 	 * Non-static variables
 	 */
@@ -88,7 +89,7 @@ public class MovingOnNetworkSkill extends Skill {
 
 	@setter(IKeywordMoNAdditional.GRAPH)
 	public void setGraph(final IScope scope, final IAgent agent, final IGraph gamaGraph) {
-		if(scope.getClock().getCycle() == 0) {
+		if(isFirstExecution) {
 			dijkstra = null;
 			graph = null;
 			MovingOnNetworkSkill.gamaGraph = null;
@@ -256,6 +257,13 @@ public class MovingOnNetworkSkill extends Skill {
 	}
 
 	private void init(final IScope scope, final IAgent agent) {
+		if(scope.hasVar("isFirstExecution"))
+			isFirstExecution = false;
+		else{
+			isFirstExecution = true;
+			scope.addVarWithValue("isFirstExecution", false);
+		}
+
 		agentFromOutsideToInside = true;
 		if(agent.hasAttribute("agentFromOutsideToInside"))
 			agentFromOutsideToInside = (Boolean) agent.getAttribute("agentFromOutsideToInside");
