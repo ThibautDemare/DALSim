@@ -134,8 +134,19 @@ grid cell width:50 height:50  {
 			color <- rgb(255, 255, 255);
 		}
 		else{
-			write "Surface = "+surface+ "et maxSurface = "+maxSurface;
-			color <- rgb(int(255 * (surface/(maxSurface))), 142, 0);
+			float ratio <- surface/maxSurface;
+			if(ratio < 0.25){
+				color <- rgb(237,248,251);
+			}
+			else if(ratio < 0.5){
+				color <- rgb(178,226,226);
+			}
+			else if(ratio < 0.75){
+				color <- rgb(102,194,164);
+			}
+			else{
+				color <- rgb(35,139,69);
+			}
 		}
 	}
 }
