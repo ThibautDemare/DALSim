@@ -210,15 +210,15 @@ public class MovingOnNetworkSkill extends Skill {
 
 		if(currentCycle != scope.getClock().getCycle()){
 			currentCycle = scope.getClock().getCycle();
+			// Color the Gama network according to the flow let by agents
+			colorGamaGraph("current_marks");//cumulative_marks
 			graph.stepBegins(currentCycle);
 			for(Edge e : graph.getEachEdge()){
 				if(e.getNumber("current_marks") != 0)
-					e.setAttribute("current_marks", 0);
+					e.setAttribute("current_marks", e.getNumber("current_marks")*0.5);
 				if(e.getNumber("current_nb_agents") != 0)
-					e.setAttribute("current_nb_agents", 0);
+					e.setAttribute("current_nb_agents", e.getNumber("current_marks")*0.5);
 			}
-			// Color the Gama network according to the flow let by agents
-			colorGamaGraph("cumulative_nb_agents");
 		}
 
 		GamaList gl;
@@ -818,22 +818,54 @@ public class MovingOnNetworkSkill extends Skill {
 		Double max = Double.NEGATIVE_INFINITY;
 		// Obtain the maximum and minimum values.
 		for(Edge e: graph.getEachEdge()) {
-			double passes = e.getNumber(attr);
-			max = Math.max(max, passes);
-			if(passes > 0 && passes <min)
-				min = passes;
+			if(e.hasAttribute(attr) && e.getNumber(attr) > 0){
+				double passes = e.getNumber(attr);
+				max = Math.max(max, passes);
+				min = Math.min(min, passes);
+			}
 		}
 		// Set the colors.
 		for(Edge e: graph.getEachEdge()) {
-			if(e.hasAttribute(attr)){
+			String r;
+			String g;
+			String b;
+			if(e.hasAttribute(attr) && e.getNumber(attr) > 0){
 				double passes = e.getNumber(attr);
+				//System.out.println("passes = "+passes);
 				double color;
 				color = ((passes-min)/(max-min));
-				Color c = Color.getHSBColor((float)(1./(100.*(color))), 0.8f, 0.8f);
-				((IAgent)e.getAttribute("gama_agent")).setAttribute("color_r", c.getRed());
-				((IAgent)e.getAttribute("gama_agent")).setAttribute("color_g", c.getGreen());
-				((IAgent)e.getAttribute("gama_agent")).setAttribute("color_b", c.getBlue());
+				double ratio = 1./(100.*(color));
+				//System.out.println("color = "+color);
+				//System.out.println("ratio = "+ratio);
+				if(ratio < 0.25){
+					r = "252";
+					g = "141";
+					b = "89";
+				}
+				else if(ratio < 0.5){
+					r ="239";
+					g = "101";
+					b = "72";
+				}
+				else if(ratio < 0.75){
+					r ="215";
+					g = "48";
+					b = "31";
+				}
+				else{
+					r ="153";
+					g = "0";
+					b = "0";
+				}
 			}
+			else {
+				r = "252";
+				g = "141";
+				b = "89";
+			}
+			((IAgent)e.getAttribute("gama_agent")).setAttribute("color_r", r);
+			((IAgent)e.getAttribute("gama_agent")).setAttribute("color_g", g);
+			((IAgent)e.getAttribute("gama_agent")).setAttribute("color_b", b);
 		}
 	}
 }
