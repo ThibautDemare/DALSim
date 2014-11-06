@@ -23,7 +23,7 @@ experiment exp_no_output type: gui {
 experiment exp_grid type: gui {
 	output {
 		display display_grid autosave: true refresh_every:1 {
-			grid cell transparency: 0.5;
+			grid cell transparency: 0.1;
 			species Road aspect: geom;
 		}
 	}
