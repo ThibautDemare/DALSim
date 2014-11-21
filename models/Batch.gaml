@@ -20,7 +20,10 @@ species Batch skills:[MovingOnNetwork]{
 	Building dest;
 	
 	reflex move when: target != nil and breakBulk = 0 {
-		do goto target:target.location on:road_network length_attribute:"length" speed_attribute:"speed" mark:overallQuantity;
+		if(network = nil){
+			network <- road_network;
+		}
+		do goto target:target.location length_attribute:"length" speed_attribute:"speed" mark:overallQuantity;
 	}
 	
 	/**
