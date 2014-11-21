@@ -68,7 +68,6 @@ public class MovingOnNetworkSkill extends Skill {
 	private static FileSinkDGSFiltered fileSink = null;
 	private static String fileName = "";
 	private static int currentCycle = 0;
-	private static boolean isFirstExecution = true;
 
 	/*
 	 * Non-static variables
@@ -89,14 +88,9 @@ public class MovingOnNetworkSkill extends Skill {
 
 	@setter(IKeywordMoNAdditional.GRAPH)
 	public void setGraph(final IScope scope, final IAgent agent, final IGraph gamaGraph) {
-		if(isFirstExecution) {
-			dijkstra = null;
-			graph = null;
-			MovingOnNetworkSkill.gamaGraph = null;
-		}
-
-		if(gamaGraph != null && (graph == null || graph.getEdge(0).getAttribute("gama_time").equals("NaN"))){ // If the graph is null or if its edges do not contain a right value of gama_time
+		if(gamaGraph != null){
 			graph = new MultiGraph("tmpGraph", true, false);
+			dijkstra = null;
 			fileSink = new FileSinkDGSFiltered();
 			graph.addSink(fileSink);
 			if(fileName.equals("")){
@@ -137,7 +131,18 @@ public class MovingOnNetworkSkill extends Skill {
 			}
 
 			MovingOnNetworkSkill.gamaGraph = gamaGraph;
+
+			scope.getSimulationScope().setAttribute("gs_graph", graph);
+			scope.getSimulationScope().setAttribute("fileSink", fileSink);
 		}
+	}
+
+	@getter(IKeywordMoNAdditional.GRAPH)
+	public IGraph getGraph(final IAgent agent) {
+		if(agent.getScope().getSimulationScope().getAttribute("gs_graph") != null)
+			return gamaGraph;
+		else
+			return null;
 	}
 
 	@getter(IKeywordMoNAdditional.LENGTH_ATTRIBUTE)
@@ -180,7 +185,6 @@ public class MovingOnNetworkSkill extends Skill {
 			name = "goto",
 			args = {
 					@arg(name = IKeywordMoNAdditional.TARGET, type = { IType.AGENT, IType.POINT, IType.GEOMETRY }, optional = false, doc = @doc("the location or entity towards which to move.")),
-					@arg(name = IKeywordMoNAdditional.ON, type = IType.GRAPH, optional = true, doc = @doc("the agent moves inside this graph.")),
 					@arg(name = IKeywordMoNAdditional.LENGTH_ATTRIBUTE, type = IType.STRING, optional = true, doc = @doc("the name of the variable containing the length of an edge.")),
 					@arg(name = IKeywordMoNAdditional.SPEED_ATTRIBUTE, type = IType.STRING, optional = true, doc = @doc("the name of the varaible containing the speed on an edge.")),
 					@arg(name = IKeywordMoNAdditional.MARK, type = IType.FLOAT, optional = true, doc = @doc("The mark (a value) left on the agent's route.")),
@@ -212,7 +216,7 @@ public class MovingOnNetworkSkill extends Skill {
 		if(currentCycle != scope.getClock().getCycle()){
 			currentCycle = scope.getClock().getCycle();
 			// Color the Gama network according to the flow let by agents
-			colorGamaGraph("current_marks");//cumulative_marks
+			colorGamaGraph("cumulative_marks");//cumulative_nb_agents
 			graph.stepBegins(currentCycle);
 			for(Edge e : graph.getEachEdge()){
 				if(e.getNumber("current_marks") != 0)
@@ -247,6 +251,9 @@ public class MovingOnNetworkSkill extends Skill {
 		agent.setAttribute("currentGsPathNode", currentGsPathNode);
 		agent.setAttribute("currentTarget", currentTarget);
 
+		scope.getSimulationScope().setAttribute("gs_graph", graph);
+		scope.getSimulationScope().setAttribute("fileSink", fileSink);
+
 		try {
 			fileSink.flush();
 		} catch (IOException e) {
@@ -257,13 +264,6 @@ public class MovingOnNetworkSkill extends Skill {
 	}
 
 	private void init(final IScope scope, final IAgent agent) {
-		if(scope.hasVar("isFirstExecution"))
-			isFirstExecution = false;
-		else{
-			isFirstExecution = true;
-			scope.addVarWithValue("isFirstExecution", false);
-		}
-
 		agentFromOutsideToInside = true;
 		if(agent.hasAttribute("agentFromOutsideToInside"))
 			agentFromOutsideToInside = (Boolean) agent.getAttribute("agentFromOutsideToInside");
@@ -315,15 +315,12 @@ public class MovingOnNetworkSkill extends Skill {
 			setSpeedAttribute(agent, (String)sa);
 		}
 
-		// If the user has not given the "on" argument, so he must have set the graph before (if not, we throw an error)
-		if(graph == null || scope.getClock().getCycle() == 0){
-			final Object on = scope.getArg("on", IType.GRAPH);
-			if(on == null){
-				throw GamaRuntimeException.error("You have not declare a graph on which the agent can move.");
-			}
-			setGraph(scope, agent, (IGraph)on);
-		}
+		// The user must have set the graph before (if not, we throw an error)
+		graph = (Graph) scope.getSimulationScope().getAttribute("gs_graph");
+		if(graph == null)
+			throw GamaRuntimeException.error("You have not declare a graph on which the agent can move.");
 
+		fileSink = (FileSinkDGSFiltered) scope.getSimulationScope().getAttribute("fileSink");
 	}
 
 	private void reachAndLeave(final IScope scope, final IAgent agent, final ILocation target){
@@ -839,12 +836,9 @@ public class MovingOnNetworkSkill extends Skill {
 			String b;
 			if(e.hasAttribute(attr) && e.getNumber(attr) > 0){
 				double passes = e.getNumber(attr);
-				//System.out.println("passes = "+passes);
 				double color;
 				color = ((passes-min)/(max-min));
 				double ratio = 1./(100.*(color));
-				//System.out.println("color = "+color);
-				//System.out.println("ratio = "+ratio);
 				if(ratio < 0.25){
 					r = "252";
 					g = "141";
@@ -867,9 +861,9 @@ public class MovingOnNetworkSkill extends Skill {
 				}
 			}
 			else {
-				r = "252";
-				g = "141";
-				b = "89";
+				r = "253";
+				g = "187";
+				b = "132";
 			}
 			((IAgent)e.getAttribute("gama_agent")).setAttribute("color_r", r);
 			((IAgent)e.getAttribute("gama_agent")).setAttribute("color_g", g);
