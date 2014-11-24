@@ -839,25 +839,25 @@ public class MovingOnNetworkSkill extends Skill {
 				double color;
 				color = ((passes-min)/(max-min));
 				double ratio = 1./(100.*(color));
-				if(ratio < 0.25){
-					r = "252";
-					g = "141";
-					b = "89";
+				if(ratio < 0.40){
+					r ="153";
+					g = "0";
+					b = "0";
 				}
-				else if(ratio < 0.5){
-					r ="239";
-					g = "101";
-					b = "72";
-				}
-				else if(ratio < 0.75){
+				else if(ratio < 0.7){
 					r ="215";
 					g = "48";
 					b = "31";
 				}
+				else if(ratio < 0.9){
+					r ="239";
+					g = "101";
+					b = "72";
+				}
 				else{
-					r ="153";
-					g = "0";
-					b = "0";
+					r = "252";
+					g = "141";
+					b = "89";
 				}
 			}
 			else {
