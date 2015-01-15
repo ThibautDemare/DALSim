@@ -31,7 +31,7 @@ global {
 	float numberofHoursBeforePO <- 24.0;
 	
 	int sizeOfStockLocalWarehouse <- 2.0;
-	int sizeOfStockLargeWarehouse <- 4.0;
+	int sizeOfStockLargeWarehouse <- 3.0;
 	
 	float threshold <- 0.5;
 	

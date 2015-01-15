@@ -38,9 +38,7 @@ global schedules: [world] +
 	file logistic_provider_shapefile <- file("../../BD_SIG/Used/LogisticProvider/LogisticProvider.shp");
 	
 	// Warehouses classified by their size
-	file warehouse_shapefile_small <- file("../../BD_SIG/Used/Warehouses/warehouses_small.shp");
-	file warehouse_shapefile_average <- file("../../BD_SIG/Used/Warehouses/warehouses_average.shp");
-	file warehouse_shapefile_large <- file("../../BD_SIG/Used/Warehouses/warehouses_large.shp");
+	file warehouse_shapefile <- file("../../BD_SIG/Used/Warehouses/warehouses_attractiveness_0.shp");
 	
 	// Final destination (for instance : shop)
 	string destination_path <- "../../BD_SIG/Used/FinalDestination/";
@@ -87,9 +85,10 @@ global schedules: [world] +
 		}
 		
 		// Warehouses
-		create Warehouse from: warehouse_shapefile_small returns: sw with: [huffValue::read("huff") as float, totalSurface::read("surface") as float, color::read("color") as string];
-		create Warehouse from: warehouse_shapefile_average returns: aw with: [huffValue::read("huff") as float, totalSurface::read("surface") as float, color::read("color") as string];
-		create Warehouse from: warehouse_shapefile_large returns: lw with: [huffValue::read("huff") as float, totalSurface::read("surface") as float, color::read("color") as string];
+		create Warehouse from: warehouse_shapefile returns: lw with: [probaAnt::read("probaAnt") as float, totalSurface::read("surface") as float];
+		ask Warehouse {
+			surfaceUsedForLH <- totalSurface*(1-probaAnt);
+		}
 		
 		//  Logistic providers
 		create LogisticProvider from: logistic_provider_shapefile;
@@ -114,7 +113,7 @@ global schedules: [world] +
 }
 
 grid cell_surface width:50 height:50  {
-	rgb color <- rgb(120, 120, 120);
+	rgb color <- rgb(255,255,255);
 	float surface;
 	float maxSurface;
 
@@ -152,7 +151,7 @@ grid cell_surface width:50 height:50  {
 }
 
 grid cell_stock_shortage width:50 height:50  {
-	rgb color <- rgb(120, 120, 120);
+	rgb color <- rgb(255,255,255);
 	float nb_stock_shortage;
 	float nb_stock;
 
@@ -171,22 +170,21 @@ grid cell_stock_shortage width:50 height:50  {
 		}
 
 		if(nb_stock = 0 or nb_stock_shortage = 0){
-			color <- rgb(255, 255, 255);
+			color <- rgb(255,255,255);
 		}
 		else{
 			float ratio <- nb_stock_shortage/nb_stock;
-			write ratio;
-			if(ratio < 0.03){
-				color <- rgb(102,194,164);
+			if(ratio < 0.025){
+				color <- rgb(rgb(102,194,164),0.1);
 			}
-			else if(ratio < 0.7){
-				color <- rgb(65,174,118);
+			else if(ratio < 0.07){
+				color <- rgb(rgb(65,174,118),0.1);
 			}
 			else if(ratio < 0.15){
-				color <- rgb(35,139,69);
+				color <- rgb(rgb(35,139,69),0.1);
 			}
 			else{
-				color <- rgb(0,88,36);
+				color <- rgb(rgb(0,88,36),0.1);
 			}
 		}
 	}

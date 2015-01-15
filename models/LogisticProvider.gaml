@@ -217,14 +217,14 @@ species LogisticProvider schedules: [] {
 			}
 			supplyChain <- first(sc);
 			first(rt).supplyChain <- supplyChain;
-			
+
 			if(use_gs){
 				if(use_r9){
 					gs_add_node_attribute gs_sender_id:"supply_chain" gs_node_id:provider.name gs_attribute_name:"type" gs_attribute_value:"provider";
 				}
 			}
 		}
-		
+
 		/*
 		 * The new customer become a new leaf of the "almost-tree" supply chain.
 		 */
@@ -240,14 +240,14 @@ species LogisticProvider schedules: [] {
 				gs_add_node_attribute gs_sender_id:"supply_chain" gs_node_id:fdm.name gs_attribute_name:"type" gs_attribute_value:"final_dest";
 			}
 		}
-			
+
 		/*
 		 * connect this leaf to a close warehouse
 		 */
 		// First we find an appropriate local warehouse
 		Warehouse closeWarehouse <- findCloseWarehouse(fdm, sizeOfStockLocalWarehouse);
 		do initStock(closeWarehouse, fdm, sizeOfStockLocalWarehouse);
-		
+
 		// And next, we look if there is already this warehouse in the supply chain
 		SupplyChainElement sceCloseWarehouse <- nil;
 		bool found <- false;
@@ -274,7 +274,7 @@ species LogisticProvider schedules: [] {
 				(fdmLeaf[0] as SupplyChainElement).fathers <- [] + self;
 			}
 			sceCloseWarehouse <- sceBuild[0];
-			
+
 			if(use_gs){
 				if(use_r9){
 					gs_add_node_attribute gs_sender_id:"supply_chain" gs_node_id:sceCloseWarehouse.building.name gs_attribute_name:"type" gs_attribute_value:"close_warehouse";
@@ -286,13 +286,13 @@ species LogisticProvider schedules: [] {
 			sceCloseWarehouse.sons <- sceCloseWarehouse.sons + fdmLeaf[0];
 			(fdmLeaf[0] as SupplyChainElement).fathers <- [] + sceCloseWarehouse;
 		}
-		
+
 		if(use_gs){
 			if(use_r9){
 				gs_add_edge gs_sender_id:"supply_chain" gs_edge_id:(fdm.name + sceCloseWarehouse.building.name) gs_node_id_from:fdm.name gs_node_id_to:sceCloseWarehouse.building.name gs_is_directed:false;
 			}
 		}
-		
+
 		/*
 		 * Connect the close warehouse to the large warehouse
 		 */
@@ -302,17 +302,19 @@ species LogisticProvider schedules: [] {
 		int i <- 0;
 		loop while: i<length(supplyChain.root.sons) and !found {
 			sceLarge <- supplyChain.root.sons[i];
-			if( ((sceLarge.building as Building).totalSurface - (sceLarge.building as Building).occupiedSurface ) >= ((fdm.building as Building).occupiedSurface * sizeOfStockLargeWarehouse) ){
+			if( ((sceLarge.building as Building).surfaceUsedForLH - (sceLarge.building as Building).occupiedSurface ) >= ((fdm.building as Building).occupiedSurface * sizeOfStockLargeWarehouse) ){
 				found <- true;
 				do initStock( (sceLarge.building as Warehouse), fdm, sizeOfStockLargeWarehouse);
 			}
 			i <- i + 1;
 		}
+
 		// If we have not found it in the large warehouses
 		if(!found){
 			// we must create one SCE
 			// we find an appropriate large warehouse
 			Warehouse largeWarehouse <- findLargeWarehouse(fdm, sizeOfStockLargeWarehouse);
+
 			do initStock(largeWarehouse, fdm, sizeOfStockLargeWarehouse);
 			// and create a SCE
 			create SupplyChainElement number:1 returns:sceBuild {
@@ -324,7 +326,7 @@ species LogisticProvider schedules: [] {
 			}
 			sceLarge <- sceBuild[0];
 			supplyChain.root.sons <- supplyChain.root.sons + sceLarge;
-			
+
 			if(use_gs){
 				if(use_r9){
 					gs_add_node_attribute gs_sender_id:"supply_chain" gs_node_id:sceLarge.building.name gs_attribute_name:"type" gs_attribute_value:"large_warehouse";
@@ -332,6 +334,7 @@ species LogisticProvider schedules: [] {
 				}
 			}
 		}
+
 		// and then this father become the real father of this close warehouse
 		found <- false;
 		i <- 0;
@@ -344,7 +347,7 @@ species LogisticProvider schedules: [] {
 		if(!found){
 			sceCloseWarehouse.fathers <- sceCloseWarehouse.fathers + sceLarge;
 		}
-		
+
 		found <- false;
 		i <- 0;
 		loop while: i<length(sceLarge.sons) and !found {
@@ -356,7 +359,7 @@ species LogisticProvider schedules: [] {
 		if(!found){
 			sceLarge.sons <- sceLarge.sons + sceCloseWarehouse;
 		}
-		
+
 		if(use_gs){
 			if(use_r9){
 				gs_add_edge gs_sender_id:"supply_chain" gs_edge_id:(sceCloseWarehouse.building.name + sceLarge.building.name) gs_node_id_from:sceCloseWarehouse.building.name gs_node_id_to:sceLarge.building.name gs_is_directed:false;
@@ -397,8 +400,8 @@ species LogisticProvider schedules: [] {
 		// I assume that there is always at least one warehouse which has a free space greater than the occupied surface of the stock to outsource.
 		// According to results, it doesn't seem foolish.
 		loop while:
-				( (lsw[f] as Building).totalSurface - (lsw[f] as Building).occupiedSurface) <= 0 or
-				( (lsw[f] as Building).totalSurface - (lsw[f] as Building).occupiedSurface - (fdm.building as Building).occupiedSurface * sizeOfStock)	< 0 {
+				( (lsw[f] as Building).surfaceUsedForLH - (lsw[f] as Building).occupiedSurface) <= 0 or
+				( (lsw[f] as Building).surfaceUsedForLH - (lsw[f] as Building).occupiedSurface - (fdm.building as Building).occupiedSurface * sizeOfStock)	< 0 {
 			f <- ((rnd(10000)/10000)^32)*(length(lsw)-1);
 		}
 		return lsw[f];/**/
@@ -409,13 +412,13 @@ species LogisticProvider schedules: [] {
 	 * Return a large warehouse : the more the warehouse has a big free surface, the more he has a chance to be selected.
 	 */
 	Warehouse findLargeWarehouse(FinalDestinationManager fdm, int sizeOfStock){
-		list<Warehouse> llw <- Warehouse sort_by (each.totalSurface-each.occupiedSurface);
+		list<Warehouse> llw <- Warehouse sort_by (each.surfaceUsedForLH-each.occupiedSurface);
 		int f <- ((rnd(10000)/10000)^32)*(length(llw)-1);
 		// I assume that there is always at least one warehouse which has a free space greater than the occupied surface of the stock to outsource.
-		// According to results, it doesn't seem foolish.
+		// It probably needs a piece of code to avoid problem of no free available surface
 		loop while:
-				( (llw[(length(llw)-1) - f] as Building).totalSurface - (llw[(length(llw)-1) - f] as Building).occupiedSurface ) <= 0 or
-				(   (llw[(length(llw)-1) - f] as Building).totalSurface - 
+				( (llw[(length(llw)-1) - f] as Building).surfaceUsedForLH - (llw[(length(llw)-1) - f] as Building).occupiedSurface ) <= 0 or
+				(   (llw[(length(llw)-1) - f] as Building).surfaceUsedForLH - 
 					(llw[(length(llw)-1) - f] as Building).occupiedSurface - 
 					((fdm.building as Building).occupiedSurface * sizeOfStock)
 				) < 0 {
@@ -442,7 +445,7 @@ species LogisticProvider schedules: [] {
 		float x_l <- large.location.x;
 		float y_l <- large.location.y;
 		loop while: i < length(law) {
-			if( ((law[i] as Building).totalSurface - (law[i] as Building).occupiedSurface ) > (fdm.building as Building).occupiedSurface * sizeOfStock ){
+			if( ((law[i] as Building).surfaceUsedForLH - (law[i] as Building).occupiedSurface ) > (fdm.building as Building).occupiedSurface * sizeOfStock ){
 				float x_a <- (law[i] as Warehouse).location.x;
 				float y_a <- (law[i] as Warehouse).location.y;
 				float euclidean_norm <- sqrt( ((x_a-x_s) + (x_a-x_l))^2 + ((y_a-y_s) + (y_a-y_l))^2 );

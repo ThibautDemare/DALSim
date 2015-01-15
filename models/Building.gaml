@@ -13,6 +13,7 @@ import "./Parameters.gaml"
 		
 species Building schedules: [] {
 	list<Stock> stocks;
+	float surfaceUsedForLH;
 	float totalSurface;
 	float occupiedSurface;
 	

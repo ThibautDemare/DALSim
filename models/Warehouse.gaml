@@ -10,7 +10,7 @@ import "./Building.gaml"
 import "./GraphStreamConnection.gaml"
 
 species Warehouse parent: RestockingBuilding schedules: [] {
-	float huffValue;
+	float probaAnt;
 	string color;
 	int department;
 	int region;

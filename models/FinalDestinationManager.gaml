@@ -43,6 +43,7 @@ species FinalDestinationManager schedules: [] {
 		create Building number: 1 returns: buildings {
 			location <- myself.location;
 			totalSurface <- myself.surface;
+			surfaceUsedForLH <- myself.surface;
 			occupiedSurface <- 0.0;
 			myself.building <- self;
 		}
@@ -105,7 +106,7 @@ species FinalDestinationManager schedules: [] {
 	/**
 	 * The consumption is between 0 and 1/decreasingRateOfStocks of the maximum stock.
 	 */
-	reflex decreasingStocks  when: ((time/3600.0) mod numberOfHoursBeforeDS) = 0.0 {//the stock decrease one time by day (one cycle = 60min)
+	reflex decreasingStocks  when: ((time/3600.0) mod numberOfHoursBeforeDS) = 0.0 {
 		loop stock over: building.stocks {
 			float consumeQuantity <- 0.0;
 			loop while: consumeQuantity = 0 {
@@ -167,7 +168,7 @@ species FinalDestinationManager schedules: [] {
 	
 	action buildRandStock{
 		// Built its stocks
- 		float freeSurface <- (building.totalSurface - building.occupiedSurface);// The free surface of the building according to the max quantity
+ 		float freeSurface <- (building.surfaceUsedForLH - building.occupiedSurface);// The free surface of the building according to the max quantity
 		float maxOccupiedSurface <- 0.0;// the occupied surface if the stock are maximum.
 		list<Stock> ls <- [];
 		int i <- 0;// useful to add an id to products
@@ -180,7 +181,7 @@ species FinalDestinationManager schedules: [] {
 				
 				// If the free surface is greater than 10 percent of the total surface,
 				// then we have : 10 percent of the free surface <= maxQuantity < freeSurface
-				if(freeSurface > myself.building.totalSurface*0.1){
+				if(freeSurface > myself.building.surfaceUsedForLH*0.1){
 					maxQuantity <- rnd(freeSurface - freeSurface*0.1)+freeSurface*0.1;
 				}
 				else{
@@ -189,7 +190,7 @@ species FinalDestinationManager schedules: [] {
 				}
 				
 				// If the remaining surface is very too tiny
-				if((freeSurface-maxQuantity) < myself.building.totalSurface*0.1){
+				if((freeSurface-maxQuantity) < myself.building.surfaceUsedForLH*0.1){
 					maxQuantity <- freeSurface;
 				}
 				
@@ -200,7 +201,7 @@ species FinalDestinationManager schedules: [] {
 				self.building <- myself.building;
 			}
 			ls <- ls + s;
-			freeSurface <- (building.totalSurface - maxOccupiedSurface);
+			freeSurface <- (building.surfaceUsedForLH - maxOccupiedSurface);
 		}
 		building.stocks <- ls;
 	}
@@ -211,7 +212,7 @@ species FinalDestinationManager schedules: [] {
 		ask s {
 			// The id of the product
 			product <- 0;
-			maxQuantity <- myself.building.totalSurface;
+			maxQuantity <- myself.building.surfaceUsedForLH;
 			quantity <- rnd(maxQuantity as int) as float;
 			myself.building.occupiedSurface <- myself.building.occupiedSurface + maxQuantity; 
 			fdm <- myself;
@@ -223,7 +224,7 @@ species FinalDestinationManager schedules: [] {
 	action buildFourStock {
 		// use exactly 4 products occupying the same surface
 		int i <- 0;
-		float freeSurface <- building.totalSurface;// The free surface of the building according to the max quantity
+		float freeSurface <- building.surfaceUsedForLH;// The free surface of the building according to the max quantity
 		float surfaceByProduct <- freeSurface / 4.0;
 		float maxOccupiedSurface <- 0.0;// the occupied surface if the stock are maximum.
 		list<Stock> ls <- [];
@@ -248,7 +249,7 @@ species FinalDestinationManager schedules: [] {
 		// use between 2 and 6 products occupying the same surface
 		int i <- 0;
 		int nbProduct <- rnd(2)+2;
-		float freeSurface <- building.totalSurface;// The free surface of the building according to the max quantity
+		float freeSurface <- building.surfaceUsedForLH;// The free surface of the building according to the max quantity
 		float surfaceByProduct <- freeSurface / nbProduct;
 		float maxOccupiedSurface <- 0.0;// the occupied surface if the stock are maximum.
 		list<Stock> ls <- [];
