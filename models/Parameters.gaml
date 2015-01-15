@@ -40,24 +40,15 @@ global {
 	 * stocks according to the number of customer computed by the Huff model. The more the customers there are, the more the decreasing 
 	 * rate allows a large consumption.
 	 */
+	float minVal <- 3.0;
+	float maxVal <- 15.0;
 	action init_decreasingRateOfStocks {
 		list<FinalDestinationManager> dests <- FinalDestinationManager sort_by each.huffValue;
 		int i <- 0;
 		int ld <- length(dests);
 		loop while: i < ld {
 			FinalDestinationManager fdm <- dests[i];
-			if(i<length(dests)/4){
-				fdm.decreasingRateOfStocks <- 9;
-			}
-			else if(i<length(dests)*2/4){
-				fdm.decreasingRateOfStocks <- 7;
-			}
-			else if(i<length(dests)*3/4){
-				fdm.decreasingRateOfStocks <- 5;
-			}
-			else {
-				fdm.decreasingRateOfStocks <- 3;
-			}
+			fdm.decreasingRateOfStocks <- round(((maxVal-minVal) / (length(dests)-1)) * (i) + minVal);
 			i <- i + 1;
 		}
 	}
