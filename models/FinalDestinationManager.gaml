@@ -83,6 +83,7 @@ species FinalDestinationManager schedules: [] {
 				gs_add_node gs_sender_id:"supply_chain" gs_node_id:name;
 				gs_add_node_attribute gs_sender_id:"supply_chain" gs_node_id:name gs_attribute_name:"x" gs_attribute_value:location.x;
 				gs_add_node_attribute gs_sender_id:"supply_chain" gs_node_id:name gs_attribute_name:"y" gs_attribute_value:location.y;
+				gs_add_node_attribute gs_sender_id:"supply_chain" gs_node_id:name gs_attribute_name:"outflow" gs_attribute_value:0.0;
 			}
 		}
 	}

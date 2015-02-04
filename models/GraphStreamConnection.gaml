@@ -7,21 +7,23 @@
 model GraphStreamConnection
 
 import "./SeineAxisModel.gaml"
+import "./Building.gaml"
 import "./Warehouse.gaml"
+import "./Provider.gaml"
 import "./LogisticProvider.gaml"
 import "./FinalDestinationManager.gaml"
 
 global {
 	
 	bool use_gs <- true;
-	bool use_r1 <- true;//actor
-	bool use_r2 <- true;//init_neighborhood_all
-	bool use_r3 <- true;//init_neighborhood_warehouse
-	bool use_r4 <- true;//init_neighborhood_final_destination
-	bool use_r5 <- true;//init_neighborhood_logistic_provider
-	bool use_r6 <- true;//init_neighborhood_warehouse_final
-	bool use_r7 <- true;//init_neighborhood_logistic_final
-	bool use_r8 <- true;//init_use_road_network
+	bool use_r1 <- false;//actor
+	bool use_r2 <- false;//init_neighborhood_all
+	bool use_r3 <- false;//init_neighborhood_warehouse
+	bool use_r4 <- false;//init_neighborhood_final_destination
+	bool use_r5 <- false;//init_neighborhood_logistic_provider
+	bool use_r6 <- false;//init_neighborhood_warehouse_final
+	bool use_r7 <- false;//init_neighborhood_logistic_final
+	bool use_r8 <- false;//init_use_road_network
 	bool use_r9 <- true;//init_use_supply_chain
 	
 	float neighborhood_dist <- 1°km;
@@ -59,14 +61,19 @@ global {
 			if(use_r7){
 				do init_neighborhood_logistic_final;
 			}
-			
-			if(use_r9){
-				// Send a step event to Graphstream to indicate that the graph has been built
-				gs_step gs_sender_id:"supply_chain" gs_step_number:1;
-			}
 		}
 	}
 	
+	reflex update_inflows when: use_gs and use_r9 {
+		ask Provider + Warehouse {
+			if(outflow_updated){
+				gs_add_node_attribute gs_sender_id:"supply_chain" gs_node_id:name gs_attribute_name:"outflow" gs_attribute_value:outflow;
+				outflow_updated <- false;
+			}
+		}
+		gs_step gs_sender_id:"supply_chain" gs_step_number:int(step);
+	}
+
 	action init_senders {
 		gs_clear_senders;
 		

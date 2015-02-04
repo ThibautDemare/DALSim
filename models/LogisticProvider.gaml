@@ -290,6 +290,11 @@ species LogisticProvider schedules: [] {
 		if(use_gs){
 			if(use_r9){
 				gs_add_edge gs_sender_id:"supply_chain" gs_edge_id:(fdm.name + sceCloseWarehouse.building.name) gs_node_id_from:fdm.name gs_node_id_to:sceCloseWarehouse.building.name gs_is_directed:false;
+				float p <- 0.0;
+					using topology(road_network){
+	                       p <-  (fdm.building.location distance_to sceCloseWarehouse.building.location);
+	                }
+					gs_add_edge_attribute gs_sender_id:"supply_chain" gs_edge_id:(fdm.building.name + sceCloseWarehouse.building.name) gs_attribute_name:"length" gs_attribute_value:p;
 			}
 		}
 
@@ -331,6 +336,11 @@ species LogisticProvider schedules: [] {
 				if(use_r9){
 					gs_add_node_attribute gs_sender_id:"supply_chain" gs_node_id:sceLarge.building.name gs_attribute_name:"type" gs_attribute_value:"large_warehouse";
 					gs_add_edge gs_sender_id:"supply_chain" gs_edge_id:(sceLarge.building.name + provider.name) gs_node_id_from:sceLarge.building.name gs_node_id_to:provider.name gs_is_directed:false;
+					float p <- 0.0;
+					using topology(road_network){
+	                       p <-  (sceLarge.building.location distance_to provider.location);
+	                }
+					gs_add_edge_attribute gs_sender_id:"supply_chain" gs_edge_id:(sceLarge.building.name + provider.name) gs_attribute_name:"length" gs_attribute_value:p;
 				}
 			}
 		}
@@ -363,6 +373,11 @@ species LogisticProvider schedules: [] {
 		if(use_gs){
 			if(use_r9){
 				gs_add_edge gs_sender_id:"supply_chain" gs_edge_id:(sceCloseWarehouse.building.name + sceLarge.building.name) gs_node_id_from:sceCloseWarehouse.building.name gs_node_id_to:sceLarge.building.name gs_is_directed:false;
+				float p <- 0.0;
+				using topology(road_network){
+                       p <-  (sceCloseWarehouse.building.location distance_to sceLarge.building.location);
+                }
+				gs_add_edge_attribute gs_sender_id:"supply_chain" gs_edge_id:(sceCloseWarehouse.building.name + sceLarge.building.name) gs_attribute_name:"length" gs_attribute_value:p;
 			}
 		}
 	}

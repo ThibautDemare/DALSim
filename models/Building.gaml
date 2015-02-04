@@ -10,12 +10,15 @@ import "./Batch.gaml"
 import "./Stock.gaml"
 import "./Order.gaml"
 import "./Parameters.gaml"
+import "./GraphStreamConnection.gaml"
 		
 species Building schedules: [] {
 	list<Stock> stocks;
 	float surfaceUsedForLH;
 	float totalSurface;
 	float occupiedSurface;
+	float outflow <- 0.0;
+	bool outflow_updated <- false;
 	
 	/*
 	 * Receive a batch
@@ -43,6 +46,7 @@ species Building schedules: [] {
 							do die;
 						}
 					}
+
 					ask self {
 						do die;
 					}
@@ -87,6 +91,10 @@ species RestockingBuilding parent: Building schedules: [] {
 							sendedQuantity <- stock.quantity;
 						}
 						stock.quantity <- stock.quantity - sendedQuantity;
+
+						outflow <- outflow + sendedQuantity;
+						outflow_updated <- true;
+
 						// And create a Stock agent which will move within a Batch
 						create Stock number:1 returns:sendedStock {
 							self.product <- order.product;
