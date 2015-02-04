@@ -40,6 +40,15 @@ experiment exp_grid_stock_shortage type: gui {
 	}
 }
 
+experiment exp_saturation type: gui {
+	output {
+		display all {
+			species Warehouse aspect: base_saturation;
+			species Road aspect: geom;
+		}
+	}
+}
+
 experiment exp_save_results type: gui {
 	output {
 		file name: "stocks_warehouses" type: text data: ""+ ((time/3600.0) as int) + "; " +stockInWarehouse + ";" + freeSurfaceInWarehouse + ";";

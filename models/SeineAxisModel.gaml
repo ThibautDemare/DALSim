@@ -189,3 +189,41 @@ grid cell_stock_shortage width:50 height:50  {
 		}
 	}
 }
+
+grid cell_saturation width:50 height:50  {
+	rgb color <- rgb(255,255,255);
+	float surface;
+	float maxSurface;
+
+	reflex coloration {
+		surface <- 0;
+		maxSurface <- 0;
+		list<Building> buildings <- (Warehouse inside self) + (Building inside self);
+
+		loop b over: buildings {
+			maxSurface <- maxSurface + b.surfaceUsedForLH;
+			ask (b as Building).stocks {
+				myself.surface <- myself.surface + self.quantity;
+			}
+		}
+
+		if(maxSurface = 0){
+			color <- rgb(255, 255, 255);
+		}
+		else{
+			float ratio <- surface/maxSurface;
+			if(ratio < 0.25){
+				color <- rgb(237,248,251);
+			}
+			else if(ratio < 0.5){
+				color <- rgb(178,226,226);
+			}
+			else if(ratio < 0.75){
+				color <- rgb(102,194,164);
+			}
+			else{
+				color <- rgb(35,139,69);
+			}
+		}
+	}
+}
