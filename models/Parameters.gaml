@@ -33,15 +33,15 @@ global {
 	int sizeOfStockLocalWarehouse <- 2.0;
 	int sizeOfStockLargeWarehouse <- 3.0;
 	
-	float threshold <- 0.5;
+	float threshold <- 0.3;
 	
 	/**
 	 * The final destinations are separated in 4 ordered sets. To each final destinations of these sets, we associate a decreasing rate of 
 	 * stocks according to the number of customer computed by the Huff model. The more the customers there are, the more the decreasing 
 	 * rate allows a large consumption.
 	 */
-	float valForMinHuff <- 20.0;
-	float valForMaxHuff <- 5.0;
+	float valForMinHuff <- 6.0;
+	float valForMaxHuff <- 1.0;
 	action init_decreasingRateOfStocks {
 		list<FinalDestinationManager> dests <- FinalDestinationManager sort_by each.huffValue;
 		int i <- 0;
