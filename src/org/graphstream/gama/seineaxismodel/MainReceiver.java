@@ -1,9 +1,12 @@
 package org.graphstream.gama.seineaxismodel;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.UnknownHostException;
 
 import org.graphstream.gama.seineaxismodel.sinkadapters.SimpleSinkAdapter;
+import org.graphstream.graph.implementations.SingleGraph;
+import org.graphstream.stream.file.FileSinkDGS;
 import org.graphstream.stream.netstream.NetStreamReceiver;
 import org.graphstream.stream.netstream.NetStreamSender;
 
@@ -38,7 +41,19 @@ public class MainReceiver {
 		new SimpleSinkAdapter(receiver8);
 		
 		NetStreamReceiver receiver9 = new NetStreamReceiver(2009);
-		new SimpleSinkAdapter(receiver9);
+		//new SimpleSinkAdapter(receiver9);
+		SingleGraph graph = new SingleGraph("test", false, false);
+		receiver9.getDefaultStream().addSink(graph);
+		FileSinkDGS fileSink = new FileSinkDGS();
+		graph.addSink(fileSink);
+		String fileName = "C:"+File.separator+"Users"+File.separator+"Thibaut"+File.separator+"Desktop"+File.separator
+					+"Thèse"+File.separator+"Workspaces"+File.separator+"Gama_model"+File.separator+"SeineAxisModel"
+					+File.separator+"results"+File.separator+"DGS"+File.separator+"supply_chain_for_centrality.dgs";
+		try {
+			fileSink.begin(fileName);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		
 		if(use_viewer){
 			new SimpleNetStreamViewer(receiver1, true);
@@ -63,6 +78,11 @@ public class MainReceiver {
 				receiver7.getDefaultStream().pump();
 				receiver8.getDefaultStream().pump();
 				receiver9.getDefaultStream().pump();
+				try {
+					fileSink.flush();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 				// A sleep to avoid an overload of the CPU
 				Thread.sleep(1000);
 			}

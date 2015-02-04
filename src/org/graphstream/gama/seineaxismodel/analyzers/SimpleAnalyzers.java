@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -25,9 +24,90 @@ import org.graphstream.stream.GraphParseException;
 
 public class SimpleAnalyzers {
 
+	/**
+	 * Compute the Pearson's correlation coefficient directly on the values
+	 * @param g
+	 * @param att1
+	 * @param att2
+	 * @return
+	 */
+	public static double pearsonCorrelationCoefficient(Graph g, String att1, String att2){
+		/*
+		 * \frac{\sum (x_i-\bar{x}).(y_i-\bar{y})}{\sqrt{\sum (x_i-\bar{x})^2 \sum (y_i-\bar{y})^2}}
+		 * X = x_i-\bar{x}
+		 * Y = y_i-\bar{y}
+		 * \frac{\sum X.Y}{\sqrt{\sum X^2 \sum Y^2}}
+		 */
+		double moyX = 0;
+		double moyY = 0;
+		for(Node n : g){
+			if(n.hasAttribute(att1))
+				moyX += n.getNumber(att1);
+			if(n.hasAttribute(att2))
+				moyY += n.getNumber(att2);
+		}
+		moyX /= g.getNodeCount();
+		moyY /= g.getNodeCount();
+		double sumXY = 0;
+		double sumX2 = 0;
+		double sumY2 = 0;
+		for(Node n : g){
+			double X = 0;
+			if(n.hasAttribute(att1))
+				X = n.getNumber(att1)-moyX;
+			double Y = 0;
+			if(n.hasAttribute(att2))
+				Y = n.getNumber(att2)-moyY;
+			sumXY += X*Y;
+			sumX2 += X*X;
+			sumY2 += Y*Y;
+		}
+
+		if((Math.sqrt(sumX2*sumY2)) != 0){
+			double res = sumXY / (Math.sqrt(sumX2*sumY2));
+			return res;
+		}
+		else
+			return 0;
+	}
+
+	/**
+	 * Compute the Spearman's correlation coefficient (with tied values)
+	 * @param g
+	 * @param att1
+	 * @param att2
+	 * @return
+	 */
+	public static double spearmanCorrelationCoefficient(Graph g, String att1, String att2){
+		ArrayList<Element> listAtt1 = new ArrayList<Element>(g.getNodeSet());
+		Collections.sort(listAtt1, new ComparatorElement(att1));
+		ArrayList<Element> listAtt2 = new ArrayList<Element>(g.getNodeSet());
+		Collections.sort(listAtt2, new ComparatorElement(att2));
+		double moyX = g.getNodeCount()/2.;
+		double moyY = g.getNodeCount()/2.;
+		double sumXY = 0;
+		double sumX2 = 0;
+		double sumY2 = 0;
+		for(int i=0; i<listAtt1.size(); i++){
+			Element e1 = listAtt1.get(i);
+			Element e2;
+			int j = 0;
+			do{
+				e2 = listAtt2.get(j++);
+			}while(e1!=e2);
+			double X = i - moyX;
+			double Y = j - moyY;
+			sumXY += X*Y;
+			sumX2 += X*X;
+			sumY2 += Y*Y;
+		}
+		return sumXY / (Math.sqrt(sumX2*sumY2));
+	}
+
 	public static void betweennessCentrality(Graph g){
 		BetweennessCentrality bcb = new BetweennessCentrality();
-		bcb.setUnweighted();
+		//bcb.setUnweighted();
+		bcb.setWeightAttributeName("length");
 		bcb.setCentralityAttributeName("BetweennessCentrality");
 		bcb.init(g);
 		bcb.compute();
@@ -41,21 +121,27 @@ public class SimpleAnalyzers {
 		}
 		writer_degreeDistribution.close();
 
-		PrintWriter writer_betweennessCentrality = new PrintWriter(System.getProperty("user.dir" )+File.separator+"CSV_Graphs_Measures"+File.separator+"betweennessCentrality_"+file+".csv", "UTF-8");
 		ArrayList<Node> nodes = new ArrayList<Node>(graph.getNodeSet());
 		Collections.sort(nodes, new BetweennessComparator());
+
+		PrintWriter writer_betweennessCentrality = new PrintWriter(System.getProperty("user.dir" )+File.separator+"CSV_Graphs_Measures"+File.separator+"betweennessCentrality_"+file+".csv", "UTF-8");
 		for(int i = 0; i < nodes.size() ; i++){
 			writer_betweennessCentrality.println(i+"; "+nodes.get(i).getNumber("BetweennessCentrality"));
 		}
 		writer_betweennessCentrality.close();
-		
+
+		PrintWriter writer_correlation_betweenness_traffic = new PrintWriter(System.getProperty("user.dir" )+File.separator+"CSV_Graphs_Measures"+File.separator+"outflows_betweennessCentrality_"+file+".csv", "UTF-8");
+		for(int i = 0; i < nodes.size() ; i++){
+			writer_correlation_betweenness_traffic.println(nodes.get(i).getNumber("BetweennessCentrality")+";"+nodes.get(i).getNumber("outflow"));
+		}
+		writer_correlation_betweenness_traffic.close();
+
 		PrintWriter writer_sizeConnectedComponentsDistribution = new PrintWriter(System.getProperty("user.dir" )+File.separator+"CSV_Graphs_Measures"+File.separator+"sizeConnectedComponentsDistribution_"+file+".csv", "UTF-8");
 		int[] sizeConnectedComponentsDistribution = graph.getAttribute("SizeConnectedComponentsDistribution");
 		for(int i = 0; i < sizeConnectedComponentsDistribution.length; i++){
 			writer_sizeConnectedComponentsDistribution.println(i+"; "+sizeConnectedComponentsDistribution[i]);
 		}
 		writer_sizeConnectedComponentsDistribution.close();
-		
 	}
 
 	/**
@@ -105,8 +191,10 @@ public class SimpleAnalyzers {
 		for(String name : names){
 			for(String destination_file : destination_files){
 				Graph graph = new SingleGraph("");
+				graph.setStrict(false);
 				try {
 					graph.read(System.getProperty("user.dir" )+File.separator+"DGS"+File.separator+name+"_"+destination_file+".dgs");
+					//graph.read(System.getProperty("user.dir" )+File.separator+"DGS"+File.separator+"supply_chain_for_centrality.dgs");
 				} catch (ElementNotFoundException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -174,7 +262,7 @@ public class SimpleAnalyzers {
 					connectedComponentsDistribution[sizeConnectedComponents.get(i)]++;
 				}
 				graph.addAttribute("SizeConnectedComponentsDistribution", connectedComponentsDistribution);
-				
+
 				System.out.println("Compute betweenness centrality...");
 				betweennessCentrality(graph);
 
@@ -192,6 +280,7 @@ public class SimpleAnalyzers {
 
 				try {
 					buildCSV(graph, name+"_"+destination_file);
+					buildCSV(graph, "supply_chain_for_centrality");
 				} catch (FileNotFoundException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -200,8 +289,12 @@ public class SimpleAnalyzers {
 					e1.printStackTrace();
 				}
 
+				System.out.println("Coefficient de Spearman : "+spearmanCorrelationCoefficient(graph, "BetweennessCentrality", "outflow"));
+				System.out.println("Coefficient de Pearson : "+pearsonCorrelationCoefficient(graph, "BetweennessCentrality", "outflow"));
+
 				try {
 					graph.write(System.getProperty("user.dir" )+File.separator+"Analyzed_DGS"+File.separator+graph.getAttribute("name")+".dgs");
+					//graph.write(System.getProperty("user.dir" )+File.separator+"Analyzed_DGS"+File.separator+"supply_chain_for_centrality.dgs");
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
