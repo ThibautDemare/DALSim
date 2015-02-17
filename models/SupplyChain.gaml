@@ -54,6 +54,8 @@ species SupplyChainElement schedules: [] {
 					self.fdm <- stock.fdm;
 					self.position <- myself.position;
 					self.reference <- stock;
+					self.logisticProvider <- myself.supplyChain.logisticProvider;
+					self.stepOrderMade <- int(time/3600);
 				}
 				orders <- orders + o;
 			}

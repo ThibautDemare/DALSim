@@ -16,4 +16,5 @@ species Order schedules: [] {
 	int position;// The position in the supply chain
 	FinalDestinationManager fdm;
 	Stock reference;
+	int stepOrderMade;
 }

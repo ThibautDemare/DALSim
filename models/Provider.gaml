@@ -43,6 +43,7 @@ species Provider parent: RestockingBuilding schedules: [] {
 				self.product <- order.product;
 				self.quantity <- order.quantity;
 				self.fdm <- order.fdm;
+				self.lp <- order.logisticProvider;
 			}
 			
 			// Looking for a batch which go to the same building
@@ -69,6 +70,7 @@ species Provider parent: RestockingBuilding schedules: [] {
 					self.breakBulk <- self.computeBreakBulk(myself.totalSurface);
 					self.position <- order.position;
 					self.dest <- order.building;
+					self.stepOrderMade <- order.stepOrderMade;
 				}
 				lb <- first(rlb);
 				leavingBatches <- leavingBatches + lb;

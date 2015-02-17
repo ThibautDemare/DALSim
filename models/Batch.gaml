@@ -18,6 +18,7 @@ species Batch skills:[MovingOnNetwork]{
 	int breakBulk <- 0;
 	int position;
 	Building dest;
+	int stepOrderMade;
 	
 	reflex move when: target != nil and breakBulk = 0 {
 		if(network = nil){

@@ -11,6 +11,7 @@ import "./Stock.gaml"
 import "./Order.gaml"
 import "./Parameters.gaml"
 import "./GraphStreamConnection.gaml"
+import "./LogisticProvider.gaml"
 		
 species Building schedules: [] {
 	list<Stock> stocks;
@@ -39,6 +40,7 @@ species Building schedules: [] {
 							if( stockBuilding.fdm = stockBatch.fdm and stockBuilding.product = stockBatch.product ){
 								stockBuilding.status <- 0;
 								stockBuilding.quantity <- stockBuilding.quantity + stockBatch.quantity;
+								(stockBatch.lp as LogisticProvider).timeToDeliver <- (stockBatch.lp as LogisticProvider).timeToDeliver + ((int(time/3600)) - self.stepOrderMade);
 							}
 						}
 						remove index:0 from: self.stocks;
@@ -100,6 +102,7 @@ species RestockingBuilding parent: Building schedules: [] {
 							self.product <- order.product;
 							self.quantity <- sendedQuantity;
 							self.fdm <- order.fdm;
+							self.lp <- order.logisticProvider;
 						}
 
 						// Looking for a batch which go to the same building
@@ -126,6 +129,7 @@ species RestockingBuilding parent: Building schedules: [] {
 								self.breakBulk <- self.computeBreakBulk(myself.totalSurface);
 								self.position <- order.position;
 								self.dest <- order.building;
+								self.stepOrderMade <- order.stepOrderMade;
 							}
 							lb <- first(rlb);
 							leavingBatches <- leavingBatches + lb;

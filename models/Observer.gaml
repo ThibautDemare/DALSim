@@ -7,6 +7,7 @@
 model Observer
 
 import "./FinalDestinationManager.gaml"
+import "./LogisticProvider.gaml"
 import "./Batch.gaml"
 import "./Warehouse.gaml"
 import "./Building.gaml"
@@ -122,5 +123,21 @@ global {
 		}
 		stockOnRoads <- stockOnRoadsProviderToLarge + stockOnRoadsLargeToClose + stockOnRoadsCloseToFinal;
 		cumulativeStockOnRoads <- cumulativeStockOnRoads + stockOnRoads;
+	}
+
+	reflex update_average_time_to_deliver {
+		int i <- 0;
+		int sum <- 0;
+		ask LogisticProvider {
+			int j <- 0;
+			loop while: j<length(timeToDeliver) {
+				sum <- sum + timeToDeliver[j];
+				j <- j + 1;
+				i <- i + 1;
+			}
+		}
+		if(i > 0){
+			write (sum/i);
+		}
 	}
 }

@@ -22,8 +22,10 @@ species LogisticProvider schedules: [] {
 	string color;
 	int department;
 	int region;
+	list<int> timeToDeliver <- [];
 	
 	init {
+		timeToDeliver <- [];
 		if(use_gs){
 			// Add a new node event for corresponding sender
 			if(use_r1){
