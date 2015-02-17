@@ -54,6 +54,7 @@ import msi.gaml.types.IType;
 	@var(name = IKeywordMoNAdditional.DEFAULT_SPEED, type = IType.FLOAT, init = "19.4444", doc = @doc("The speed outside the graph (in meter/second). Default : 70km/h.")),
 	@var(name = IKeywordMoNAdditional.GRAPH, type = IType.GRAPH, doc = @doc("The graph or network on which the agent moves.")),
 	@var(name = IKeywordMoNAdditional.FILENAME, type = IType.STRING, doc = @doc("The name of the DGS file and its path where the graph must be saved.")),
+	@var(name = IKeywordMoNAdditional.PATH_LENGTH, type = IType.FLOAT, doc = @doc("The length of the computed path.")),
 })
 @skill(name = IKeywordMoNAdditional.MOVING_ON_NETWORK)
 public class MovingOnNetworkSkill extends Skill {
@@ -705,6 +706,10 @@ public class MovingOnNetworkSkill extends Skill {
 		dijkstra.setSource(sourceNode);
 		dijkstra.compute();
 		Path p = dijkstra.getPath(targetNode);
+
+		double length = p.getPathWeight("gama_time");
+		final IAgent agent = getCurrentAgent(scope);
+		agent.setAttribute(IKeywordMoNAdditional.PATH_LENGTH, length);
 
 		/*
 		 * Add closest edge(s)

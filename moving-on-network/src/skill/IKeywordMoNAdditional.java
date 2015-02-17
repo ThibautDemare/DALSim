@@ -12,4 +12,5 @@ public class IKeywordMoNAdditional implements IKeyword {
 	public static final String ON = "on";
 	public static final String FILENAME = "Network";
 	public static final String MARK = "mark";
+	public static final String PATH_LENGTH = "path_length";
 }
