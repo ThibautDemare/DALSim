@@ -72,6 +72,9 @@ experiment exp_save_results type: gui {
 
 		file name: "number_empty_stock_warehouses" type: text data: ""+ ((time/3600.0) as int) + "; " + 
 			numberOfEmptyStockInWarehouses + ";";
+
+		file name: "average_time_to_deliver" type: text data: ""+ ((time/3600.0) as int) + "; " +
+			averageTimeToDeliver + ";";
 	}
 }
 

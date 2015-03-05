@@ -41,6 +41,8 @@ global {
 	float stockOnRoadsCloseToFinal <- 0.0;
 	float cumulativeStockOnRoadsCloseToFinal <- 0.0;
 	
+	float averageTimeToDeliver <- 0;
+
 	reflex updateStockInBuildings {
 		do computeStockInFinalDests;
 		do computeStockInWarehouses;
@@ -137,7 +139,7 @@ global {
 			}
 		}
 		if(i > 0){
-			write (sum/i);
+			averageTimeToDeliver <- (sum/i);
 		}
 	}
 }
