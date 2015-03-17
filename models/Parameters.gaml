@@ -13,6 +13,9 @@ import "./FinalDestinationManager.gaml"
 global {
 	float step <- 60 °mn;//60 minutes per step
 	
+	int adoptedStrategy <- 3;
+	int numberWarehouseSelected <- 15;
+
 	/*
 	 * Some variables and functions to call some reflex
 	 */

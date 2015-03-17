@@ -16,6 +16,7 @@ import "./Stock.gaml"
 import "./SeineAxisModel.gaml"
 import "./GraphStreamConnection.gaml"
 import "./Parameters.gaml"
+import "./Strategies.gaml"
 
 species LogisticProvider schedules: [] {
 	SupplyChain supplyChain <- nil;
@@ -247,7 +248,7 @@ species LogisticProvider schedules: [] {
 		 * connect this leaf to a close warehouse
 		 */
 		// First we find an appropriate local warehouse
-		Warehouse closeWarehouse <- findCloseWarehouse(fdm, sizeOfStockLocalWarehouse);
+		Warehouse closeWarehouse <- findWarehouseLvl1(fdm, sizeOfStockLocalWarehouse);
 		do initStock(closeWarehouse, fdm, sizeOfStockLocalWarehouse);
 
 		// And next, we look if there is already this warehouse in the supply chain
@@ -320,7 +321,7 @@ species LogisticProvider schedules: [] {
 		if(!found){
 			// we must create one SCE
 			// we find an appropriate large warehouse
-			Warehouse largeWarehouse <- findLargeWarehouse(fdm, sizeOfStockLargeWarehouse);
+			Warehouse largeWarehouse <- findWarehouseLvl3(fdm, sizeOfStockLargeWarehouse);
 
 			do initStock(largeWarehouse, fdm, sizeOfStockLargeWarehouse);
 			// and create a SCE
@@ -409,75 +410,37 @@ species LogisticProvider schedules: [] {
 	}
 	
 	/**
-	 * Return a small warehouse according to the position of the final destination : the more the warehouse is close to the final destination, the more he has a chance to be selected.
+	 * Return a warehouse of first level in the supply chain
 	 */
-	Warehouse findCloseWarehouse(FinalDestinationManager fdm, int sizeOfStock){
-		list<Warehouse> lsw <- Warehouse sort_by (fdm distance_to each);
-		int f <- ((rnd(10000)/10000)^32)*(length(lsw)-1);
-		// I assume that there is always at least one warehouse which has a free space greater than the occupied surface of the stock to outsource.
-		// According to results, it doesn't seem foolish.
-		loop while:
-				( (lsw[f] as Building).surfaceUsedForLH - (lsw[f] as Building).occupiedSurface) <= 0 or
-				( (lsw[f] as Building).surfaceUsedForLH - (lsw[f] as Building).occupiedSurface - (fdm.building as Building).occupiedSurface * sizeOfStock)	< 0 {
-			f <- ((rnd(10000)/10000)^32)*(length(lsw)-1);
+	Warehouse findWarehouseLvl1(FinalDestinationManager fdm, int sizeOfStock){
+		Warehouse w <- nil;
+		if(adoptedStrategy = 1){
+			w <- world.findWarehouseLvl1Strat1(fdm, sizeOfStock);
 		}
-		return lsw[f];/**/
-		//return one_of(average_warehouse);
+		else if(adoptedStrategy = 2){
+			w <- world.findWarehouseLvl1Strat2(fdm, sizeOfStock);
+		}
+		else if(adoptedStrategy = 3){
+			w <- world.findWarehouseLvl1Strat3(fdm, sizeOfStock);
+		}
+		return w;
 	}
-	
+
 	/**
-	 * Return a large warehouse : the more the warehouse has a big free surface, the more he has a chance to be selected.
+	 * Return a warehouse of third level in the supply chain
 	 */
-	Warehouse findLargeWarehouse(FinalDestinationManager fdm, int sizeOfStock){
-		list<Warehouse> llw <- Warehouse sort_by (each.surfaceUsedForLH-each.occupiedSurface);
-		int f <- ((rnd(10000)/10000)^32)*(length(llw)-1);
-		// I assume that there is always at least one warehouse which has a free space greater than the occupied surface of the stock to outsource.
-		// It probably needs a piece of code to avoid problem of no free available surface
-		loop while:
-				( (llw[(length(llw)-1) - f] as Building).surfaceUsedForLH - (llw[(length(llw)-1) - f] as Building).occupiedSurface ) <= 0 or
-				(   (llw[(length(llw)-1) - f] as Building).surfaceUsedForLH - 
-					(llw[(length(llw)-1) - f] as Building).occupiedSurface - 
-					((fdm.building as Building).occupiedSurface * sizeOfStock)
-				) < 0 {
-			f <- ((rnd(10000)/10000)^32)*(length(llw)-1);
+	Warehouse findWarehouseLvl3(FinalDestinationManager fdm, int sizeOfStock){
+		Warehouse w <- nil;
+		if(adoptedStrategy = 1){
+			w <- world.findWarehouseLvl3Strat1(fdm, sizeOfStock);
 		}
-		return llw[(length(llw)-1) - f];/**/
-		//return one_of(large_warehouse);
-	}
-	
-	/**
-	 * Return an average warehouse according to this formulae :
-	 * - Let A be the small warehouse, B the average one that we are looking for, and C the large one.
-	 * - Let ->AB the vector between the local warehouse and the average one.
-	 * - Let ->CB be the vector between the large warehouse and the average one.
-	 * So, we are trying to find B which minimize ||(->AB) + (->CB)||.
-	 */
-	Warehouse findAverageWarehouse(Warehouse small, Warehouse large, FinalDestinationManager fdm, int sizeOfStock){
-		list<Warehouse> law <- Warehouse;
-		float min_euclidean_norm <-  -(2-252)*21023;// The max float value
-		int min_index <- -1;
-		int i <- 0;
-		float x_s <- small.location.x;
-		float y_s <- small.location.y;
-		float x_l <- large.location.x;
-		float y_l <- large.location.y;
-		loop while: i < length(law) {
-			if( ((law[i] as Building).surfaceUsedForLH - (law[i] as Building).occupiedSurface ) > (fdm.building as Building).occupiedSurface * sizeOfStock ){
-				float x_a <- (law[i] as Warehouse).location.x;
-				float y_a <- (law[i] as Warehouse).location.y;
-				float euclidean_norm <- sqrt( ((x_a-x_s) + (x_a-x_l))^2 + ((y_a-y_s) + (y_a-y_l))^2 );
-				if(euclidean_norm < min_euclidean_norm){
-					min_euclidean_norm <- euclidean_norm;
-					min_index <- i;
-				}
-			}
-			i <- i + 1;
+		else if(adoptedStrategy = 2){
+			w <- world.findWarehouseLvl3Strat2(fdm, sizeOfStock);
 		}
-		if(min_index = -1){
-			write "error : no average warehouse has been found";
+		else if(adoptedStrategy = 3){
+			w <- world.findWarehouseLvl3Strat3(fdm, sizeOfStock);
 		}
-		return law[min_index];/**/
-		//return one_of(average_warehouse);
+		return w;
 	}
 	
 	aspect base { 

@@ -14,6 +14,7 @@ species Warehouse parent: RestockingBuilding schedules: [] {
 	string color;
 	int department;
 	int region;
+	float accessibility <- -1;
 	
 	init {
 		if(use_gs){
