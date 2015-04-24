@@ -30,6 +30,7 @@ import msi.gama.metamodel.topology.graph.GraphTopology;
 import msi.gama.precompiler.GamlAnnotations.action;
 import msi.gama.precompiler.GamlAnnotations.arg;
 import msi.gama.precompiler.GamlAnnotations.doc;
+import msi.gama.precompiler.GamlAnnotations.example;
 import msi.gama.precompiler.GamlAnnotations.getter;
 import msi.gama.precompiler.GamlAnnotations.setter;
 import msi.gama.precompiler.GamlAnnotations.skill;
@@ -39,12 +40,14 @@ import msi.gama.runtime.GAMA;
 import msi.gama.runtime.IScope;
 import msi.gama.runtime.exceptions.GamaRuntimeException;
 import msi.gama.util.GamaList;
+import msi.gama.util.GamaListFactory;
 import msi.gama.util.graph.GraphUtilsGraphStream;
 import msi.gama.util.graph.IGraph;
 import msi.gama.util.graph._Edge;
 import msi.gama.util.graph._Vertex;
 import msi.gaml.operators.Cast;
 import msi.gaml.skills.Skill;
+import msi.gaml.types.GamaAgentType;
 import msi.gaml.types.IType;
 
 @doc("This skill is intended to move an agent on a network according to speed and length attributes on the edges. When The agent is not already on the graph, we assume that the length is an euclidean length and we use a default speed given by the user.")
@@ -123,7 +126,7 @@ public class MovingOnNetworkSkill extends Skill {
 			fileSink.addNodeAttributeFiltered("result");
 
 			graph.stepBegins(currentCycle);
-			getGraphstreamGraphFromGamaGraph(gamaGraph, graph);
+			getGraphstreamGraphFromGamaGraph(scope, gamaGraph, graph);
 
 			try {
 				fileSink.flush();
@@ -191,7 +194,7 @@ public class MovingOnNetworkSkill extends Skill {
 					@arg(name = IKeywordMoNAdditional.MARK, type = IType.FLOAT, optional = true, doc = @doc("The mark (a value) left on the agent's route.")),
 			},
 			doc =
-			@doc(value = "moves the agent towards the target passed in the arguments.", returns = "the path followed by the agent.", examples = { "do goto target: (one_of road).location on: road_network;" })
+			@doc(value = "moves the agent towards the target passed in the arguments.", returns = "the path followed by the agent.", examples = { @example("do goto target: (one_of road).location on: road_network;") })
 			)
 	public GamaList gotoAction(final IScope scope) throws GamaRuntimeException {
 		final IAgent agent = getCurrentAgent(scope);
@@ -424,7 +427,7 @@ public class MovingOnNetworkSkill extends Skill {
 			double mark = (Double) scope.getArg(IKeywordMoNAdditional.MARK, IType.FLOAT);
 			GamaPoint currentLocation = (GamaPoint) agent.getLocation().copy(scope);
 			// It follows the path on the graph, node by node
-			GamaList gl = new GamaList();
+			GamaList gl = GamaListFactory.EMPTY_LIST;
 
 			// Does the agent need to reach the next Node?
 			if(!agentOnANode){
@@ -432,7 +435,7 @@ public class MovingOnNetworkSkill extends Skill {
 				// Moreover, if the agent is at the last part of its path, and if he has some remaining time, then, it means that he will leave the network
 				if(currentGsPathEdge.size()== 1 && remainingTime >= 0){
 					// Thus, we pop the current edge of the path and the node (the last ones)
-					gl.add(currentGsPathEdge.remove(0).getAttribute("gama_agent"));
+					gl.addValue(scope, currentGsPathEdge.remove(0).getAttribute("gama_agent"));
 					currentGsPathNode.remove(0);
 					agentFromInsideToOutside = true;
 					agentInside = false;
@@ -482,7 +485,7 @@ public class MovingOnNetworkSkill extends Skill {
 					remainingTime -= time;
 				}
 				// We add the gama agent associated to this edge
-				gl.add(edge.getAttribute("gama_agent"));
+				gl.addValue(scope, edge.getAttribute("gama_agent"));
 			}
 			// We return the list of edges that the agent has traveled.
 			return gl;
@@ -742,7 +745,7 @@ public class MovingOnNetworkSkill extends Skill {
 	 * @param gamaGraph
 	 * @return The Graphstream graph
 	 */
-	private static void getGraphstreamGraphFromGamaGraph(final IGraph gamaGraph, Graph g) {
+	private static void getGraphstreamGraphFromGamaGraph(IScope scope, final IGraph gamaGraph, Graph g) {
 		Map<Object, Node> gamaNode2graphStreamNode = new HashMap<Object, Node>(gamaGraph._internalNodesSet().size());
 
 		// add nodes
@@ -793,12 +796,12 @@ public class MovingOnNetworkSkill extends Skill {
 					a.setAttribute("graphstream_edge", e);
 				}
 			} catch (EdgeRejectedException e) {
-				GAMA.reportError(GamaRuntimeException
-						.warning("an edge was rejected during the transformation, probably because it was a double one"),
+				GAMA.reportError(scope, GamaRuntimeException
+						.warning("an edge was rejected during the transformation, probably because it was a double one", scope),
 						true);
 			} catch (IdAlreadyInUseException e) {
-				GAMA.reportError(GamaRuntimeException
-						.warning("an edge was rejected during the transformation, probably because it was a double one"),
+				GAMA.reportError(scope, GamaRuntimeException
+						.warning("an edge was rejected during the transformation, probably because it was a double one", scope),
 						true);
 			}
 
@@ -806,16 +809,16 @@ public class MovingOnNetworkSkill extends Skill {
 
 		// some basic tests for integrity
 		if ( gamaGraph.getVertices().size() != g.getNodeCount() ) {
-			GAMA.reportError(
+			GAMA.reportError(scope,
 					GamaRuntimeException.warning("The exportation ran without error, but an integrity test failed: " +
 							"the number of vertices is not correct(" + g.getNodeCount() + " instead of " +
-							gamaGraph.getVertices().size() + ")"), true);
+							gamaGraph.getVertices().size() + ")", scope), true);
 		}
 		if ( gamaGraph.getEdges().size() != g.getEdgeCount() ) {
-			GAMA.reportError(
+			GAMA.reportError(scope,
 					GamaRuntimeException.warning("The exportation ran without error, but an integrity test failed: " +
 							"the number of edges is not correct(" + g.getEdgeCount() + " instead of " +
-							gamaGraph.getEdges().size() + ")"), true);
+							gamaGraph.getEdges().size() + ")", scope), true);
 		}
 	}
 

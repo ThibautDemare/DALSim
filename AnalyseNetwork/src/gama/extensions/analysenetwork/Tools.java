@@ -119,12 +119,12 @@ public class Tools {
 					a.setAttribute("gaml.extensions.analysenetwork.graphstream_edge", e);
 				}
 			} catch (EdgeRejectedException e) {
-				GAMA.reportError(GamaRuntimeException
-						.warning("an edge was rejected during the transformation, probably because it was a double one"),
+				GAMA.reportError(scope, GamaRuntimeException
+						.warning("an edge was rejected during the transformation, probably because it was a double one", scope),
 						true);
 			} catch (IdAlreadyInUseException e) {
-				GAMA.reportError(GamaRuntimeException
-						.warning("an edge was rejected during the transformation, probably because it was a double one"),
+				GAMA.reportError(scope, GamaRuntimeException
+						.warning("an edge was rejected during the transformation, probably because it was a double one", scope),
 						true);
 			}
 
@@ -132,16 +132,16 @@ public class Tools {
 
 		// some basic tests for integrity
 		if ( gamaGraph.getVertices().size() != g.getNodeCount() ) {
-			GAMA.reportError(
+			GAMA.reportError(scope,
 					GamaRuntimeException.warning("The exportation ran without error, but an integrity test failed: " +
 							"the number of vertices is not correct(" + g.getNodeCount() + " instead of " +
-							gamaGraph.getVertices().size() + ")"), true);
+							gamaGraph.getVertices().size() + ")", scope), true);
 		}
 		if ( gamaGraph.getEdges().size() != g.getEdgeCount() ) {
-			GAMA.reportError(
+			GAMA.reportError(scope,
 					GamaRuntimeException.warning("The exportation ran without error, but an integrity test failed: " +
 							"the number of edges is not correct(" + g.getEdgeCount() + " instead of " +
-							gamaGraph.getEdges().size() + ")"), true);
+							gamaGraph.getEdges().size() + ")", scope), true);
 		}
 		
 		return g;
