@@ -2,6 +2,7 @@ revoir système de calcul du taux de décroissance
 indice de performance du système
 affichage saturation 
 
+Ajout d'autres agents Provider + Freight forwarder (agents qui possèdent une préférence (une proba?) de plutôt faire passer la marchandise par tel ou tel Provider)
 
 Size of building affect break bulk time + include more hazard with international travel. 
 
