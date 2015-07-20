@@ -28,7 +28,7 @@ species SupplyChainElement schedules: [] {
 	action recursiveTests(list<Order> sonOrders){
 		Building b <- building;
 		
-		// First, we add the orders made by the son in order to process its later
+		// First, we add the orders made by the son in order to process them later
 		if(!empty(sonOrders)){
 			loop sonOrder over: sonOrders {
 				ask b as RestockingBuilding {
@@ -42,7 +42,7 @@ species SupplyChainElement schedules: [] {
 			return;
 		}
 				
-		// Now, we can build an order with each product which needs to be restock
+		// Now, we can build an order with each product which needs to be restocked
 		list<Order> orders <- [];
 		loop stock over: b.stocks {
 			if stock.lp = supplyChain.logisticProvider and stock.quantity < threshold*stock.maxQuantity and stock.status = 0 {
