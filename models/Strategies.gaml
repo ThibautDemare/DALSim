@@ -22,7 +22,7 @@ global {
 	 * Return a small warehouse according to the position of the final destination : the more the warehouse is close to the final destination, the more he has a chance to be selected.
 	 */
 	Warehouse findWarehouseLvl1Strat1(FinalDestinationManager fdm, int sizeOfStock){
-		list<Warehouse> lsw <- Warehouse sort_by (fdm distance_to each);
+		list<Warehouse> lsw <- copy(Warehouse) sort_by (fdm distance_to each);
 		int f <- ((rnd(10000)/10000)^32)*(length(lsw)-1);
 		// I assume that there is always at least one warehouse which has a free space greater than the occupied surface of the stock to outsource.
 		// According to results, it doesn't seem foolish.
@@ -39,7 +39,7 @@ global {
 	 * Return a large warehouse : the more the warehouse has a big free surface, the more he has a chance to be selected.
 	 */
 	Warehouse findWarehouseLvl3Strat1(FinalDestinationManager fdm, int sizeOfStock){
-		list<Warehouse> llw <- Warehouse sort_by (each.surfaceUsedForLH-each.occupiedSurface);
+		list<Warehouse> llw <- copy(Warehouse) sort_by (each.surfaceUsedForLH-each.occupiedSurface);
 		int f <- ((rnd(10000)/10000)^6)*(length(llw)-1);
 		// I assume that there is always at least one warehouse which has a free space greater than the occupied surface of the stock to outsource.
 		// It probably needs a piece of code to avoid problem of no free available surface
@@ -75,7 +75,7 @@ global {
 			}
 		}
 		
-		list<Warehouse> lw <- list(Warehouse);
+		list<Warehouse> lw <- copy(list(Warehouse));
 		
 		// Remove the ones that cannot welcome the stocks of the customer
 		int i <- 0;
@@ -119,8 +119,7 @@ global {
 			}
 		}
 		
-		list<Warehouse> lw <- list(Warehouse);
-		
+		list<Warehouse> lw <- copy(list(Warehouse));
 		// Remove the ones that cannot welcome the stocks of the customer
 		int i <- 0;
 		loop while: i < length(lw) {
@@ -131,7 +130,6 @@ global {
 				i <- i + 1;
 			}
 		}
-
 		// Delete the smallest ones
 		i <- 0;
 		loop while: i < length(lw) {
@@ -140,7 +138,6 @@ global {
 			}
 			i <- i + 1;
 		}
-
 		// We only keep the most accessible warehouses
 		lw <- lw sort_by (each.accessibility);
 		i <- 0;
@@ -150,7 +147,6 @@ global {
 			}
 			i <- i + 1;
 		}
-		
 		// Return the most accessible (in the case of the Shimbel index, the most accessible has the lowest value of accessibility
 		lw <- lw sort_by (each.accessibility);
 		return lw[0];
@@ -168,7 +164,7 @@ global {
 	 * On sélectionne le plus proche
 	 */
 	Warehouse findWarehouseLvl1Strat3(FinalDestinationManager fdm, int sizeOfStock){
-		list<Warehouse> lw <- list(Warehouse);
+		list<Warehouse> lw <- copy(list(Warehouse));
 		
 		// Remove the ones that cannot welcome the stocks of the customer
 		int i <- 0;
@@ -194,7 +190,7 @@ global {
 	 * On choisit le plus proche?/le plus large/celui ayant la plus grande valeur d'accessibilité? => à tester
 	 */
 	Warehouse findWarehouseLvl3Strat3(FinalDestinationManager fdm, int sizeOfStock){
-		list<Warehouse> lw <- list(Warehouse);
+		list<Warehouse> lw <- copy(list(Warehouse));
 		
 		// Remove the ones that cannot welcome the stocks of the customer
 		int i <- 0;
