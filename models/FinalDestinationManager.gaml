@@ -164,7 +164,7 @@ species FinalDestinationManager schedules: [] {
 	}
 	
 	aspect base { 
-		draw square(2°km) color: rgb("DarkOrange") ;
+		draw shape+3°px color: rgb("DarkOrange") ;
 	}
 	
 	action buildRandStock{
@@ -236,7 +236,7 @@ species FinalDestinationManager schedules: [] {
 				product <- i;
 				i <- i + 1;
 				maxQuantity <- surfaceByProduct;
-				quantity <- rnd(maxQuantity) as float;
+				quantity <- rnd(maxQuantity);
 				myself.building.occupiedSurface <- myself.building.occupiedSurface + maxQuantity;
 				fdm <- myself;
 				self.building <- myself.building;
