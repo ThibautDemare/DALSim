@@ -16,6 +16,6 @@ species Road schedules: [] {
 	int color_g <- 120;
 	int color_b <- 120;
 	aspect geom {
-		draw shape color: rgb(color_r, color_g, color_b);
+		draw shape + 2°px border: rgb(color_r, color_g, color_b) color: rgb(color_r, color_g, color_b);
 	}
 }
