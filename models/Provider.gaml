@@ -58,7 +58,7 @@ species Provider parent: RestockingBuilding schedules: [] {
 				}
 			}
 			Batch lb <- nil;
-			// There is a such Batch, we update it
+			// There is such a Batch, we update it
 			if(foundBatch){
 				lb <- leavingBatches[j];
 			}
@@ -92,5 +92,5 @@ species Provider parent: RestockingBuilding schedules: [] {
 	
 	aspect base { 
 		draw square(5°km) color: rgb("MediumSeaGreen") ;
-	} 
+	}
 }
