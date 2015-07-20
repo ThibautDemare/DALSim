@@ -25,8 +25,8 @@ global schedules: [world] +
 				shuffle(FinalDestinationManager) + 
 				shuffle(LogisticProvider)+
 				shuffle(Provider) + 
-				shuffle(Warehouse) +
 				shuffle(Building) +
+				shuffle(Warehouse) +
 				Batch + 
 				Stock {
 	
@@ -151,14 +151,14 @@ grid cell_surface width:50 height:50  {
 }
 
 grid cell_stock_shortage width:50 height:50  {
-	rgb color <- rgb(255,255,255);
+	rgb color <- rgb(rgb(255,255,255),0.0);
 	float nb_stock_shortage;
 	float nb_stock;
 
 	reflex coloration {
 		nb_stock_shortage <- 0;
 		nb_stock <- 0;
-		list<Building> buildings <- (Warehouse inside self) + (Building inside self);
+		list<Building> buildings <- (Building inside self);// + (Warehouse inside self);
 
 		loop b over: buildings {
 			ask (b as Building).stocks {
@@ -170,21 +170,21 @@ grid cell_stock_shortage width:50 height:50  {
 		}
 
 		if(nb_stock = 0 or nb_stock_shortage = 0){
-			color <- rgb(255,255,255);
+			color <- rgb(rgb(255,255,255),0.1);
 		}
 		else{
 			float ratio <- nb_stock_shortage/nb_stock;
 			if(ratio < 0.025){
-				color <- rgb(rgb(102,194,164),0.1);
+				color <- rgb(rgb(102,194,164),0.5);
 			}
 			else if(ratio < 0.07){
-				color <- rgb(rgb(65,174,118),0.1);
+				color <- rgb(rgb(65,174,118),0.8);
 			}
 			else if(ratio < 0.15){
-				color <- rgb(rgb(35,139,69),0.1);
+				color <- rgb(rgb(35,139,69),0.8);
 			}
 			else{
-				color <- rgb(rgb(0,88,36),0.1);
+				color <- rgb(rgb(0,88,36),0.8);
 			}
 		}
 	}
