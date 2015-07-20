@@ -41,7 +41,7 @@ global {
 	float stockOnRoadsCloseToFinal <- 0.0;
 	float cumulativeStockOnRoadsCloseToFinal <- 0.0;
 	
-	float averageTimeToDeliver <- 0;
+	float averageTimeToDeliver <- 0.0;
 
 	reflex updateStockInBuildings {
 		do computeStockInFinalDests;
