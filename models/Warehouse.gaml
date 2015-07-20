@@ -45,18 +45,18 @@ species Warehouse parent: RestockingBuilding schedules: [] {
 	}
 	
 	aspect base {
-		draw circle(1.5°km) color: rgb("RoyalBlue");
+		draw shape+3°px color: rgb("RoyalBlue");
 	}
 
 	aspect base_condition {
 		if(length(stocks) != 0){
-			draw circle(1.5°km) color: rgb("RoyalBlue");
+			draw shape+3°px color: rgb("RoyalBlue");
 		}
 	}
 
 	aspect base_saturation {
 		if(occupiedSurface > 0.9 * surfaceUsedForLH){
-			draw circle(1.5°km) color: rgb("RoyalBlue");
+			draw shape+3°px color: rgb("RoyalBlue");
 		}
 	}
 }
