@@ -393,7 +393,7 @@ species LogisticProvider schedules: [] {
 			// We create the stock agent
 			create Stock number:1 returns:s {
 				self.product <- stockFdm.product;
-				self.quantity <- stockFdm.maxQuantity * sizeOfStock;
+				self.quantity <- rnd(stockFdm.maxQuantity * sizeOfStock);
 				self.maxQuantity <- stockFdm.maxQuantity * sizeOfStock;
 				self.status <- 0;
 				self.fdm <- fdm;
@@ -445,5 +445,5 @@ species LogisticProvider schedules: [] {
 	
 	aspect base { 
 		draw square(1.5°km) color: rgb("green") ;
-	} 
+	}
 }
