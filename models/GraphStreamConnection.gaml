@@ -15,7 +15,7 @@ import "./FinalDestinationManager.gaml"
 
 global {
 	
-	bool use_gs <- true;
+	bool use_gs <- false;
 	bool use_r1 <- false;//actor
 	bool use_r2 <- false;//init_neighborhood_all
 	bool use_r3 <- false;//init_neighborhood_warehouse
@@ -24,7 +24,7 @@ global {
 	bool use_r6 <- false;//init_neighborhood_warehouse_final
 	bool use_r7 <- false;//init_neighborhood_logistic_final
 	bool use_r8 <- false;//init_use_road_network
-	bool use_r9 <- true;//init_use_supply_chain
+	bool use_r9 <- false;//init_use_supply_chain
 	
 	float neighborhood_dist <- 1°km;
 	
