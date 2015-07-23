@@ -13,7 +13,7 @@ import "./Parameters.gaml"
 import "./GraphStreamConnection.gaml"
 import "./LogisticProvider.gaml"
 		
-species Building schedules: [] {
+species Building schedules:[] {
 	list<Stock> stocks;
 	float surfaceUsedForLH;
 	float totalSurface;
@@ -58,7 +58,7 @@ species Building schedules: [] {
 	}
 }
 
-species RestockingBuilding parent: Building schedules: [] {
+species RestockingBuilding parent: Building schedules:[] {
 	list<Order> currentOrders <- [];
 	
 	action addOrder(Order order){
