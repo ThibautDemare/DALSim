@@ -132,7 +132,7 @@ public class DisplayGraph {
 
 					Graph graph = new SingleGraph("");
 					try {
-						graph.read(System.getProperty("user.dir" )+File.separator+"DGS"+File.separator+name+".dgs");
+						graph.read(System.getProperty("user.dir" )+File.separator+folder+File.separator+name+".dgs");
 					} catch (ElementNotFoundException e) {
 						e.printStackTrace();
 					} catch (IOException e) {
