@@ -123,14 +123,14 @@ species FinalDestinationManager schedules: [] {
 	/**
 	 * Increment the currentInertia value one time by month
 	 */
-	reflex updateCurrentInertia when: ((time/3600.0) mod numberOfHoursBeforeUCI) = 0.0 { // One time by month. 720 = number of hours in one month 
+	/*reflex updateCurrentInertia when: ((time/3600.0) mod numberOfHoursBeforeUCI) = 0.0 { // One time by month. 720 = number of hours in one month 
 		currentInertia <- currentInertia + 1;
 	}
 	
 	/**
 	 * If the agent can change his logistic provider, the agent must take a decision (a probability) if he really changes or not. The more the time goes, the more the agent has a chance.
 	 */
-	reflex wantToChangeLogisticProvider when: (currentInertia > maxInertia and maxInertia >= 0) {
+	/*reflex wantToChangeLogisticProvider when: (currentInertia > maxInertia and maxInertia >= 0) {
 		if(flip((currentInertia - maxInertia)/1000)){
 			// Inform current logistic provider that he lost a customer
 			ask logisticProvider {
