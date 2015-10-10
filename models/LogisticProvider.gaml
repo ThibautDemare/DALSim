@@ -25,6 +25,9 @@ species LogisticProvider schedules: [] {
 	int region;
 	list<int> timeToDeliver <- [];
 	
+	list<SupplyChainElement> lvl1Warehouses <- [];
+	list<SupplyChainElement> lvl2Warehouses <- [];
+
 	init {
 		timeToDeliver <- [];
 		if(use_gs){
@@ -198,39 +201,30 @@ species LogisticProvider schedules: [] {
 			}
 		}
 	}
-	
-	/**
-	 * When a logistic provider has a new customer, he need to find a new supply chain. This method build it.
-	 */
-	action getNewCustomer(FinalDestinationManager fdm){
-		/*
-		 * Initiate the supply chain with just the provider as root
-		 */
-		if(supplyChain = nil){
-			// Build the root of this almost-tree
-			create SupplyChainElement number:1 returns:rt {
-				building <- provider;
-				sons <- [];
-				position <- 0;
-			}
-			// and build the supply chain with this root
-			create SupplyChain number:1 returns:sc {
-				logisticProvider <- myself;
-				root <- rt[0];
-			}
-			supplyChain <- first(sc);
-			first(rt).supplyChain <- supplyChain;
 
-			if(use_gs){
-				if(use_r9){
-					gs_add_node_attribute gs_sender_id:"supply_chain" gs_node_id:provider.name gs_attribute_name:"type" gs_attribute_value:"provider";
-				}
+	action connectRoot {
+		// Build the root of this almost-tree
+		create SupplyChainElement number:1 returns:rt {
+			building <- provider;
+			sons <- [];
+			position <- 0;
+		}
+		// and build the supply chain with this root
+		create SupplyChain number:1 returns:sc {
+			logisticProvider <- myself;
+			root <- rt[0];
+		}
+		supplyChain <- first(sc);
+		first(rt).supplyChain <- supplyChain;
+
+		if(use_gs){
+			if(use_r9){
+				gs_add_node_attribute gs_sender_id:"supply_chain" gs_node_id:provider.name gs_attribute_name:"type" gs_attribute_value:"provider";
 			}
 		}
+	}
 
-		/*
-		 * The new customer become a new leaf of the "almost-tree" supply chain.
-		 */
+	SupplyChainElement connectCustomer(FinalDestinationManager fdm) {
 		create SupplyChainElement number:1 returns:fdmLeaf {
 			self.building <- fdm.building;
 			self.sons <- [];
@@ -243,12 +237,15 @@ species LogisticProvider schedules: [] {
 				gs_add_node_attribute gs_sender_id:"supply_chain" gs_node_id:fdm.name gs_attribute_name:"type" gs_attribute_value:"final_dest";
 			}
 		}
+		return fdmLeaf[0];
+	}
 
-		/*
-		 * connect this leaf to a close warehouse
-		 */
+	SupplyChainElement connectLvl1Warehouse(FinalDestinationManager fdm, SupplyChainElement fdmLeaf) {
 		// First we find an appropriate local warehouse
 		Warehouse closeWarehouse <- findWarehouseLvl1(fdm, sizeOfStockLocalWarehouse);
+		if(! (lvl1Warehouses contains closeWarehouse)){
+			lvl1Warehouses <- lvl1Warehouses + closeWarehouse;
+		}
 		do initStock(closeWarehouse, fdm, sizeOfStockLocalWarehouse);
 
 		// And next, we look if there is already this warehouse in the supply chain
@@ -274,7 +271,7 @@ species LogisticProvider schedules: [] {
 				building <- closeWarehouse;
 				sons <- [] + fdmLeaf;
 				fathers <- [];
-				(fdmLeaf[0] as SupplyChainElement).fathers <- [] + self;
+				fdmLeaf.fathers <- [] + self;
 			}
 			sceCloseWarehouse <- sceBuild[0];
 
@@ -287,7 +284,7 @@ species LogisticProvider schedules: [] {
 		else{
 			// We must update the fathers of the leaf and the sons of the close warehouse
 			sceCloseWarehouse.sons <- sceCloseWarehouse.sons + fdmLeaf[0];
-			(fdmLeaf[0] as SupplyChainElement).fathers <- [] + sceCloseWarehouse;
+			fdmLeaf.fathers <- [] + sceCloseWarehouse;
 		}
 
 		if(use_gs){
@@ -301,12 +298,13 @@ species LogisticProvider schedules: [] {
 			}
 		}
 
-		/*
-		 * Connect the close warehouse to the large warehouse
-		 */
+		return sceCloseWarehouse;
+	}
+
+	action connectLvl2Warehouse(FinalDestinationManager fdm, SupplyChainElement sceCloseWarehouse){
 		// We try to find a father who has an appropriate surface
 		SupplyChainElement sceLarge <- nil;
-		found <- false;
+		bool found <- false;
 		int i <- 0;
 		loop while: i<length(supplyChain.root.sons) and !found {
 			sceLarge <- supplyChain.root.sons[i];
@@ -321,8 +319,10 @@ species LogisticProvider schedules: [] {
 		if(!found){
 			// we must create one SCE
 			// we find an appropriate large warehouse
-			Warehouse largeWarehouse <- findWarehouseLvl3(fdm, sizeOfStockLargeWarehouse);
-
+			Warehouse largeWarehouse <- findWarehouseLvl2(fdm, sizeOfStockLargeWarehouse);
+			if(! (lvl2Warehouses contains largeWarehouse)){
+				lvl2Warehouses <- lvl1Warehouses + largeWarehouse;
+			}
 			do initStock(largeWarehouse, fdm, sizeOfStockLargeWarehouse);
 			// and create a SCE
 			create SupplyChainElement number:1 returns:sceBuild {
@@ -384,6 +384,35 @@ species LogisticProvider schedules: [] {
 			}
 		}
 	}
+
+	/**
+	 * When a logistic provider has a new customer, he need to find a new supply chain. This method build it.
+	 */
+	action getNewCustomer(FinalDestinationManager fdm){
+
+		/*
+		 * Initiate the supply chain with just the provider as root
+		 */
+		if(supplyChain = nil){
+			do connectRoot;
+		}
+
+		/*
+		 * The new customer become a new leaf of the "almost-tree" supply chain.
+		 */
+		SupplyChainElement fdmLeaf <- connectCustomer(fdm);
+
+		/*
+		 * connect this leaf to a close warehouse
+		 */
+		SupplyChainElement sceCloseWarehouse <- connectLvl1Warehouse(fdm, fdmLeaf);
+
+		/*
+		 * Connect the close warehouse to the large warehouse
+		 */
+		do connectLvl2Warehouse(fdm, sceCloseWarehouse);
+
+	}
 	
 	/**
 	 * We assume that the warehouse have already a stock when we initialize a new supply chain
@@ -415,13 +444,13 @@ species LogisticProvider schedules: [] {
 	Warehouse findWarehouseLvl1(FinalDestinationManager fdm, int sizeOfStock){
 		Warehouse w <- nil;
 		if(adoptedStrategy = 1){
-			w <- world.findWarehouseLvl1Strat1(fdm, sizeOfStock);
+			w <- world.findWarehouseLvl1Strat1(fdm, sizeOfStock, lvl1Warehouses, lvl2Warehouses);
 		}
 		else if(adoptedStrategy = 2){
-			w <- world.findWarehouseLvl1Strat2(fdm, sizeOfStock);
+			w <- world.findWarehouseLvl1Strat2(fdm, sizeOfStock, lvl1Warehouses, lvl2Warehouses);
 		}
 		else if(adoptedStrategy = 3){
-			w <- world.findWarehouseLvl1Strat3(fdm, sizeOfStock);
+			w <- world.findWarehouseLvl1Strat3(fdm, sizeOfStock, lvl1Warehouses, lvl2Warehouses);
 		}
 		return w;
 	}
@@ -429,16 +458,16 @@ species LogisticProvider schedules: [] {
 	/**
 	 * Return a warehouse of third level in the supply chain
 	 */
-	Warehouse findWarehouseLvl3(FinalDestinationManager fdm, int sizeOfStock){
+	Warehouse findWarehouseLvl2(FinalDestinationManager fdm, int sizeOfStock){
 		Warehouse w <- nil;
 		if(adoptedStrategy = 1){
-			w <- world.findWarehouseLvl3Strat1(fdm, sizeOfStock);
+			w <- world.findWarehouseLvl2Strat1(fdm, sizeOfStock, lvl1Warehouses, lvl2Warehouses);
 		}
 		else if(adoptedStrategy = 2){
-			w <- world.findWarehouseLvl3Strat2(fdm, sizeOfStock);
+			w <- world.findWarehouseLvl2Strat2(fdm, sizeOfStock, lvl1Warehouses, lvl2Warehouses);
 		}
 		else if(adoptedStrategy = 3){
-			w <- world.findWarehouseLvl3Strat3(fdm, sizeOfStock);
+			w <- world.findWarehouseLvl2Strat3(fdm, sizeOfStock, lvl1Warehouses, lvl2Warehouses);
 		}
 		return w;
 	}
