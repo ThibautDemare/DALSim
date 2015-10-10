@@ -95,6 +95,17 @@ global schedules: [world] +
 		
 		// Final destinations
 		create FinalDestinationManager from: destination_shapefile with: [huffValue::read("huff") as float, surface::read("surface") as float, color::read("color") as string];
+		/*
+		int i <- 500;
+		list<FinalDestinationManager> lfdm <- shuffle(FinalDestinationManager);
+		loop while: i < length(lfdm) {
+			FinalDestinationManager s <- lfdm[i];
+			remove index: i from: lfdm;
+			ask s {
+				do die;
+			}
+		}
+		/**/
 		
 		// Init the decreasing rate of consumption
 		do init_decreasingRateOfStocks;
