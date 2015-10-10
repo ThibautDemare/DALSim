@@ -13,7 +13,7 @@ import "./FinalDestinationManager.gaml"
 global {
 	float step <- 60 °mn;//60 minutes per step
 	
-	int adoptedStrategy <- 3;
+	int adoptedStrategy <- 2;
 	int numberWarehouseSelected <- 15;
 
 	/*
@@ -42,7 +42,7 @@ global {
 	 * The more the Huff value is high, the more the stocks decrease quickly, the more the rate is down
 	 */
 	float valForMinHuff <- 6.0;
-	float valForMaxHuff <- 1.0;
+	float valForMaxHuff <- 4.0;
 	action init_decreasingRateOfStocks {
 		list<FinalDestinationManager> dests <- FinalDestinationManager sort_by each.huffValue;
 		int i <- 0;
