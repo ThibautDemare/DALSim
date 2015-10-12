@@ -18,10 +18,11 @@ import "./Parameters.gaml"
 
 species FinalDestinationManager schedules: [] {
 	LogisticProvider logisticProvider;
+	list<float> localLPEfficiencies <- [];
+	float localAverageLPEfficiency <- 0.0;
+	int numberOfDaysOfContract <- 0;
 	Building building;
 	float huffValue;// number of customer according to huff model => this value cant be used like this because the Huff model does not take care of time.
-	int currentInertia;
-	int maxInertia;
 	int decreasingRateOfStocks;
 	string color;
 	int department;
@@ -29,15 +30,7 @@ species FinalDestinationManager schedules: [] {
 	float surface;
 	
 	init {
-		// Init the inertia mechanism
-		currentInertia <- 0;
-		// There is one chance on 10 to never change of logistic provider
-		if(flip(probabilityToChangeLogisticProvider)){
-			maxInertia <- rnd(24)+12;// Between one year and 3 years
-		}
-		else{
-			maxInertia <- -1;
-		}
+
 		
 		// Associate a building to this manager
 		create Building number: 1 returns: buildings {
@@ -121,39 +114,32 @@ species FinalDestinationManager schedules: [] {
 	}
 	
 	/**
-	 * Increment the currentInertia value one time by month
+	 * This reflex manages the contract with the logistic provider.
+	 * If the contract is old enough, and if the efficiency of the LP is too low, then the FDM change of collaborator.
 	 */
-	/*reflex updateCurrentInertia when: ((time/3600.0) mod numberOfHoursBeforeUCI) = 0.0 { // One time by month. 720 = number of hours in one month 
-		currentInertia <- currentInertia + 1;
-	}
-	
-	/**
-	 * If the agent can change his logistic provider, the agent must take a decision (a probability) if he really changes or not. The more the time goes, the more the agent has a chance.
-	 */
-	/*reflex wantToChangeLogisticProvider when: (currentInertia > maxInertia and maxInertia >= 0) {
-		if(flip((currentInertia - maxInertia)/1000)){
-			// Inform current logistic provider that he lost a customer
-			ask logisticProvider {
-				do lostCustomer(myself);
-			}
-			// Choose a new one
-			logisticProvider <- chooseLogisticProvider();
-			// Inform him that he gets a new customer
-			ask logisticProvider {
-				do getNewCustomer(myself);
-			}
-			currentInertia <- 0;
-			if(use_gs){
-				// Add new node/edge events for corresponding sender
-				if(use_r1){
-					// We don't remove the old edge. The actor network can be seen as a cumulative network.
-					// Is it a problem? Do we need to remove this edge?
-					gs_add_edge gs_sender_id:"actor" gs_edge_id:(name + logisticProvider.name) gs_node_id_from:name gs_node_id_to:logisticProvider.name gs_is_directed:false;
+	reflex manageContractWithLP {
+		numberOfDaysOfContract <- numberOfDaysOfContract + 1;
+		if(numberOfDaysOfContract > minimalNumberOfDaysOfContract){
+			if(localAverageLPEfficiency < averageLPEfficiency){
+				// the logsitic provider is not efficient enough. He must be replaced by another one.
+				// Inform the current logistic provider that he losts a customer
+				ask logisticProvider {
+					do lostCustomer(myself);
 				}
+				// Choose a new one
+				logisticProvider <- chooseLogisticProvider();
+				// Inform him that he gets a new customer
+				ask logisticProvider {
+					do getNewCustomer(myself);
+				}
+				// Re-initialise some variables : contract is new, and efficiency values are set to zero.
+				numberOfDaysOfContract <- 0;
+				localLPEfficiencies <- [];
+				localAverageLPEfficiency <- 0.0;
 			}
 		}
 	}
-	
+
 	/**
 	 * The more the logistic provider is close, the more he has a chance to be selected.
 	 */
