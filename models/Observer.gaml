@@ -15,6 +15,8 @@ import "./Parameters.gaml"
 import "./Stock.gaml"
 
 global {
+	list<float> averagesLPEfficiency <- [];
+	float averageLPEfficiency <- 0.0;
 	int numberofEmptyStockInFinalDests <- 0;
 	int numberOfEmptyStockInWarehouses <- 0;
 	
@@ -48,6 +50,10 @@ global {
 		do computeStockInWarehouses;
 	}
 	
+	/*
+	 * This method computes the free surface of every final destination, the surface used, and the number of stock shortages
+	 * This number of stock shortages is stored in an array 'lpEfficiencies' in order to used it as a perforamnce measure of the logistic provider collaborating with the final destination manager.
+	 */
 	action computeStockInFinalDests{
 		stockInFinalDest <- 0.0;
 		freeSurfaceInFinalDest <- 0.0;
@@ -55,18 +61,53 @@ global {
 		float totalNumberOfStock <- 0.0;
 		ask FinalDestinationManager {
 			float tempStock <- 0.0;
+			float nbStockShortages <- 0.0;
 			ask self.building.stocks {
 				stockInFinalDest <- stockInFinalDest + self.quantity;
+				if(self.quantity = 0){
+					nbStockShortages <- nbStockShortages + 1.0;
+				}
 				tempStock <- tempStock + self.quantity;
 				totalNumberOfStock <- totalNumberOfStock + 1;
 				if(self.quantity = 0){
 					numberofEmptyStockInFinalDests <- numberofEmptyStockInFinalDests + 1;
 				}
 			}
+			self.localLPEfficiencies <- localLPEfficiencies + nbStockShortages;
 			freeSurfaceInFinalDest <- freeSurfaceInFinalDest + (surface - tempStock);
 		}
 	}
 	
+	/*
+	 * This reflex updates every step the average efficiency of every logistic provider, but also the estimated efficiency at the FDM level.
+	 */
+	reflex updateAverageLPEfficiency {
+		float currentLPEfficiency <- 0;
+		ask FinalDestinationManager {
+			int i <- 0;
+			self.localAverageLPEfficiency <- 0;
+			loop while: i < length(localLPEfficiencies) {
+				self.localAverageLPEfficiency <- self.localAverageLPEfficiency + localLPEfficiencies[i];
+				i <- i + 1;
+			}
+			self.localAverageLPEfficiency <- self.localAverageLPEfficiency / length(localLPEfficiencies);
+			currentLPEfficiency <- currentLPEfficiency + self.localAverageLPEfficiency;
+		}
+		currentLPEfficiency <- currentLPEfficiency / length(FinalDestinationManager);
+		averagesLPEfficiency <- averagesLPEfficiency + 0.0;
+		if(length(averagesLPEfficiency) > numberOfStepConsideredForLPEfficiency){
+			remove index: 0 from: averagesLPEfficiency;
+		}
+		averagesLPEfficiency[length(averagesLPEfficiency)-1] <- averagesLPEfficiency[length(averagesLPEfficiency)-1] + currentLPEfficiency;
+		int i <- 0;
+		averageLPEfficiency <- 0.0;
+		loop while: i < length(averagesLPEfficiency) {
+			averageLPEfficiency <- averageLPEfficiency + averagesLPEfficiency[i];
+			i <- i + 1;
+		}
+		averageLPEfficiency <- averageLPEfficiency / length(averagesLPEfficiency);
+	}
+
 	action computeStockInWarehouses {
 		stockInWarehouse <- 0.0;
 		freeSurfaceInWarehouse <- 0.0;
