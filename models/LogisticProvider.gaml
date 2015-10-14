@@ -61,146 +61,123 @@ species LogisticProvider schedules: [] {
 			do recursiveTests([] as list<Order>);
 		}
 	}
-	
+
+
+
+	/*
+	 * These methods are used to remove a customer and disconnect him of the supply chain
+	 */
+
 	/**
 	 * When a logistic provider loose a customer (a FinalDestinationManager) he must update the stock on its warehouses
 	 */
 	action lostCustomer(FinalDestinationManager fdm){
-		// Find the good SCE
+		/*
+		 * Browse the warehouses to get the stocks to remove and the list of warehouses which could be deleted from the supply chain
+		 */
 		int i <- 0;
-		SupplyChainElement sceLeaf <- nil;
-		loop while: i<length(supplyChain.leafs) and sceLeaf = nil {
-			if(fdm.building = ((supplyChain.leafs[i] as SupplyChainElement).building )){
-				sceLeaf <- supplyChain.leafs[i];
-			}
-			i <- i + 1;
-		}
-		// Delete the stocks which belong to the FDM, in the warehouses of the supply chain
-		// Also, find the SCE which are not still used
-		list<SupplyChainElement> sceToDelete <- [];
-		loop sceClose over: sceLeaf.fathers {
-			Building b1 <- (sceClose as SupplyChainElement).building;
-			do deleteStock(fdm, b1);
-			
-			if(isUseless(sceClose.building)){
-				sceToDelete <- sceToDelete + sceClose;
-			}
-			
-			loop sceLarge over: sceClose.fathers {
-				Building b2 <- (sceLarge as SupplyChainElement).building;
-				do deleteStock(fdm, b2);
-				
-				if(isUseless(sceLarge.building)){
-					sceToDelete <- sceToDelete + sceLarge;
-				}
-			}
-			
-			if(use_gs){
-				if(use_r9){
-					gs_remove_edge gs_sender_id:"supply_chain" gs_edge_id:(fdm.name + sceClose.building.name);
-				}
-			}
-		}
-		
-		// And finally remove these useless SCE from the SC
-		do removeSCE(sceToDelete);
-	}
-	
-	/**
-	 * Remove a SupplyChainElement from the SupplyChain of the current LogisticProvider
-	 */
-	action removeSCE(list<SupplyChainElement> sceToDelete){
-		loop while: !empty(sceToDelete){
-			SupplyChainElement sce <- first(sceToDelete);
-			// Delete this sce in his fathers
-			loop father over:sce.fathers {
-				int j <- 0;
-				bool found <- false;
-				loop while: j < length(father.sons) and !found {
-					if(father.sons[j] = sce){
-						found <- true;
-					}
-					else {
-						j <- j + 1;
-					}
-				}
-				remove index: j from: father.sons;
-				
-				if(use_gs){
-					if(use_r9){
-						gs_remove_edge gs_sender_id:"supply_chain" gs_edge_id:(sce.building.name + father.building.name);
-					}
-				}
-			}
-			// Delete this sce in his sons
-			loop son over:sce.sons {
-				int j <- 0;
-				bool found <- false;
-				loop while: j < length(son.fathers) and !found {
-					if(son.fathers[j] = sce){
-						found <- true;
-					}
-					else {
-						j <- j + 1;
-					}
-				}
-				remove index: j from: son.fathers;
-				
-				if(use_gs){
-					if(use_r9){
-						gs_remove_edge gs_sender_id:"supply_chain" gs_edge_id:(son.building.name + sce.building.name);
-					}
-				}
-			}
-			remove index:0 from: sceToDelete;
-			ask sce {
-				do die;
-			}
-		}
-	}
-	
-	/**
-	 * Check if a building have still some stock managed by the current logistic provider.
-	 * If there is not, it means that the building is useless in the supply chain.
-	 */
-	bool isUseless(Building b){
-		// Watch if this warehouse is useful or not
-		int j <- 0;
-		bool isUseless <- true;
-		loop while: j < length(b.stocks) and isUseless {
-			Stock stock <- b.stocks[j];
-			if(stock.lp = self){
-				isUseless <- false;
-			}
-			j <- j + 1;
-		}
-		return isUseless;
-	}
-	
-	/**
-	 * Delete all the stocks of a given FinalDestinationManager in a given building
-	 */
-	action deleteStock(FinalDestinationManager fdm, Building b){
-		loop stockFdm over: (fdm.building as Building).stocks {	
-			int i <- 0;
-			Stock stockW <- nil;
-			// Browse the stocks of this warehouse and remove the outsourced stock
-			loop while: i < length(b.stocks) {
-				stockW <- b.stocks[i];
-				if(stockW.fdm = fdm and stockW.product = stockFdm.product){
-					// We update the occupied surface
-					b.occupiedSurface <- b.occupiedSurface - stockW.maxQuantity;
-					remove stockW from: b.stocks;
-					ask stockW {
-						do die;
-					}
+		list<Warehouse> uselessWarehouses <- [];
+		list<Stock> stockRemoved <- [];
+		loop while: i < length(lvl1Warehouses) {
+			int j <- 0;
+			list<Stock> temp_stocks <- (lvl1Warehouses[i] as Warehouse).stocks;
+			bool useless <- true;
+			loop while: j < length(temp_stocks) {
+				if(temp_stocks[i].fdm = fdm and temp_stocks[i].lp = self){
+					stockRemoved <- stockRemoved + temp_stocks[i];
+					remove index: j from: (lvl1Warehouses[i] as Warehouse).stocks;
 				}
 				else {
-					i <- i + 1;
+					// if the current stock is managed by the current LP, but does not belong to the FDM, then it means that this warehouse is useful
+					if(temp_stocks[i].lp = self){
+						useless <- false;
+					}
+					j <- j + 1;
 				}
 			}
+			if(useless){
+				uselessWarehouses <- uselessWarehouses + lvl1Warehouses[i];
+				remove index: i from: lvl1Warehouses;
+			}
+			else {
+				i <- i + 1;
+			}
+		}
+
+		// I wanted to make a mathod in order to not duplicate the following code, unfortunately, I can't return both the list of useless warehouse and of stocks...
+		// It is ugly... I know and I feel ashamed!
+		i <- 0;
+		loop while: i < length(lvl2Warehouses) {
+			int j <- 0;
+			list<Stock> temp_stocks <- (lvl2Warehouses[i] as Warehouse).stocks;
+			bool useless <- true;
+			loop while: j < length(temp_stocks) {
+				if(temp_stocks[i].fdm = fdm and temp_stocks[i].lp = self){
+					stockRemoved <- stockRemoved + temp_stocks[i];
+					remove index: j from: (lvl2Warehouses[i] as Warehouse).stocks;
+				}
+				else {
+					// if the current stock is managed by the current LP, but does not belong to the FDM, then it means that this warehouse is useful
+					if(temp_stocks[i].lp = self){
+						useless <- false;
+					}
+					j <- j + 1;
+				}
+			}
+			if(useless){
+				uselessWarehouses <- uselessWarehouses + lvl2Warehouses[i];
+				remove index: i from: lvl2Warehouses;
+			}
+			else {
+				i <- i + 1;
+			}
+		}
+
+		/*
+		 * Delete the useless SupplyChainElement and the supply chain itself if there is no more customer
+		 */
+		list<SupplyChainElement> uselessSCE <- deleteUselessWarehouses(supplyChain.root, fdm, uselessWarehouses);
+		loop while: 0 < length(uselessSCE) {
+			ask uselessSCE {
+				do die;
+			}
+			remove index: 0 from: uselessSCE;
+		}
+		if(length(supplyChain.root.sons) = 0){
+			ask supplyChain.root {
+				do die;
+			}
+			ask supplyChain {
+				do die;
+			}
+			supplyChain <- nil;
 		}
 	}
+
+	/*
+	 * A recursive method which browse the supply chain and delete the useless suplly chain element from the leafs to the root
+	 */
+	list<SupplyChainElement> deleteUselessWarehouses(SupplyChainElement sce, FinalDestinationManager fdm, list<Warehouse> uselessWarehouses){
+		int i <- 0;
+		list<SupplyChainElement> uselessSCE <- [];
+		loop while: i < length(sce.sons) {
+			uselessSCE <- uselessSCE + deleteUselessWarehouses(sce.sons[i], fdm, uselessWarehouses);
+			if(uselessWarehouses contains sce.sons[i].building or sce.sons[i].building = fdm.building){
+				uselessSCE <- uselessSCE + sce.sons[i];
+				remove index: i from: sce.sons;
+			}
+			else {
+				i <- i + 1;
+			}
+		}
+		return uselessSCE;
+	}
+
+
+
+	/*
+	 * These methods are used to connect a new customer to the supply chain
+	 */
 
 	action connectRoot {
 		// Build the root of this almost-tree
