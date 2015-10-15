@@ -83,13 +83,13 @@ species LogisticProvider schedules: [] {
 			list<Stock> temp_stocks <- (lvl1Warehouses[i] as Warehouse).stocks;
 			bool useless <- true;
 			loop while: j < length(temp_stocks) {
-				if(temp_stocks[i].fdm = fdm and temp_stocks[i].lp = self){
-					stockRemoved <- stockRemoved + temp_stocks[i];
+				if(temp_stocks[j].fdm = fdm and temp_stocks[j].lp = self){
+					stockRemoved <- stockRemoved + temp_stocks[j];
 					remove index: j from: (lvl1Warehouses[i] as Warehouse).stocks;
 				}
 				else {
 					// if the current stock is managed by the current LP, but does not belong to the FDM, then it means that this warehouse is useful
-					if(temp_stocks[i].lp = self){
+					if(temp_stocks[j].lp = self){
 						useless <- false;
 					}
 					j <- j + 1;
@@ -112,13 +112,13 @@ species LogisticProvider schedules: [] {
 			list<Stock> temp_stocks <- (lvl2Warehouses[i] as Warehouse).stocks;
 			bool useless <- true;
 			loop while: j < length(temp_stocks) {
-				if(temp_stocks[i].fdm = fdm and temp_stocks[i].lp = self){
-					stockRemoved <- stockRemoved + temp_stocks[i];
+				if(temp_stocks[j].fdm = fdm and temp_stocks[j].lp = self){
+					stockRemoved <- stockRemoved + temp_stocks[j];
 					remove index: j from: (lvl2Warehouses[i] as Warehouse).stocks;
 				}
 				else {
 					// if the current stock is managed by the current LP, but does not belong to the FDM, then it means that this warehouse is useful
-					if(temp_stocks[i].lp = self){
+					if(temp_stocks[j].lp = self){
 						useless <- false;
 					}
 					j <- j + 1;
@@ -136,9 +136,9 @@ species LogisticProvider schedules: [] {
 		/*
 		 * Delete the useless SupplyChainElement and the supply chain itself if there is no more customer
 		 */
-		list<SupplyChainElement> uselessSCE <- deleteUselessWarehouses(supplyChain.root, fdm, uselessWarehouses);
+		list<SupplyChainElement> uselessSCE <- deleteUselessSCE(supplyChain.root, fdm, uselessWarehouses);
 		loop while: 0 < length(uselessSCE) {
-			ask uselessSCE {
+			ask uselessSCE[0] {
 				do die;
 			}
 			remove index: 0 from: uselessSCE;
@@ -155,20 +155,22 @@ species LogisticProvider schedules: [] {
 	}
 
 	/*
-	 * A recursive method which browse the supply chain and delete the useless suplly chain element from the leafs to the root
+	 * A recursive method which browse the supply chain and delete the useless supply chain elements from the leafs to the root
 	 */
-	list<SupplyChainElement> deleteUselessWarehouses(SupplyChainElement sce, FinalDestinationManager fdm, list<Warehouse> uselessWarehouses){
+	list<SupplyChainElement> deleteUselessSCE(SupplyChainElement sce, FinalDestinationManager fdm, list<Warehouse> uselessWarehouses){
 		int i <- 0;
 		list<SupplyChainElement> uselessSCE <- [];
 		loop while: i < length(sce.sons) {
-			uselessSCE <- uselessSCE + deleteUselessWarehouses(sce.sons[i], fdm, uselessWarehouses);
-			if(uselessWarehouses contains sce.sons[i].building or sce.sons[i].building = fdm.building){
-				uselessSCE <- uselessSCE + sce.sons[i];
+			uselessSCE <- uselessSCE + deleteUselessSCE(sce.sons[i], fdm, uselessWarehouses);
+			if(uselessSCE contains sce.sons[i]){
 				remove index: i from: sce.sons;
 			}
 			else {
 				i <- i + 1;
 			}
+		}
+		if(uselessWarehouses contains sce or sce.building = fdm.building){
+			return uselessSCE + sce;
 		}
 		return uselessSCE;
 	}
@@ -260,7 +262,7 @@ species LogisticProvider schedules: [] {
 		}
 		else{
 			// We must update the fathers of the leaf and the sons of the close warehouse
-			sceCloseWarehouse.sons <- sceCloseWarehouse.sons + fdmLeaf[0];
+			sceCloseWarehouse.sons <- sceCloseWarehouse.sons + fdmLeaf;
 			fdmLeaf.fathers <- [] + sceCloseWarehouse;
 		}
 
@@ -363,7 +365,7 @@ species LogisticProvider schedules: [] {
 	}
 
 	/**
-	 * When a logistic provider has a new customer, he need to find a new supply chain. This method build it.
+	 * When a logistic provider has a new customer, he needs to find a new supply chain. This method build it.
 	 */
 	action getNewCustomer(FinalDestinationManager fdm){
 
