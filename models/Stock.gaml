@@ -12,7 +12,7 @@ species Stock schedules: [] {
 	int product;
 	float quantity;
 	float maxQuantity;
-	int status <- false;
+	int status <- 0; // = 0 : a restock has not been asked; = 1 the restock has been asked; = 2 : ?? no idea ?? ; = 3 : a building is processing the order to restock
 	FinalDestinationManager fdm;
 	LogisticProvider lp;
 	int stepWithNoStock <- 0;
