@@ -20,7 +20,7 @@ species FinalDestinationManager schedules: [] {
 	LogisticProvider logisticProvider;
 	list<float> localLPEfficiencies <- [];
 	float localAverageLPEfficiency <- 0.0;
-	int numberOfDaysOfContract <- 0;
+	int numberOfDaysOfContract <- rnd(minimalNumberOfDaysOfContract);
 	Building building;
 	float huffValue;// number of customer according to huff model => this value cant be used like this because the Huff model does not take care of time.
 	int decreasingRateOfStocks;
@@ -31,7 +31,6 @@ species FinalDestinationManager schedules: [] {
 	
 	init {
 
-		
 		// Associate a building to this manager
 		create Building number: 1 returns: buildings {
 			location <- myself.location;
