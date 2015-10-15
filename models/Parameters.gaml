@@ -20,10 +20,10 @@ global {
 	 * Some variables and functions to call some reflex
 	 */
 	 
-	// The probability to change sometimes of logistic provider
-	float probabilityToChangeLogisticProvider <- 0.9;
-	// The numbers of hours between each calls to the reflex "updateCurrentInertia"
-	float numberOfHoursBeforeUCI <- 720.0;
+	// The minimal number of days a final destination manager must wait before he can decide if he wants to change of logistic provider
+	int minimalNumberOfDaysOfContract <- 100;
+	// This is the number of step considered to compute the logistic provider efficiency
+	int numberOfStepConsideredForLPEfficiency <- 100;
 	// The numbers of hours between each calls to the reflex "decreasingStocks"
 	float numberOfHoursBeforeDS <- 24.0;
 	// The numbers of hours between each calls to the reflex "testRestockNeeded"
