@@ -131,6 +131,13 @@ species FinalDestinationManager schedules: [] {
 				ask logisticProvider {
 					do getNewCustomer(myself);
 				}
+
+				// We changed of LP but the new one does not know that some stock should be restocked.
+				int i <- 0;
+				loop while: i < length(building.stocks) {
+					building.stocks[i].status <- 0;
+				}
+
 				// Re-initialise some variables : contract is new, and efficiency values are set to zero.
 				numberOfDaysOfContract <- 0;
 				localLPEfficiencies <- [];
