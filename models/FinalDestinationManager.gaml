@@ -20,7 +20,7 @@ species FinalDestinationManager schedules: [] {
 	LogisticProvider logisticProvider;
 	list<float> localLPEfficiencies <- [];
 	float localAverageLPEfficiency <- 0.0;
-	int numberOfDaysOfContract <- rnd(minimalNumberOfDaysOfContract);
+	int numberOfDaysOfContract <- rnd(minimalNumberOfDaysOfContract - 50) + 50;
 	Building building;
 	float huffValue;// number of customer according to huff model => this value cant be used like this because the Huff model does not take care of time.
 	int decreasingRateOfStocks;
@@ -119,12 +119,21 @@ species FinalDestinationManager schedules: [] {
 	reflex manageContractWithLP {
 		numberOfDaysOfContract <- numberOfDaysOfContract + 1;
 		if(numberOfDaysOfContract > minimalNumberOfDaysOfContract){
-			if(localAverageLPEfficiency < averageLPEfficiency){
+			if(localAverageLPEfficiency < averageLPEfficiency / 3.0){
 				// the logsitic provider is not efficient enough. He must be replaced by another one.
 				// Inform the current logistic provider that he losts a customer
+				list<Stock> stockRemoved;
 				ask logisticProvider {
-					do lostCustomer(myself);
+					stockRemoved <- lostCustomer(myself);
 				}
+				// One day, I should managed these stocks differently
+				loop while: 0 < length(stockRemoved) {
+					ask stockRemoved[0] {
+						do die;
+					}
+					remove index: 0 from: stockRemoved;
+				}
+
 				// Choose a new one
 				logisticProvider <- chooseLogisticProvider();
 				// Inform him that he gets a new customer
@@ -136,6 +145,8 @@ species FinalDestinationManager schedules: [] {
 				int i <- 0;
 				loop while: i < length(building.stocks) {
 					building.stocks[i].status <- 0;
+					building.stocks[i].lp <- logisticProvider;
+					i <- i + 1;
 				}
 
 				// Re-initialise some variables : contract is new, and efficiency values are set to zero.
@@ -150,9 +161,10 @@ species FinalDestinationManager schedules: [] {
 	 * The more the logistic provider is close, the more he has a chance to be selected.
 	 */
 	LogisticProvider chooseLogisticProvider {
-		list<LogisticProvider> llp <- LogisticProvider sort_by (self distance_to each);
-		int f <- ((rnd(10000)/10000)^6)*(length(llp)-1);
-		return llp[f];
+//		list<LogisticProvider> llp <- LogisticProvider sort_by (self distance_to each);
+//		int f <- ((rnd(10000)/10000)^6)*(length(llp)-1);
+//		return llp[f];
+		return one_of(LogisticProvider);
 	}
 	
 	aspect base { 

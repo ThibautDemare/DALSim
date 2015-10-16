@@ -84,6 +84,7 @@ species LogisticProvider schedules: [] {
 			bool useless <- true;
 			loop while: j < length(temp_stocks) {
 				if(temp_stocks[j].fdm = fdm and temp_stocks[j].lp = self){
+					(lvl1Warehouses[i] as Warehouse).occupiedSurface <- (lvl1Warehouses[i] as Warehouse).occupiedSurface - temp_stocks[j].maxQuantity;
 					stockRemoved <- stockRemoved + temp_stocks[j];
 					remove index: j from: (lvl1Warehouses[i] as Warehouse).stocks;
 				}
@@ -113,6 +114,7 @@ species LogisticProvider schedules: [] {
 			bool useless <- true;
 			loop while: j < length(temp_stocks) {
 				if(temp_stocks[j].fdm = fdm and temp_stocks[j].lp = self){
+					(lvl2Warehouses[i] as Warehouse).occupiedSurface <- (lvl2Warehouses[i] as Warehouse).occupiedSurface - temp_stocks[j].maxQuantity;
 					stockRemoved <- stockRemoved + temp_stocks[j];
 					remove index: j from: (lvl2Warehouses[i] as Warehouse).stocks;
 				}
@@ -152,6 +154,8 @@ species LogisticProvider schedules: [] {
 			}
 			supplyChain <- nil;
 		}
+
+		return stockRemoved;
 	}
 
 	/*
@@ -169,7 +173,10 @@ species LogisticProvider schedules: [] {
 				i <- i + 1;
 			}
 		}
-		if(uselessWarehouses contains sce or sce.building = fdm.building){
+		if(sce.building = fdm.building){
+			remove sce from: sce.supplyChain.leafs;
+		}
+		if(uselessWarehouses contains sce.building or sce.building = fdm.building){
 			return uselessSCE + sce;
 		}
 		return uselessSCE;
@@ -222,27 +229,11 @@ species LogisticProvider schedules: [] {
 	SupplyChainElement connectLvl1Warehouse(FinalDestinationManager fdm, SupplyChainElement fdmLeaf) {
 		// First we find an appropriate local warehouse
 		Warehouse closeWarehouse <- findWarehouseLvl1(fdm, sizeOfStockLocalWarehouse);
-		if(! (lvl1Warehouses contains closeWarehouse)){
-			lvl1Warehouses <- lvl1Warehouses + closeWarehouse;
-		}
 		do initStock(closeWarehouse, fdm, sizeOfStockLocalWarehouse);
-
-		// And next, we look if there is already this warehouse in the supply chain
 		SupplyChainElement sceCloseWarehouse <- nil;
-		bool found <- false;
-		int i <- 0;
-		loop while: i<length( (supplyChain.root as SupplyChainElement).sons) and sceCloseWarehouse = nil {
-			int j <- 0;
-			loop while: j<length( (supplyChain.root.sons[i] as SupplyChainElement).sons) and sceCloseWarehouse = nil {
-				if(closeWarehouse = ((supplyChain.root.sons[i] as SupplyChainElement).sons[j] as SupplyChainElement).building){
-					sceCloseWarehouse <- (supplyChain.root.sons[i] as SupplyChainElement).sons[j];
-				}
-				j <- j + 1;
-			}
-			i <- i + 1;
-		}
-		// If there is not already this SCE
-		if(sceCloseWarehouse = nil){
+
+		if(!(lvl1Warehouses contains closeWarehouse)){
+			lvl1Warehouses <- lvl1Warehouses + closeWarehouse;
 			// We must create a SCE corresponding to this warehouse
 			create SupplyChainElement number:1 returns:sceBuild {
 				self.supplyChain <- myself.supplyChain;
@@ -261,6 +252,20 @@ species LogisticProvider schedules: [] {
 			}
 		}
 		else{
+			// The selected warehouse exists already in the supply chain. We must find it
+			bool found <- false;
+			int i <- 0;
+			loop while: i<length( (supplyChain.root as SupplyChainElement).sons) and sceCloseWarehouse = nil {
+				int j <- 0;
+				loop while: j<length( (supplyChain.root.sons[i] as SupplyChainElement).sons) and sceCloseWarehouse = nil {
+					if(closeWarehouse = ((supplyChain.root.sons[i] as SupplyChainElement).sons[j] as SupplyChainElement).building){
+						sceCloseWarehouse <- (supplyChain.root.sons[i] as SupplyChainElement).sons[j];
+					}
+					j <- j + 1;
+				}
+				i <- i + 1;
+			}
+
 			// We must update the fathers of the leaf and the sons of the close warehouse
 			sceCloseWarehouse.sons <- sceCloseWarehouse.sons + fdmLeaf;
 			fdmLeaf.fathers <- [] + sceCloseWarehouse;
@@ -300,7 +305,7 @@ species LogisticProvider schedules: [] {
 			// we find an appropriate large warehouse
 			Warehouse largeWarehouse <- findWarehouseLvl2(fdm, sizeOfStockLargeWarehouse);
 			if(! (lvl2Warehouses contains largeWarehouse)){
-				lvl2Warehouses <- lvl1Warehouses + largeWarehouse;
+				lvl2Warehouses <- lvl2Warehouses + largeWarehouse;
 			}
 			do initStock(largeWarehouse, fdm, sizeOfStockLargeWarehouse);
 			// and create a SCE
