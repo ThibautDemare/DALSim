@@ -41,7 +41,7 @@ species SupplyChainElement schedules: [] {
 		if(self = supplyChain.root){
 			return;
 		}
-				
+
 		// Now, we can build an order with each product which needs to be restocked
 		list<Order> orders <- [];
 		loop stock over: b.stocks {
