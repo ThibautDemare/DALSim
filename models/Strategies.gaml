@@ -236,7 +236,7 @@ global {
 	 * On supprime ceux qui n'ont pas la capacité d'entreposer la marchandise
 	 * On sélectionne le plus proche
 	 */
-	Warehouse findWarehouseLvl1Strat3(FinalDestinationManager fdm, int sizeOfStock, list<SupplyChainElement> lvl1Warehouses, list<SupplyChainElement> lvl2Warehouses){
+	Warehouse findWarehouseLvl1Strat3(FinalDestinationManager fdm, int sizeOfStock, list<SupplyChainElement> lvl2Warehouses){
 		list<Warehouse> lw <- copy(list(Warehouse));
 		
 		// Remove the ones that cannot welcome the stocks of the customer
@@ -272,7 +272,7 @@ global {
 	 * On supprime ceux qui n'ont pas la capacité d'entreposer la marchandise
 	 * On choisit le plus large
 	 */
-	Warehouse findWarehouseLvl2Strat3(FinalDestinationManager fdm, int sizeOfStock, list<SupplyChainElement> lvl1Warehouses, list<SupplyChainElement> lvl3Warehouses){
+	Warehouse findWarehouseLvl2Strat3(FinalDestinationManager fdm, int sizeOfStock, list<SupplyChainElement> lvl1Warehouses){
 		list<Warehouse> lw <- copy(list(Warehouse));
 		
 		// Remove the ones which cannot welcome the stocks of the customer because they are already a warehouse of level 1
@@ -300,5 +300,51 @@ global {
 		// return the largest one
 		lw <- lw sort_by (each.surfaceUsedForLH - each.occupiedSurface);
 		return lw[length(lw) - 1];
+	}
+
+	/*
+	 * Strategy 4 : pure random selection
+	 */
+
+	/**
+	 * Select randomly a warehouse
+	 */
+	Warehouse findWarehouseLvl1Strat4(FinalDestinationManager fdm, int sizeOfStock, list<SupplyChainElement> lvl2Warehouses){
+		return pureRandom(fdm, sizeOfStock, lvl2Warehouses);
+	}
+
+	/**
+	 * Select randomly a warehouse
+	 */
+	Warehouse findWarehouseLvl2Strat4(FinalDestinationManager fdm, int sizeOfStock, list<SupplyChainElement> lvl1Warehouses){
+		return pureRandom(fdm, sizeOfStock, lvl1Warehouses);
+	}
+
+	Warehouse pureRandom(FinalDestinationManager fdm, int sizeOfStock, list<SupplyChainElement> otherLvlWarehouses){
+		list<Warehouse> lw <- copy(list(Warehouse));
+
+		// Remove the ones that cannot welcome the stocks of the customer
+		int i <- 0;
+		loop while: i < length(lw) {
+			if(( lw[i] as Building).surfaceUsedForLH - (lw[i] as Building).occupiedSurface - ((fdm.building as Building).occupiedSurface * sizeOfStock ) < 0) {
+				remove index: i from: lw;
+			}
+			else{
+				i <- i + 1;
+			}
+		}
+
+		// Remove the ones which cannot welcome the stocks of the customer because they are already a warehouse of level 2
+		int i <- 0;
+		loop while: i < length(lw) {
+			if(otherLvlWarehouses contains lw[i]){
+				remove index: i from: lw;
+			}
+			else{
+				i <- i + 1;
+			}
+		}
+
+		return one_of(lw);
 	}
 }

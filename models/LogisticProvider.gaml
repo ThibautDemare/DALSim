@@ -434,7 +434,10 @@ species LogisticProvider schedules: [] {
 			w <- world.findWarehouseLvl1Strat2(fdm, sizeOfStock, lvl1Warehouses, lvl2Warehouses);
 		}
 		else if(adoptedStrategy = 3){
-			w <- world.findWarehouseLvl1Strat3(fdm, sizeOfStock, lvl1Warehouses, lvl2Warehouses);
+			w <- world.findWarehouseLvl1Strat3(fdm, sizeOfStock, lvl2Warehouses);
+		}
+		else if(adoptedStrategy = 4){
+			w <- world.findWarehouseLvl1Strat4(fdm, sizeOfStock, lvl2Warehouses);
 		}
 		return w;
 	}
@@ -451,7 +454,10 @@ species LogisticProvider schedules: [] {
 			w <- world.findWarehouseLvl2Strat2(fdm, sizeOfStock, lvl1Warehouses, lvl2Warehouses);
 		}
 		else if(adoptedStrategy = 3){
-			w <- world.findWarehouseLvl2Strat3(fdm, sizeOfStock, lvl1Warehouses, lvl2Warehouses);
+			w <- world.findWarehouseLvl2Strat3(fdm, sizeOfStock, lvl1Warehouses);
+		}
+		else if(adoptedStrategy = 4){
+			w <- world.findWarehouseLvl2Strat4(fdm, sizeOfStock, lvl1Warehouses);
 		}
 		return w;
 	}
