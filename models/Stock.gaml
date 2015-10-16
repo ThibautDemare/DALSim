@@ -18,7 +18,7 @@ species Stock schedules: [] {
 	int stepWithNoStock <- 0;
 	int stepWithStock <- 0;
 	Building building;
-	
+	 
 	reflex updateStepWithNoStock {
 		if(quantity = 0){
 			stepWithNoStock <- stepWithNoStock + 1;
