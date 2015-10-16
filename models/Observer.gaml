@@ -176,6 +176,11 @@ global {
 		int sum <- 0;
 		ask LogisticProvider {
 			int j <- 0;
+
+			loop while: 50 < length(timeToDeliver) {
+				remove index: 0 from: timeToDeliver;
+			}
+
 			loop while: j<length(timeToDeliver) {
 				sum <- sum + timeToDeliver[j];
 				j <- j + 1;
@@ -191,6 +196,11 @@ global {
 		sum <- 0;
 		ask FinalDestinationManager {
 			int j <- 0;
+
+			loop while: 50 < length(timeToBeDelivered) {
+				remove index: 0 from: timeToBeDelivered;
+			}
+
 			loop while: j<length(timeToBeDelivered) {
 				sum <- sum + timeToBeDelivered[j];
 				j <- j + 1;
