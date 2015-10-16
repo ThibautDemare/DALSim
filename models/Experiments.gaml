@@ -285,5 +285,8 @@ experiment exp_all type: gui {
 
 		file name: "average_time_to_deliver" type: text data: ""+ ((time/3600.0) as int) + "; " +
 			averageTimeToDeliver + ";";
+
+		file name: "average_time_to_be_delivered" type: text data: ""+ ((time/3600.0) as int) + "; " +
+			averageTimeToBeDelivered + ";";
 	}
 }

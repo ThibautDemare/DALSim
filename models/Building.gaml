@@ -40,7 +40,11 @@ species Building schedules:[] {
 							if( stockBuilding.fdm = stockBatch.fdm and stockBuilding.product = stockBatch.product ){
 								stockBuilding.status <- 0;
 								stockBuilding.quantity <- stockBuilding.quantity + stockBatch.quantity;
+								// Update lists containing the time to deliver a goods in order to measure the efficiency of the actors 
 								(stockBatch.lp as LogisticProvider).timeToDeliver <- (stockBatch.lp as LogisticProvider).timeToDeliver + ((int(time/3600)) - self.stepOrderMade);
+								if(stockBuilding.fdm.building = myself){ // The average time to be delivered is only useful with the building of the FDM and not for every building of the supply chain
+									stockBuilding.fdm.timeToBeDelivered <- stockBuilding.fdm.timeToBeDelivered + ((int(time/3600)) - self.stepOrderMade);
+								}
 							}
 						}
 						remove index:0 from: self.stocks;

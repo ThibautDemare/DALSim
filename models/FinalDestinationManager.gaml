@@ -28,7 +28,8 @@ species FinalDestinationManager schedules: [] {
 	int department;
 	int region;
 	float surface;
-	
+	list<int> timeToBeDelivered <- []; // This variable is used to have an idea of the efficicency of the LP to deliver quickly the goods
+
 	init {
 
 		// Associate a building to this manager

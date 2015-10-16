@@ -42,8 +42,10 @@ global {
 	float cumulativeStockOnRoadsLargeToClose <- 0.0;
 	float stockOnRoadsCloseToFinal <- 0.0;
 	float cumulativeStockOnRoadsCloseToFinal <- 0.0;
-	
+
+	// These variables are used to measure the efficiency of the logistic provider to deliver quickly the goods
 	float averageTimeToDeliver <- 0.0;
+	float averageTimeToBeDelivered <- 0.0;
 
 	reflex updateStockInBuildings {
 		do computeStockInFinalDests;
@@ -169,6 +171,7 @@ global {
 	}
 
 	reflex update_average_time_to_deliver {
+		// Update the average time to deliver (at the LPs level)
 		int i <- 0;
 		int sum <- 0;
 		ask LogisticProvider {
@@ -181,6 +184,21 @@ global {
 		}
 		if(i > 0){
 			averageTimeToDeliver <- (sum/i);
+		}
+
+		// Update the average time to be delivered (at the FDMs level)
+		i <- 0;
+		sum <- 0;
+		ask FinalDestinationManager {
+			int j <- 0;
+			loop while: j<length(timeToBeDelivered) {
+				sum <- sum + timeToBeDelivered[j];
+				j <- j + 1;
+				i <- i + 1;
+			}
+		}
+		if(i > 0){
+			averageTimeToBeDelivered <- (sum/i);
 		}
 	}
 }
