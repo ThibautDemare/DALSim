@@ -258,6 +258,18 @@ experiment exp_all type: gui {
 				data "Number of empty stock in warehouses" value: numberOfEmptyStockInWarehouses color: rgb('green') ;
 			}
 		}/**/
+
+		display chart_averageTimeToDeliver refresh:every(1) {
+			chart  "Average time that the LPs took to deliver goods somewhere" type: series {
+				data "Average time that the LPs took to deliver goods somewhere" value: averageTimeToDeliver color: rgb('green') ;
+			}
+		}/**/
+
+		display chart_averageTimeToBeDelivered refresh:every(1) {
+			chart  "Average time that the LPs took to deliver goods to FDMs" type: series {
+				data "Average time that the LPs took to deliver goods to FDMs" value: averageTimeToBeDelivered color: rgb('green') ;
+			}
+		}/**/
 	}
 
 	output {
