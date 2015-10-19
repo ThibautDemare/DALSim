@@ -138,6 +138,10 @@ species FinalDestinationManager schedules: [] {
 					do getNewCustomer(myself, stocksRemoved.stocksLvl1, stocksRemoved.stocksLvl2);
 				}
 
+				ask stocksRemoved {
+					do die;
+				}
+
 				// We changed of LP but the new one does not know that some stock should be restocked.
 				int i <- 0;
 				loop while: i < length(building.stocks) {
