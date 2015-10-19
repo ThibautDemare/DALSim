@@ -21,7 +21,7 @@ species FinalDestinationManager schedules: [] {
 	LogisticProvider logisticProvider;
 	list<float> localLPEfficiencies <- [];
 	float localAverageLPEfficiency <- 0.0;
-	int numberOfDaysOfContract <- rnd(minimalNumberOfDaysOfContract - 50) + 50;
+	int numberOfDaysOfContract <- rnd(720) - 100;
 	Building building;
 	float huffValue;// number of customer according to huff model => this value cant be used like this because the Huff model does not take care of time.
 	int decreasingRateOfStocks;
@@ -30,6 +30,7 @@ species FinalDestinationManager schedules: [] {
 	int region;
 	float surface;
 	list<int> timeToBeDelivered <- []; // This variable is used to have an idea of the efficicency of the LP to deliver quickly the goods
+	float localTimeToBeDelivered <- 0.0;
 
 	init {
 
@@ -121,7 +122,8 @@ species FinalDestinationManager schedules: [] {
 	reflex manageContractWithLP {
 		numberOfDaysOfContract <- numberOfDaysOfContract + 1;
 		if(numberOfDaysOfContract > minimalNumberOfDaysOfContract){
-			if(localAverageLPEfficiency < averageLPEfficiency / 3.0){
+			//if(localAverageLPEfficiency < averageLPEfficiency ){
+			if(localTimeToBeDelivered > averageTimeToBeDelivered ){
 				// the logsitic provider is not efficient enough. He must be replaced by another one.
 				// Inform the current logistic provider that he losts a customer
 				TransferredStocks stocksRemoved;
@@ -148,6 +150,8 @@ species FinalDestinationManager schedules: [] {
 				numberOfDaysOfContract <- 0;
 				localLPEfficiencies <- [];
 				localAverageLPEfficiency <- 0.0;
+				timeToBeDelivered <- [];
+				localTimeToBeDelivered <- 0.0;
 			}
 		}
 	}

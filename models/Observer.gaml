@@ -196,6 +196,7 @@ global {
 		sum <- 0;
 		ask FinalDestinationManager {
 			int j <- 0;
+			int localSum <- 0;
 
 			loop while: 50 < length(timeToBeDelivered) {
 				remove index: 0 from: timeToBeDelivered;
@@ -203,8 +204,12 @@ global {
 
 			loop while: j<length(timeToBeDelivered) {
 				sum <- sum + timeToBeDelivered[j];
+				localSum <- localSum + timeToBeDelivered[j];
 				j <- j + 1;
 				i <- i + 1;
+			}
+			if( length(timeToBeDelivered) > 0){
+				localTimeToBeDelivered <- localSum / length(timeToBeDelivered);
 			}
 		}
 		if(i > 0){
