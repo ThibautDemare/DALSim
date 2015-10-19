@@ -13,6 +13,7 @@ import "./Batch.gaml"
 import "./Building.gaml"
 import "./Order.gaml"
 import "./Stock.gaml"
+import "./TransferredStocks.gaml"
 import "./GraphStreamConnection.gaml"
 import "./Parameters.gaml"
 
@@ -89,7 +90,7 @@ species FinalDestinationManager schedules: [] {
 		
 		logisticProvider <- chooseLogisticProvider();
 		ask logisticProvider {
-			do getNewCustomer(myself);
+			do getNewCustomer(myself, nil, nil);
 		}
 		
 		loop stock over: building.stocks {
@@ -123,23 +124,16 @@ species FinalDestinationManager schedules: [] {
 			if(localAverageLPEfficiency < averageLPEfficiency / 3.0){
 				// the logsitic provider is not efficient enough. He must be replaced by another one.
 				// Inform the current logistic provider that he losts a customer
-				list<Stock> stockRemoved;
+				TransferredStocks stocksRemoved;
 				ask logisticProvider {
-					stockRemoved <- lostCustomer(myself);
-				}
-				// One day, I should managed these stocks differently
-				loop while: 0 < length(stockRemoved) {
-					ask stockRemoved[0] {
-						do die;
-					}
-					remove index: 0 from: stockRemoved;
+					stocksRemoved <- lostCustomer(myself);
 				}
 
 				// Choose a new one
 				logisticProvider <- chooseLogisticProvider();
 				// Inform him that he gets a new customer
 				ask logisticProvider {
-					do getNewCustomer(myself);
+					do getNewCustomer(myself, stocksRemoved.stocksLvl1, stocksRemoved.stocksLvl2);
 				}
 
 				// We changed of LP but the new one does not know that some stock should be restocked.

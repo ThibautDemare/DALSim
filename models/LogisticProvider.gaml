@@ -13,6 +13,7 @@ import "./Building.gaml"
 import "./SupplyChain.gaml"
 import "./Order.gaml"
 import "./Stock.gaml"
+import "./TransferredStocks.gaml"
 import "./SeineAxisModel.gaml"
 import "./GraphStreamConnection.gaml"
 import "./Parameters.gaml"
@@ -71,13 +72,13 @@ species LogisticProvider schedules: [] {
 	/**
 	 * When a logistic provider loose a customer (a FinalDestinationManager) he must update the stock on its warehouses
 	 */
-	action lostCustomer(FinalDestinationManager fdm){
+	TransferredStocks lostCustomer(FinalDestinationManager fdm){
 		/*
 		 * Browse the warehouses to get the stocks to remove and the list of warehouses which could be deleted from the supply chain
 		 */
 		int i <- 0;
 		list<Warehouse> uselessWarehouses <- [];
-		list<Stock> stockRemoved <- [];
+		TransferredStocks stocksRemoved;
 		loop while: i < length(lvl1Warehouses) {
 			int j <- 0;
 			list<Stock> temp_stocks <- (lvl1Warehouses[i] as Warehouse).stocks;
@@ -85,7 +86,7 @@ species LogisticProvider schedules: [] {
 			loop while: j < length(temp_stocks) {
 				if(temp_stocks[j].fdm = fdm and temp_stocks[j].lp = self){
 					(lvl1Warehouses[i] as Warehouse).occupiedSurface <- (lvl1Warehouses[i] as Warehouse).occupiedSurface - temp_stocks[j].maxQuantity;
-					stockRemoved <- stockRemoved + temp_stocks[j];
+					stocksRemoved.stocksLvl1 <- stocksRemoved.stocksLvl1 + temp_stocks[j];
 					remove index: j from: (lvl1Warehouses[i] as Warehouse).stocks;
 				}
 				else {
@@ -115,7 +116,7 @@ species LogisticProvider schedules: [] {
 			loop while: j < length(temp_stocks) {
 				if(temp_stocks[j].fdm = fdm and temp_stocks[j].lp = self){
 					(lvl2Warehouses[i] as Warehouse).occupiedSurface <- (lvl2Warehouses[i] as Warehouse).occupiedSurface - temp_stocks[j].maxQuantity;
-					stockRemoved <- stockRemoved + temp_stocks[j];
+					stocksRemoved.stocksLvl2 <- stocksRemoved.stocksLvl2 + temp_stocks[j];
 					remove index: j from: (lvl2Warehouses[i] as Warehouse).stocks;
 				}
 				else {
@@ -155,7 +156,7 @@ species LogisticProvider schedules: [] {
 			supplyChain <- nil;
 		}
 
-		return stockRemoved;
+		return stocksRemoved;
 	}
 
 	/*
@@ -226,10 +227,10 @@ species LogisticProvider schedules: [] {
 		return fdmLeaf[0];
 	}
 
-	SupplyChainElement connectLvl1Warehouse(FinalDestinationManager fdm, SupplyChainElement fdmLeaf) {
+	SupplyChainElement connectLvl1Warehouse(FinalDestinationManager fdm, SupplyChainElement fdmLeaf, list<Stock> stocksLvl1) {
 		// First we find an appropriate local warehouse
 		Warehouse closeWarehouse <- findWarehouseLvl1(fdm, sizeOfStockLocalWarehouse);
-		do initStock(closeWarehouse, fdm, sizeOfStockLocalWarehouse);
+		do initStock(closeWarehouse, fdm, stocksLvl1, sizeOfStockLocalWarehouse);
 		SupplyChainElement sceCloseWarehouse <- nil;
 
 		if(!(lvl1Warehouses contains closeWarehouse)){
@@ -285,7 +286,7 @@ species LogisticProvider schedules: [] {
 		return sceCloseWarehouse;
 	}
 
-	action connectLvl2Warehouse(FinalDestinationManager fdm, SupplyChainElement sceCloseWarehouse){
+	action connectLvl2Warehouse(FinalDestinationManager fdm, SupplyChainElement sceCloseWarehouse, list<Stock> stocksLvl2){
 		// We try to find a father who has an appropriate surface
 		SupplyChainElement sceLarge <- nil;
 		bool found <- false;
@@ -294,7 +295,7 @@ species LogisticProvider schedules: [] {
 			sceLarge <- supplyChain.root.sons[i];
 			if( ((sceLarge.building as Building).surfaceUsedForLH - (sceLarge.building as Building).occupiedSurface ) >= ((fdm.building as Building).occupiedSurface * sizeOfStockLargeWarehouse) ){
 				found <- true;
-				do initStock( (sceLarge.building as Warehouse), fdm, sizeOfStockLargeWarehouse);
+				do initStock( (sceLarge.building as Warehouse), fdm, stocksLvl2, sizeOfStockLargeWarehouse);
 			}
 			i <- i + 1;
 		}
@@ -307,7 +308,7 @@ species LogisticProvider schedules: [] {
 			if(! (lvl2Warehouses contains largeWarehouse)){
 				lvl2Warehouses <- lvl2Warehouses + largeWarehouse;
 			}
-			do initStock(largeWarehouse, fdm, sizeOfStockLargeWarehouse);
+			do initStock(largeWarehouse, fdm, stocksLvl2, sizeOfStockLargeWarehouse);
 			// and create a SCE
 			create SupplyChainElement number:1 returns:sceBuild {
 				self.supplyChain <- myself.supplyChain;
@@ -372,7 +373,7 @@ species LogisticProvider schedules: [] {
 	/**
 	 * When a logistic provider has a new customer, he needs to find a new supply chain. This method build it.
 	 */
-	action getNewCustomer(FinalDestinationManager fdm){
+	action getNewCustomer(FinalDestinationManager fdm, list<Stock> stocksLvl1, list<Stock> stocksLvl2){
 
 		/*
 		 * Initiate the supply chain with just the provider as root
@@ -389,36 +390,44 @@ species LogisticProvider schedules: [] {
 		/*
 		 * connect this leaf to a close warehouse
 		 */
-		SupplyChainElement sceCloseWarehouse <- connectLvl1Warehouse(fdm, fdmLeaf);
+		SupplyChainElement sceCloseWarehouse <- connectLvl1Warehouse(fdm, fdmLeaf, stocksLvl1);
 
 		/*
 		 * Connect the close warehouse to the large warehouse
 		 */
-		do connectLvl2Warehouse(fdm, sceCloseWarehouse);
+		do connectLvl2Warehouse(fdm, sceCloseWarehouse, stocksLvl2);
 
 	}
 	
 	/**
 	 * We assume that the warehouse have already a stock when we initialize a new supply chain
 	 */
-	action initStock(Warehouse warehouse, FinalDestinationManager fdm, int sizeOfStock){
-		loop stockFdm over: (fdm.building as Building).stocks {
-			// We create the stock agent
-			create Stock number:1 returns:s {
-				self.product <- stockFdm.product;
-				self.quantity <- rnd(stockFdm.maxQuantity * sizeOfStock);
-				self.maxQuantity <- stockFdm.maxQuantity * sizeOfStock;
-				self.status <- 0;
-				self.fdm <- fdm;
-				self.lp <- myself;
-				self.building <- warehouse;
+	action initStock(Warehouse warehouse, FinalDestinationManager fdm, list<Stock> stocks, int sizeOfStock){
+		if(stocks = nil){
+			loop stockFdm over: (fdm.building as Building).stocks {
+				// We create the stock agent
+				create Stock number:1 returns:s {
+					self.product <- stockFdm.product;
+					self.quantity <- rnd(stockFdm.maxQuantity * sizeOfStock);
+					self.maxQuantity <- stockFdm.maxQuantity * sizeOfStock;
+					self.status <- 0;
+					self.fdm <- fdm;
+					self.lp <- myself;
+					self.building <- warehouse;
+				}
+
+				// and add it to the list of stocks in the warehouse
+				warehouse.stocks <- warehouse.stocks + s[0];
+
+				// Finally we update the occupied surface
+				warehouse.occupiedSurface <- warehouse.occupiedSurface + (s[0] as Stock).maxQuantity;
 			}
-			
-			// and add it to the list of stocks in the warehouse
-			warehouse.stocks <- warehouse.stocks + s[0];
-			
-			// Finally we update the occupied surface
-			warehouse.occupiedSurface <- warehouse.occupiedSurface + (s[0] as Stock).maxQuantity;
+		}
+		else {
+			warehouse.stocks <- warehouse.stocks + stocks;
+			loop stock over: stocks {
+				warehouse.occupiedSurface <- warehouse.occupiedSurface + (stock as Stock).maxQuantity;
+			}
 		}
 	}
 	
