@@ -79,6 +79,8 @@ species LogisticProvider schedules: [] {
 		int i <- 0;
 		list<Warehouse> uselessWarehouses <- [];
 		TransferredStocks stocksRemoved;
+		create TransferredStocks number: 1 returns: rts;
+		stocksRemoved <- rts[0];
 		loop while: i < length(lvl1Warehouses) {
 			int j <- 0;
 			list<Stock> temp_stocks <- (lvl1Warehouses[i] as Warehouse).stocks;
@@ -427,6 +429,10 @@ species LogisticProvider schedules: [] {
 			warehouse.stocks <- warehouse.stocks + stocks;
 			loop stock over: stocks {
 				warehouse.occupiedSurface <- warehouse.occupiedSurface + (stock as Stock).maxQuantity;
+				(stock as Stock).fdm <- fdm;
+				(stock as Stock).lp <- self;
+				(stock as Stock).building <- warehouse;
+				(stock as Stock).status <- 0;
 			}
 		}
 	}
