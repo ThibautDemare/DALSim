@@ -15,47 +15,67 @@ import "./LogisticProvider.gaml"
 		
 species Building schedules:[] {
 	list<Stock> stocks;
+	list<Stock> entering_stocks;
+	list<int> listStepOrderMade <- [];
 	float surfaceUsedForLH;
 	float totalSurface;
 	float occupiedSurface;
 	float outflow <- 0.0;
 	bool outflow_updated <- false;
+	int maxProcessCapacity <- 10000;
 	
+	reflex processEnteringGoods when: length(entering_stocks) > 0 {
+		int i <- 0;
+		loop while: i < maxProcessCapacity  and length(entering_stocks) > 0 {
+			Stock entering_stock <- entering_stocks[0];
+			int j <- 0;
+			bool notfound <- true;
+			loop while: j < length(stocks) and notfound {
+				Stock stockBuilding <- stocks[j];
+				if( stockBuilding.fdm = entering_stock.fdm and stockBuilding.product = entering_stock.product ){
+					notfound <- false;
+					stockBuilding.status <- 0;
+					stockBuilding.quantity <- stockBuilding.quantity + entering_stock.quantity;
+					// Update lists containing the time to deliver a goods in order to measure the efficiency of the actors 
+					(entering_stock.lp as LogisticProvider).timeToDeliver <- (entering_stock.lp as LogisticProvider).timeToDeliver + ((int(time/3600)) - listStepOrderMade[0]);
+					if(stockBuilding.fdm.building = self){ // The average time to be delivered is only useful with the building of the FDM and not for every building of the supply chain
+						stockBuilding.fdm.timeToBeDelivered <- stockBuilding.fdm.timeToBeDelivered + ((int(time/3600)) - listStepOrderMade[0]);
+					}
+				}
+				j <- j + 1;
+			}
+
+			i <- i + 1;
+			remove index:0 from: entering_stocks;
+			remove index: 0 from: listStepOrderMade;
+
+			if(notfound){
+				// this stock probably came after a changement of LP
+				// We need to transfer it somewhere.
+				write "OMG!! A lost stock!!!!!!";
+			}
+			else {
+				ask entering_stock {
+					do die;
+				}
+			}
+		}
+	}
+
 	/*
 	 * Receive a batch
 	 */
-	reflex receive_batch when: length(stocks)>0{
+	reflex receive_batch {
 		list<Batch> entering_batch <- (Batch inside self);
 		if( !(empty (entering_batch))) {
 			ask entering_batch {
 				//If the batch is at the right adress
-				if( target != nil and self.dest = myself){
-					self.breakBulk <- self.computeBreakBulk(myself.totalSurface);
-					target <- nil;
-				}
-				else if (target = nil and self.breakBulk = 0 and self.dest = myself) {
-					loop while: !empty(self.stocks){
-						Stock stockBatch <- first(self.stocks);
-						loop stockBuilding over: myself.stocks {
-							if( stockBuilding.fdm = stockBatch.fdm and stockBuilding.product = stockBatch.product ){
-								stockBuilding.status <- 0;
-								stockBuilding.quantity <- stockBuilding.quantity + stockBatch.quantity;
-								// Update lists containing the time to deliver a goods in order to measure the efficiency of the actors 
-								(stockBatch.lp as LogisticProvider).timeToDeliver <- (stockBatch.lp as LogisticProvider).timeToDeliver + ((int(time/3600)) - self.stepOrderMade);
-								if(stockBuilding.fdm.building = myself){ // The average time to be delivered is only useful with the building of the FDM and not for every building of the supply chain
-									stockBuilding.fdm.timeToBeDelivered <- stockBuilding.fdm.timeToBeDelivered + ((int(time/3600)) - self.stepOrderMade);
-								}
-							}
-						}
-						remove index:0 from: self.stocks;
-						ask stockBatch {
-							do die;
-						}
+				if(self.dest = myself){
+					loop stock over: self.stocks {
+						myself.entering_stocks <- myself.entering_stocks + stock;
+						myself.listStepOrderMade <- myself.listStepOrderMade + self.stepOrderMade;
 					}
-
-					ask self {
-						do die;
-					}
+					do die;
 				}
 			}
  		}
