@@ -67,7 +67,6 @@ species Provider parent: RestockingBuilding schedules: [] {
 				create Batch number: 1 returns:rlb {
 					self.target <- order.building.location;
 					self.location <- myself.location;
-					self.breakBulk <- self.computeBreakBulk(myself.totalSurface);
 					self.position <- order.position;
 					self.dest <- order.building;
 					self.stepOrderMade <- order.stepOrderMade;

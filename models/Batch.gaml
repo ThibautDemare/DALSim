@@ -15,30 +15,17 @@ species Batch skills:[MovingOnNetwork] schedules:[] {
 	list<Stock> stocks;
 	point target;
 	float speed <- 70.0 °km/°h;
-	int breakBulk <- 0;
 	int position;
 	Building dest;
 	int stepOrderMade;
 	
-	reflex move when: target != nil and breakBulk = 0 {
+	reflex move when: target != nil {
 		if(network = nil){
 			network <- road_network;
 		}
 		do goto target:target.location length_attribute:"length" speed_attribute:"speed" mark:overallQuantity;
 	}
-	
-	/**
-	 * A break bulk can take between 2 and 24 hours.
-	 * This function must be improve and take care of the surface of the building
-	 */
-	int computeBreakBulk(float surface){
-		return rnd(22)+2;
-	}
-	
-	reflex decreaseBreakBulk when: breakBulk > 0 {
-		breakBulk <- breakBulk - 1;
-	}
-	
+
 	aspect base {
 		string color <- "";
 		if( position = 1){// The provider must send new stock
