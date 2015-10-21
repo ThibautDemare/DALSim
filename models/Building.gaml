@@ -36,10 +36,13 @@ species Building schedules:[] {
 					notfound <- false;
 					stockBuilding.status <- 0;
 					stockBuilding.quantity <- stockBuilding.quantity + entering_stock.quantity;
-					// Update lists containing the time to deliver some goods in order to measure the efficiency of the actors 
-					(entering_stock.lp as LogisticProvider).timeToDeliver <- (entering_stock.lp as LogisticProvider).timeToDeliver + ((int(time/3600)) - listStepOrderMade[0]);
-					if(stockBuilding.fdm.building = self){ // The average time to be delivered is only useful with the building of the FDM and not for every building of the supply chain
-						stockBuilding.fdm.timeToBeDelivered <- stockBuilding.fdm.timeToBeDelivered + ((int(time/3600)) - listStepOrderMade[0]);
+
+					if(listStepOrderMade[0] >= 0){
+						// Update lists containing the time to deliver some goods in order to measure the efficiency of the actors
+						(entering_stock.lp as LogisticProvider).timeToDeliver <- (entering_stock.lp as LogisticProvider).timeToDeliver + ((int(time/3600)) - listStepOrderMade[0]);
+						if(stockBuilding.fdm.building = self){ // The average time to be delivered is only useful with the building of the FDM and not for every building of the supply chain
+							stockBuilding.fdm.timeToBeDelivered <- stockBuilding.fdm.timeToBeDelivered + ((int(time/3600)) - listStepOrderMade[0]);
+						}
 					}
 				}
 				j <- j + 1;
@@ -52,12 +55,18 @@ species Building schedules:[] {
 			if(notfound){
 				// this stock probably came after a changement of LP
 				// We need to transfer it somewhere.
-				write "OMG!! A lost stock!!!!!!";
-			}
-			else {
-				ask entering_stock {
-					do die;
+				// We choose to send the lost stock directly to the FDM
+				create Batch number: 1 returns:rlb {
+					self.target <- entering_stock.fdm.building.location;
+					self.location <- myself.location;
+					self.position <- 4; // We define the fourth position as t
+					self.dest <- entering_stock.fdm.building;
+					self.stepOrderMade <- -1;
 				}
+			}
+
+			ask entering_stock {
+				do die;
 			}
 		}
 	}
