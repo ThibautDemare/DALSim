@@ -17,13 +17,14 @@ species Building schedules:[] {
 	list<Stock> stocks;
 	list<Stock> entering_stocks;
 	list<int> listStepOrderMade <- [];
+	list<Batch> leavingBatches <- [];
 	float surfaceUsedForLH;
 	float totalSurface;
 	float occupiedSurface;
 	float outflow <- 0.0;
 	bool outflow_updated <- false;
 	int maxProcessCapacity <- 10000;
-	
+
 	reflex processEnteringGoods when: length(entering_stocks) > 0 {
 		int i <- 0;
 		loop while: i < maxProcessCapacity  and length(entering_stocks) > 0 {
@@ -56,17 +57,12 @@ species Building schedules:[] {
 				// this stock probably came after a changement of LP
 				// We need to transfer it somewhere.
 				// We choose to send the lost stock directly to the FDM
-				create Batch number: 1 returns:rlb {
-					self.target <- entering_stock.fdm.building.location;
-					self.location <- myself.location;
-					self.position <- 4; // We define the fourth position as t
-					self.dest <- entering_stock.fdm.building;
-					self.stepOrderMade <- -1;
-				}
+				do sendStock(entering_stock, entering_stock.fdm.building, 4, -1);
 			}
-
-			ask entering_stock {
-				do die;
+			else {
+				ask entering_stock {
+					do die;
+				}
 			}
 		}
 	}
@@ -89,20 +85,53 @@ species Building schedules:[] {
 			}
  		}
 	}
+
+	action sendStock(Stock stockToSend, Building buildingTarget, int position, int stepOrderMade){
+		// Looking for a batch which go to the same building
+		bool foundBatch <- false;
+		int j <- 0;
+		loop while: j < length(leavingBatches) and !foundBatch {
+			if( (leavingBatches[j] as Batch).dest = buildingTarget and position = (leavingBatches[j] as Batch).position){
+				foundBatch <- true;
+			}
+			else {
+				j <- j + 1;
+			}
+		}
+		Batch lb <- nil;
+		// There is such a Batch, we update it
+		if(foundBatch){
+			lb <- leavingBatches[j];
+		}
+		else {
+			// else, we create one
+			create Batch number: 1 returns:rlb {
+				self.target <- buildingTarget.location;
+				self.location <- myself.location;
+				self.position <- position;
+				self.dest <- buildingTarget;
+				self.stepOrderMade <- stepOrderMade;
+			}
+			lb <- first(rlb);
+			leavingBatches <- leavingBatches + lb;
+		}
+
+		lb.overallQuantity <- lb.overallQuantity + stockToSend.quantity;
+		lb.stocks <- lb.stocks + stockToSend;
+	}
 }
 
 species RestockingBuilding parent: Building schedules:[] {
 	list<Order> currentOrders <- [];
-	
+
 	action addOrder(Order order){
 		currentOrders <- currentOrders + order;
 	}
-	
+
 	/*
 	 * Receive a request from a logistic provider to restock another building
 	 */
 	reflex processOrders when: !empty(currentOrders) {
-		list<Batch> leavingBatches <- [];
 		// We empty progressively the list of orders after have processed them
 		int k <- 0;
 		loop while: k<length(currentOrders) {
@@ -138,37 +167,7 @@ species RestockingBuilding parent: Building schedules:[] {
 							self.lp <- order.logisticProvider;
 						}
 
-						// Looking for a batch which go to the same building
-						bool foundBatch <- false;
-						int j <- 0;
-						loop while: j < length(leavingBatches) and !foundBatch {
-							if( (leavingBatches[j] as Batch).dest = order.building and order.position = (leavingBatches[j] as Batch).position){
-								foundBatch <- true;
-							}
-							else {
-								j <- j + 1;
-							}
-						}
-						Batch lb <- nil;
-						// There is a such Batch, we update it
-						if(foundBatch){
-							lb <- leavingBatches[j];
-						}
-						else {
-							// else, we create one
-							create Batch number: 1 returns:rlb {
-								self.target <- order.building.location;
-								self.location <- myself.location;
-								self.position <- order.position;
-								self.dest <- order.building;
-								self.stepOrderMade <- order.stepOrderMade;
-							}
-							lb <- first(rlb);
-							leavingBatches <- leavingBatches + lb;
-						}
-
-						lb.overallQuantity <- lb.overallQuantity + sendedQuantity;
-						lb.stocks <- lb.stocks + sendedStock;
+						do sendStock(sendedStock[0], order.building, order.position, order.stepOrderMade);
 					}
 					i <- i + 1;
 				}
