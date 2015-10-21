@@ -23,11 +23,11 @@ species Building schedules:[] {
 	float occupiedSurface;
 	float outflow <- 0.0;
 	bool outflow_updated <- false;
-	int maxProcessCapacity <- 10000;
+	int maxProcessEnteringGoodsCapacity <- 10000;
 
 	reflex processEnteringGoods when: length(entering_stocks) > 0 {
 		int i <- 0;
-		loop while: i < maxProcessCapacity  and length(entering_stocks) > 0 {
+		loop while: i < maxProcessEnteringGoodsCapacity  and length(entering_stocks) > 0 {
 			Stock entering_stock <- entering_stocks[0];
 			int j <- 0;
 			bool notfound <- true;
@@ -123,6 +123,7 @@ species Building schedules:[] {
 
 species RestockingBuilding parent: Building schedules:[] {
 	list<Order> currentOrders <- [];
+	int maxProcessOrdersCapacity <- 100000;
 
 	action addOrder(Order order){
 		currentOrders <- currentOrders + order;
@@ -134,7 +135,7 @@ species RestockingBuilding parent: Building schedules:[] {
 	reflex processOrders when: !empty(currentOrders) {
 		// We empty progressively the list of orders after have processed them
 		int k <- 0;
-		loop while: k<length(currentOrders) {
+		loop while: k<length(currentOrders) and k < maxProcessOrdersCapacity {
 			Order order <- currentOrders[k];
 			if(!dead(order)){
 				// We compare the product and the owner of each stock to the product and owner of this current order
