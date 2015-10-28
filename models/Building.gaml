@@ -23,11 +23,30 @@ species Building schedules:[] {
 	float occupiedSurface;
 	float outflow <- 0.0;
 	bool outflow_updated <- false;
-	int maxProcessEnteringGoodsCapacity <- 10000;
+	int maxProcessEnteringGoodsCapacity <- 50;
+
+	/*
+	 * Receive a batch
+	 */
+	reflex receive_batch {
+		list<Batch> entering_batch <- (Batch inside self);
+		if( !(empty (entering_batch))) {
+			ask entering_batch {
+				//If the batch is at the right adress
+				if(self.dest = myself){
+					loop stock over: self.stocks {
+						myself.entering_stocks <- myself.entering_stocks + stock;
+						myself.listStepOrderMade <- myself.listStepOrderMade + self.stepOrderMade;
+					}
+					do die;
+				}
+			}
+		}
+	}
 
 	reflex processEnteringGoods when: length(entering_stocks) > 0 {
 		int i <- 0;
-		loop while: i < maxProcessEnteringGoodsCapacity  and length(entering_stocks) > 0 {
+		loop while: i < maxProcessEnteringGoodsCapacity and length(entering_stocks) > 0 {
 			Stock entering_stock <- entering_stocks[0];
 			int j <- 0;
 			bool notfound <- true;
@@ -57,7 +76,7 @@ species Building schedules:[] {
 				// this stock probably came after a changement of LP
 				// We need to transfer it somewhere.
 				// We choose to send the lost stock directly to the FDM
-				do sendStock(entering_stock, entering_stock.fdm.building, 4, -1);
+				do sendStock(entering_stock, entering_stock.fdm.building, -1, -1);
 			}
 			else {
 				ask entering_stock {
@@ -65,25 +84,6 @@ species Building schedules:[] {
 				}
 			}
 		}
-	}
-
-	/*
-	 * Receive a batch
-	 */
-	reflex receive_batch {
-		list<Batch> entering_batch <- (Batch inside self);
-		if( !(empty (entering_batch))) {
-			ask entering_batch {
-				//If the batch is at the right adress
-				if(self.dest = myself){
-					loop stock over: self.stocks {
-						myself.entering_stocks <- myself.entering_stocks + stock;
-						myself.listStepOrderMade <- myself.listStepOrderMade + self.stepOrderMade;
-					}
-					do die;
-				}
-			}
- 		}
 	}
 
 	action sendStock(Stock stockToSend, Building buildingTarget, int position, int stepOrderMade){
@@ -123,7 +123,7 @@ species Building schedules:[] {
 
 species RestockingBuilding parent: Building schedules:[] {
 	list<Order> currentOrders <- [];
-	int maxProcessOrdersCapacity <- 100000;
+	int maxProcessOrdersCapacity <- 50;
 
 	action addOrder(Order order){
 		currentOrders <- currentOrders + order;
@@ -135,9 +135,9 @@ species RestockingBuilding parent: Building schedules:[] {
 	reflex processOrders when: !empty(currentOrders) {
 		// We empty progressively the list of orders after have processed them
 		int k <- 0;
-		loop while: k<length(currentOrders) and k < maxProcessOrdersCapacity {
-			Order order <- currentOrders[k];
-			if(!dead(order)){
+		loop while: length(currentOrders) > 0 and k < maxProcessOrdersCapacity {
+			Order order <- currentOrders[0];
+			if(!dead(order)){// when we test the restock, a son send his orders to all of his fathers. Therefore, a building can receive an order which is not for him in reality.
 				// We compare the product and the owner of each stock to the product and owner of this current order
 				bool foundStock <- false;
 				int i <- 0;
@@ -174,13 +174,14 @@ species RestockingBuilding parent: Building schedules:[] {
 				}
 
 				if(foundStock){
+					k <- k + 1;
 					ask order {
 						do die;
 					}
 				}
 			}
-			k <- k + 1;
+			remove index: 0 from: currentOrders;
 		}
-		currentOrders <- [];
+		leavingBatches <- [];
 	}
 }
