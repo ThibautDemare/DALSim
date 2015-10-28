@@ -21,7 +21,7 @@ species FinalDestinationManager schedules: [] {
 	LogisticProvider logisticProvider;
 	list<float> localLPEfficiencies <- [];
 	float localAverageLPEfficiency <- 0.0;
-	int numberOfDaysOfContract <- rnd(720) - 100;
+	int numberOfHoursOfContract <- rnd(720) - 100;
 	Building building;
 	float huffValue;// number of customer according to huff model => this value cant be used like this because the Huff model does not take care of time.
 	int decreasingRateOfStocks;
@@ -120,8 +120,8 @@ species FinalDestinationManager schedules: [] {
 	 * If the contract is old enough, and if the efficiency of the LP is too low, then the FDM change of collaborator.
 	 */
 	reflex manageContractWithLP {
-		numberOfDaysOfContract <- numberOfDaysOfContract + 1;
-		if(numberOfDaysOfContract > minimalNumberOfDaysOfContract){
+		numberOfHoursOfContract <- numberOfHoursOfContract + 1;
+		if(numberOfHoursOfContract > minimalNumberOfHoursOfContract){
 			//if(localAverageLPEfficiency < averageLPEfficiency ){
 			if(localTimeToBeDelivered > averageTimeToBeDelivered ){
 				// the logsitic provider is not efficient enough. He must be replaced by another one.
@@ -151,7 +151,7 @@ species FinalDestinationManager schedules: [] {
 				}
 
 				// Re-initialise some variables : contract is new, and efficiency values are set to zero.
-				numberOfDaysOfContract <- 0;
+				numberOfHoursOfContract <- 0;
 				localLPEfficiencies <- [];
 				localAverageLPEfficiency <- 0.0;
 				timeToBeDelivered <- [];
