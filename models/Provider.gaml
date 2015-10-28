@@ -32,7 +32,7 @@ species Provider parent: RestockingBuilding schedules: [] {
 	 * Receive a request from a logistic provider to restock another building
 	 */
 	reflex processOrders when: !empty(currentOrders){
-		list<Batch> leavingBatches <- [];
+		leavingBatches <- [];
 		// We empty progressively the list of orders after have processed them
 		int i <- 0;
 		loop while: i<length(currentOrders) {
