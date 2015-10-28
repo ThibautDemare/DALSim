@@ -109,7 +109,9 @@ global schedules: [world] +
 		
 		// Init the decreasing rate of consumption
 		do init_decreasingRateOfStocks;
-		
+
+		// I create one batch who will do nothing, because, if there is no batch at all, it slows down the simulation... Weird...
+		create Batch number:1;
 	}
 	
 	/*
