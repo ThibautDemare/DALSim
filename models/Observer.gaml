@@ -144,27 +144,39 @@ global {
 		
 		// Filter the right agents
 		ask Batch {
+			if(!marked){
+				marked <- true;
+				if(self.position = 1){
+					cumulativeNumberOfBatchProviderToLarge <- cumulativeNumberOfBatchProviderToLarge + 1;
+					cumulativeStockOnRoadsProviderToLarge <- cumulativeStockOnRoadsProviderToLarge + self.overallQuantity;
+				}
+				else if(self.position = 2){
+					cumulativeNumberOfBatchLargeToClose <- cumulativeNumberOfBatchLargeToClose + 1;
+					cumulativeStockOnRoadsLargeToClose <- cumulativeStockOnRoadsLargeToClose + self.overallQuantity;
+				}
+				else if(self.position = 3){
+					cumulativeNumberOfBatchCloseToFinal <- cumulativeNumberOfBatchCloseToFinal + 1;
+					cumulativeStockOnRoadsCloseToFinal <- cumulativeStockOnRoadsCloseToFinal + self.overallQuantity;
+				}
+				if(self.position > 0){
+					cumulativeNumberOfBatch <- cumulativeNumberOfBatch + 1;
+				}
+			}
 			if(self.position = 1){
 				numberOfBatchProviderToLarge <- numberOfBatchProviderToLarge + 1;
-				cumulativeNumberOfBatchProviderToLarge <- cumulativeNumberOfBatchProviderToLarge + 1;
 				stockOnRoadsProviderToLarge <- stockOnRoadsProviderToLarge + self.overallQuantity;
-				cumulativeStockOnRoadsProviderToLarge <- cumulativeStockOnRoadsProviderToLarge + self.overallQuantity;
 			}
 			else if(self.position = 2){
 				numberOfBatchLargeToClose <- numberOfBatchLargeToClose + 1;
-				cumulativeNumberOfBatchLargeToClose <- cumulativeNumberOfBatchLargeToClose + 1;
 				stockOnRoadsLargeToClose <- stockOnRoadsLargeToClose + self.overallQuantity;
-				cumulativeStockOnRoadsLargeToClose <- cumulativeStockOnRoadsLargeToClose + self.overallQuantity;
 			}
 			else if(self.position = 3){
 				numberOfBatchCloseToFinal <- numberOfBatchCloseToFinal + 1;
-				cumulativeNumberOfBatchCloseToFinal <- cumulativeNumberOfBatchCloseToFinal + 1;
 				stockOnRoadsCloseToFinal <- stockOnRoadsCloseToFinal + self.overallQuantity;
-				cumulativeStockOnRoadsCloseToFinal <- cumulativeStockOnRoadsCloseToFinal + self.overallQuantity;
 			}
-			totalNumberOfBatch <- totalNumberOfBatch + 1;
-			cumulativeNumberOfBatch <- cumulativeNumberOfBatch + 1;
-			
+			if(self.position > 0){
+				totalNumberOfBatch <- totalNumberOfBatch + 1;
+			}
 		}
 		stockOnRoads <- stockOnRoadsProviderToLarge + stockOnRoadsLargeToClose + stockOnRoadsCloseToFinal;
 		cumulativeStockOnRoads <- cumulativeStockOnRoads + stockOnRoads;

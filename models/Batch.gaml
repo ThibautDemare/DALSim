@@ -18,7 +18,8 @@ species Batch skills:[MovingOnNetwork] schedules:[] {
 	int position;
 	Building dest;
 	int stepOrderMade;
-	
+	bool marked <- false;// useful for the Observer in order to avoid to count the batch two times
+
 	reflex move when: target != nil {
 		if(network = nil){
 			network <- road_network;
@@ -37,7 +38,12 @@ species Batch skills:[MovingOnNetwork] schedules:[] {
 		else if( position = 3){
 			color <- "orange";
 		}
-		draw triangle(3.0°km) color: rgb(color) ;
+		else {
+			color <- "grey";
+		}
+		if(position > 0){
+			draw triangle(3.0°km) color: rgb(color) ;
+		}
 	}
 	
 	aspect little_base {
@@ -51,6 +57,11 @@ species Batch skills:[MovingOnNetwork] schedules:[] {
 		else if( position = 3){
 			color <- "orange";
 		}
-		draw triangle(1.0°km) color: rgb(color) ;
+		else {
+			color <- "grey";
+		}
+		if(position > 0){
+			draw triangle(3.0°km) color: rgb(color) ;
+		}
 	}
 }
