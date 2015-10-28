@@ -23,7 +23,7 @@ species Building schedules:[] {
 	float occupiedSurface;
 	float outflow <- 0.0;
 	bool outflow_updated <- false;
-	int maxProcessEnteringGoodsCapacity <- 50;
+	int maxProcessEnteringGoodsCapacity <- 500;
 
 	/*
 	 * Receive a batch
@@ -84,6 +84,7 @@ species Building schedules:[] {
 				}
 			}
 		}
+		leavingBatches <- [];
 	}
 
 	action sendStock(Stock stockToSend, Building buildingTarget, int position, int stepOrderMade){
@@ -123,7 +124,7 @@ species Building schedules:[] {
 
 species RestockingBuilding parent: Building schedules:[] {
 	list<Order> currentOrders <- [];
-	int maxProcessOrdersCapacity <- 50;
+	int maxProcessOrdersCapacity <- 500;
 
 	action addOrder(Order order){
 		currentOrders <- currentOrders + order;
