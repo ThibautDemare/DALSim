@@ -160,6 +160,7 @@ global {
 				}
 				if(self.position > 0){
 					cumulativeNumberOfBatch <- cumulativeNumberOfBatch + 1;
+					cumulativeStockOnRoads <- cumulativeStockOnRoads + self.overallQuantity;
 				}
 			}
 			if(self.position = 1){
@@ -179,7 +180,6 @@ global {
 			}
 		}
 		stockOnRoads <- stockOnRoadsProviderToLarge + stockOnRoadsLargeToClose + stockOnRoadsCloseToFinal;
-		cumulativeStockOnRoads <- cumulativeStockOnRoads + stockOnRoads;
 	}
 
 	reflex update_average_time_to_deliver {
