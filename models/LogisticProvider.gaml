@@ -26,8 +26,8 @@ species LogisticProvider schedules: [] {
 	int region;
 	list<int> timeToDeliver <- [];
 	
-	list<SupplyChainElement> lvl1Warehouses <- [];
-	list<SupplyChainElement> lvl2Warehouses <- [];
+	list<Warehouse> lvl1Warehouses <- [];
+	list<Warehouse> lvl2Warehouses <- [];
 
 	init {
 		timeToDeliver <- [];
@@ -307,7 +307,7 @@ species LogisticProvider schedules: [] {
 			// we must create one SCE
 			// we find an appropriate large warehouse
 			Warehouse largeWarehouse <- findWarehouseLvl2(fdm, sizeOfStockLargeWarehouse);
-			if(! (lvl2Warehouses contains largeWarehouse)){
+			if(! (lvl2Warehouses contains largeWarehouse)){// Should always be true, isn't it? otherwise, we would have found a SCE...
 				lvl2Warehouses <- lvl2Warehouses + largeWarehouse;
 			}
 			do initStock(largeWarehouse, fdm, stocksLvl2, sizeOfStockLargeWarehouse);
@@ -405,7 +405,7 @@ species LogisticProvider schedules: [] {
 	 * We assume that the warehouse have already a stock when we initialize a new supply chain
 	 */
 	action initStock(Warehouse warehouse, FinalDestinationManager fdm, list<Stock> stocks, int sizeOfStock){
-		if(stocks = nil){
+		if(stocks = nil or length(stocks) = 0){
 			loop stockFdm over: (fdm.building as Building).stocks {
 				// We create the stock agent
 				create Stock number:1 returns:s {
@@ -443,7 +443,7 @@ species LogisticProvider schedules: [] {
 	Warehouse findWarehouseLvl1(FinalDestinationManager fdm, int sizeOfStock){
 		Warehouse w <- nil;
 		if(adoptedStrategy = 1){
-			w <- world.findWarehouseLvl1Strat1(fdm, sizeOfStock, lvl1Warehouses, lvl2Warehouses);
+			w <- world.findWarehouseLvl1Strat1(fdm, sizeOfStock, lvl2Warehouses);
 		}
 		else if(adoptedStrategy = 2){
 			w <- world.findWarehouseLvl1Strat2(fdm, sizeOfStock, lvl1Warehouses, lvl2Warehouses);
@@ -463,7 +463,7 @@ species LogisticProvider schedules: [] {
 	Warehouse findWarehouseLvl2(FinalDestinationManager fdm, int sizeOfStock){
 		Warehouse w <- nil;
 		if(adoptedStrategy = 1){
-			w <- world.findWarehouseLvl2Strat1(fdm, sizeOfStock, lvl1Warehouses, lvl2Warehouses);
+			w <- world.findWarehouseLvl2Strat1(fdm, sizeOfStock, lvl1Warehouses);
 		}
 		else if(adoptedStrategy = 2){
 			w <- world.findWarehouseLvl2Strat2(fdm, sizeOfStock, lvl1Warehouses, lvl2Warehouses);
