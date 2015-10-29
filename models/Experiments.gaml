@@ -302,3 +302,41 @@ experiment exp_all type: gui {
 			averageTimeToBeDelivered + ";";
 	}
 }
+
+experiment 'Run 5 simulations' type: batch repeat: 4 keep_seed: true until: ( time > 100 ) {
+	parameter "adoptedStrategy" var: adoptedStrategy <- 1;
+
+	action _step_ {
+		adoptedStrategy <- adoptedStrategy + 1;
+	}
+
+	output {
+		file name: "stocks_warehouses" type: text data: "" + ((time/3600.0) as int) + ";" +stockInWarehouse + ";" + freeSurfaceInWarehouse + ";";
+
+		file name: "stocks_final_dests" type: text data: "" + ((time/3600.0) as int) + ";" +stockInFinalDest + ";" + freeSurfaceInFinalDest + ";";
+
+		file name: "cumulative_number_batches" type: text data: "" + ((time/3600.0) as int) + ";" +
+			cumulativeNumberOfBatch + ";" + cumulativeNumberOfBatchProviderToLarge + ";" + cumulativeNumberOfBatchLargeToClose + ";" + cumulativeNumberOfBatchCloseToFinal + ";";
+
+		file name: "cumulative_stock_on_roads" type: text data: "" + ((time/3600.0) as int) + ";" +
+			cumulativeStockOnRoads + ";" + cumulativeStockOnRoadsProviderToLarge + ";" + cumulativeStockOnRoadsLargeToClose + ";" + cumulativeStockOnRoadsCloseToFinal + ";";
+
+		file name: "number_batches" type: text data: "" + ((time/3600.0) as int) + ";" +
+			totalNumberOfBatch + ";" + numberOfBatchProviderToLarge + ";" + numberOfBatchLargeToClose + ";" + numberOfBatchCloseToFinal + ";";
+
+		file name: "stock_on_roads" type: text data: "" + ((time/3600.0) as int) + ";" +
+			stockOnRoads + ";" + stockOnRoadsProviderToLarge + ";" + stockOnRoadsLargeToClose + ";" + stockOnRoadsCloseToFinal + ";";
+
+		file name: "number_empty_stock_final_dest" type: text data: "" + ((time/3600.0) as int) + ";" +
+			numberofEmptyStockInFinalDests + ";";
+
+		file name: "number_empty_stock_warehouses" type: text data: "" + ((time/3600.0) as int) + ";" +
+			numberOfEmptyStockInWarehouses + ";";
+
+		file name: "average_time_to_deliver" type: text data: "" + ((time/3600.0) as int) + ";" +
+			averageTimeToDeliver + ";";
+
+		file name: "average_time_to_be_delivered" type: text data: "" + ((time/3600.0) as int) + ";" +
+			averageTimeToBeDelivered + ";";
+	}
+}
