@@ -233,24 +233,24 @@ global {
 
 	reflex saveObservations when: saveObservations {
 		save "" + ((time/3600.0) as int) + ";" +stockInWarehouse + ";" + freeSurfaceInWarehouse + ";"
-			to: "stocks_warehouses" + "_AS" + adoptedStrategy type: text;
+			to: "stocks_warehouses" + "_AS" + adoptedStrategy + ".csv" type: text rewrite: false;
 		save "" + ((time/3600.0) as int) + ";" +stockInFinalDest + ";" + freeSurfaceInFinalDest + ";"
-			to: "stocks_final_dests" + "_AS" + adoptedStrategy type: text;
+			to: "stocks_final_dests" + "_AS" + adoptedStrategy + ".csv" type: text rewrite: false;
 		save "" + ((time/3600.0) as int) + ";" + cumulativeNumberOfBatch + ";" + cumulativeNumberOfBatchProviderToLarge + ";" + cumulativeNumberOfBatchLargeToClose + ";" + cumulativeNumberOfBatchCloseToFinal + ";"
-			to: "cumulative_number_batches" + "_AS" + adoptedStrategy type: text;
+			to: "cumulative_number_batches" + "_AS" + adoptedStrategy + ".csv" type: text rewrite: false;
 		save "" + ((time/3600.0) as int) + ";" + cumulativeStockOnRoads + ";" + cumulativeStockOnRoadsProviderToLarge + ";" + cumulativeStockOnRoadsLargeToClose + ";" + cumulativeStockOnRoadsCloseToFinal + ";"
-			to: "cumulative_stock_on_roads" + "_AS" + adoptedStrategy type: text;
+			to: "cumulative_stock_on_roads" + "_AS" + adoptedStrategy + ".csv" type: text rewrite: false;
 		save "" + ((time/3600.0) as int) + ";" + totalNumberOfBatch + ";" + numberOfBatchProviderToLarge + ";" + numberOfBatchLargeToClose + ";" + numberOfBatchCloseToFinal + ";"
-			to: "number_batches" + "_AS" + adoptedStrategy type: text;
+			to: "number_batches" + "_AS" + adoptedStrategy + ".csv" type: text rewrite: false;
 		save "" + ((time/3600.0) as int) + ";" + stockOnRoads + ";" + stockOnRoadsProviderToLarge + ";" + stockOnRoadsLargeToClose + ";" + stockOnRoadsCloseToFinal + ";"
-			to: "stock_on_roads" + "_AS" + adoptedStrategy type: text;
+			to: "stock_on_roads" + "_AS" + adoptedStrategy + ".csv" type: text rewrite: false;
 		save "" + ((time/3600.0) as int) + ";" + numberofEmptyStockInFinalDests + ";"
-			to: "number_empty_stock_final_dest" + "_AS" + adoptedStrategy type: text;
+			to: "number_empty_stock_final_dest" + "_AS" + adoptedStrategy + ".csv" type: text rewrite: false;
 		save "" + ((time/3600.0) as int) + ";" + numberOfEmptyStockInWarehouses + ";"
-			to: "number_empty_stock_warehouses" + "_AS" + adoptedStrategy type: text;
+			to: "number_empty_stock_warehouses" + "_AS" + adoptedStrategy + ".csv" type: text rewrite: false;
 		save "" + ((time/3600.0) as int) + ";" + averageTimeToDeliver + ";"
-			to: "average_time_to_deliver" + "_AS" + adoptedStrategy type: text;
+			to: "average_time_to_deliver" + "_AS" + adoptedStrategy + ".csv" type: text rewrite: false;
 		save "" + ((time/3600.0) as int) + ";" + averageTimeToBeDelivered + ";"
-			to: "average_time_to_be_delivered" + "_AS" + adoptedStrategy type: text;
+			to: "average_time_to_be_delivered" + "_AS" + adoptedStrategy + ".csv" type: text rewrite: false;
 	}
 }
