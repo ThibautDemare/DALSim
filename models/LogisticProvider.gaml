@@ -20,6 +20,7 @@ import "./Parameters.gaml"
 import "./Strategies.gaml"
 
 species LogisticProvider schedules: [] {
+	int timeShifting <- rnd(23);
 	SupplyChain supplyChain <- nil;
 	string color;
 	int department;
@@ -57,7 +58,7 @@ species LogisticProvider schedules: [] {
 		}
 	}
 	
-	reflex testRestockNeeded when: supplyChain != nil and ((time/3600.0) mod numberOfHoursBeforeTRN) = 0.0 and (time/3600.0) > 0 {
+	reflex testRestockNeeded when: supplyChain != nil and (((time/3600.0) + timeShifting) mod numberOfHoursBeforeTRN) = 0.0 and (time/3600.0) > 0 {
 		ask supplyChain.leafs { 
 			do recursiveTests([] as list<Order>);
 		}

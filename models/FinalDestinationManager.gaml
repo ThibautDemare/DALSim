@@ -18,10 +18,11 @@ import "./GraphStreamConnection.gaml"
 import "./Parameters.gaml"
 
 species FinalDestinationManager schedules: [] {
+	int timeShifting <- rnd(23);
 	LogisticProvider logisticProvider;
 	list<float> localLPEfficiencies <- [];
 	float localAverageLPEfficiency <- 0.0;
-	int numberOfHoursOfContract <- rnd(720) - 100;
+	int numberOfHoursOfContract <- rnd(336) - 100;
 	Building building;
 	float huffValue;// number of customer according to huff model => this value cant be used like this because the Huff model does not take care of time.
 	int decreasingRateOfStocks;
@@ -102,7 +103,7 @@ species FinalDestinationManager schedules: [] {
 	/**
 	 * The consumption is between 0 and 1/decreasingRateOfStocks of the maximum stock.
 	 */
-	reflex decreasingStocks  when: ((time/3600.0) mod numberOfHoursBeforeDS) = 0.0 {
+	reflex decreasingStocks  when: (((time/3600.0) + timeShifting) mod numberOfHoursBeforeDS) = 0.0 {
 		loop stock over: building.stocks {
 			float consumeQuantity <- 0.0;
 			loop while: consumeQuantity = 0 {
