@@ -2,22 +2,11 @@ package skill;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.graphstream.algorithm.Dijkstra;
-import org.graphstream.graph.Edge;
-import org.graphstream.graph.EdgeRejectedException;
-import org.graphstream.graph.Graph;
-import org.graphstream.graph.IdAlreadyInUseException;
-import org.graphstream.graph.Node;
-import org.graphstream.graph.Path;
-import org.graphstream.graph.implementations.MultiGraph;
-
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.Point;
 
 import msi.gama.common.interfaces.ILocated;
 import msi.gama.common.util.GeometryUtils;
@@ -47,17 +36,51 @@ import msi.gama.util.graph._Edge;
 import msi.gama.util.graph._Vertex;
 import msi.gaml.operators.Cast;
 import msi.gaml.skills.Skill;
-import msi.gaml.types.GamaAgentType;
 import msi.gaml.types.IType;
+
+import org.graphstream.algorithm.Dijkstra;
+import org.graphstream.graph.Edge;
+import org.graphstream.graph.EdgeRejectedException;
+import org.graphstream.graph.Graph;
+import org.graphstream.graph.IdAlreadyInUseException;
+import org.graphstream.graph.Node;
+import org.graphstream.graph.Path;
+import org.graphstream.graph.implementations.MultiGraph;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.Point;
+
+
 
 @doc("This skill is intended to move an agent on a network according to speed and length attributes on the edges. When The agent is not already on the graph, we assume that the length is an euclidean length and we use a default speed given by the user.")
 @vars({
-	@var(name = IKeywordMoNAdditional.LENGTH_ATTRIBUTE, type = IType.STRING, init = "'length'", doc = @doc("The attribute giving the length of the edge. Be careful : this variable is shared by all moving agent.")),
-	@var(name = IKeywordMoNAdditional.SPEED_ATTRIBUTE, type = IType.STRING, init = "'speed'", doc = @doc("The attribute giving the default speed. Be careful : this variable is shared by all moving agent.")),
-	@var(name = IKeywordMoNAdditional.DEFAULT_SPEED, type = IType.FLOAT, init = "19.4444", doc = @doc("The speed outside the graph (in meter/second). Default : 70km/h.")),
-	@var(name = IKeywordMoNAdditional.GRAPH, type = IType.GRAPH, doc = @doc("The graph or network on which the agent moves.")),
-	@var(name = IKeywordMoNAdditional.FILENAME, type = IType.STRING, doc = @doc("The name of the DGS file and its path where the graph must be saved.")),
-	@var(name = IKeywordMoNAdditional.PATH_LENGTH, type = IType.FLOAT, doc = @doc("The length of the computed path.")),
+	@var(
+			name = IKeywordMoNAdditional.LENGTH_ATTRIBUTE,
+			type = IType.STRING,
+			init = "'length'",
+			doc = @doc("The attribute giving the length of the edge. Be careful : this variable is shared by all moving agent.")),
+	@var(
+			name = IKeywordMoNAdditional.SPEED_ATTRIBUTE,
+			type = IType.STRING,
+			init = "'speed'",
+			doc = @doc("The attribute giving the default speed. Be careful : this variable is shared by all moving agent.")),
+	@var(
+			name = IKeywordMoNAdditional.DEFAULT_SPEED,
+			type = IType.FLOAT, init = "19.4444",
+			doc = @doc("The speed outside the graph (in meter/second). Default : 70km/h.")),
+	@var(
+			name = IKeywordMoNAdditional.GRAPH,
+			type = IType.GRAPH,
+			doc = @doc("The graph or network on which the agent moves.")),
+	@var(
+			name = IKeywordMoNAdditional.FILENAME,
+			type = IType.STRING,
+			doc = @doc("The name of the DGS file and its path where the graph must be saved.")),
+	@var(
+			name = IKeywordMoNAdditional.PATH_LENGTH,
+			type = IType.FLOAT,
+			doc = @doc("The length of the computed path.")),
 })
 @skill(name = IKeywordMoNAdditional.MOVING_ON_NETWORK)
 public class MovingOnNetworkSkill extends Skill {
@@ -827,55 +850,95 @@ public class MovingOnNetworkSkill extends Skill {
 	 * @param attr The attribute containing the value allowing the coloring
 	 */
 	private void colorGamaGraph(String attr){
-		Double min = Double.POSITIVE_INFINITY;
-		Double max = Double.NEGATIVE_INFINITY;
+//		Double min = Double.POSITIVE_INFINITY;
+//		Double max = Double.NEGATIVE_INFINITY;
+		ArrayList<SortEdge> listEdge = new ArrayList<SortEdge>();
+		
 		// Obtain the maximum and minimum values.
 		for(Edge e: graph.getEachEdge()) {
+			double passes = 0.0;
 			if(e.hasAttribute(attr) && e.getNumber(attr) > 0){
-				double passes = e.getNumber(attr);
-				max = Math.max(max, passes);
-				min = Math.min(min, passes);
+				passes = e.getNumber(attr);
+//				max = Math.max(max, passes);
+//				min = Math.min(min, passes);
 			}
+			listEdge.add(new SortEdge(passes, e));
 		}
-		// Set the colors.
-		for(Edge e: graph.getEachEdge()) {
-			String r;
-			String g;
-			String b;
-			if(e.hasAttribute(attr) && e.getNumber(attr) > 0){
-				double passes = e.getNumber(attr);
-				double color;
-				color = ((passes-min)/(max-min));
-				double ratio = 1./(100.*(color));
-				if(ratio < 0.40){
-					r ="153";
-					g = "0";
-					b = "0";
-				}
-				else if(ratio < 0.7){
-					r ="215";
-					g = "48";
-					b = "31";
-				}
-				else if(ratio < 0.9){
-					r ="239";
-					g = "101";
-					b = "72";
-				}
-				else{
-					r = "252";
-					g = "141";
-					b = "89";
-				}
-			}
-			else {
-				r = "253";
-				g = "187";
-				b = "132";
-			}
-			((IAgent)e.getAttribute("gama_agent")).setAttribute("color_r", r);
-			((IAgent)e.getAttribute("gama_agent")).setAttribute("color_g", g);
-			((IAgent)e.getAttribute("gama_agent")).setAttribute("color_b", b);
+		Collections.sort(listEdge);
+		for(int i = 0; i < listEdge.size(); i++){
+			((IAgent)listEdge.get(i).edge.getAttribute("gama_agent")).setAttribute("brightness", (255 / (listEdge.size()) - 1) * i );
+		}
+//		for(Edge e: graph.getEachEdge()) {
+//			old_value = 10000
+//					old_min = -16000
+//					old_max = 16000
+//					new_min = 0
+//					new_max = 100
+//					
+//			new_value = ( (old_value - old_min) / (old_max - old_min) ) * (new_max - new_min) + new_min
+//					
+//			double passes = e.getNumber(attr);
+//			passes = ((passes-min)/(max-min));
+//			passes = 1./(100.*(passes));
+//			passes = max - passes;
+//			
+//			
+//			((IAgent)e.getAttribute("gama_agent")).setAttribute("brightness", ( (passes - 0) / (max - min - 0) ) * (160 - 80) + 80);
+//			String r;
+//			String g;
+//			String b;
+//			if(e.hasAttribute(attr) && e.getNumber(attr) > 0){
+//				double passes = e.getNumber(attr);
+//				double color;
+//				color = ((passes-min)/(max-min));
+//				double ratio = 1./(100.*(color));
+//				if(ratio < 0.40){
+//					r ="153";
+//					g = "0";
+//					b = "0";
+//				}
+//				else if(ratio < 0.7){
+//					r ="215";
+//					g = "48";
+//					b = "31";
+//				}
+//				else if(ratio < 0.9){
+//					r ="239";
+//					g = "101";
+//					b = "72";
+//				}
+//				else{
+//					r = "252";
+//					g = "141";
+//					b = "89";
+//				}
+//			}
+//			else {
+//				r = "253";
+//				g = "187";
+//				b = "132";
+//			}
+//			
+//			((IAgent)e.getAttribute("gama_agent")).setAttribute("color_r", r);
+//			((IAgent)e.getAttribute("gama_agent")).setAttribute("color_g", g);
+//			((IAgent)e.getAttribute("gama_agent")).setAttribute("color_b", b);
+//		}
+	}
+	
+	private class SortEdge implements Comparable<SortEdge> {
+		double value;
+		Edge edge;
+		public SortEdge(double value, Edge edge){
+			this.value = value;
+			this.edge = edge;
+		}
+		
+		public int compareTo(SortEdge o) {
+			if(value < o.value)
+				return -1;
+			else if(value == o.value)
+				return 0;
+			return 1;
 		}
 	}
 }
