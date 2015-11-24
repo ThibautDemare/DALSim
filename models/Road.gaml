@@ -12,10 +12,13 @@ species Road schedules: [] {
 	//geometry display_shape <- shape + 2.0;
 	float speed;
 	float length;
-	int color_r <- 120;
-	int color_g <- 120;
-	int color_b <- 120;
+	int colorValue <- -1;
 	aspect geom {
-		draw shape + 2°px border: rgb(color_r, color_g, color_b) color: rgb(color_r, color_g, color_b);
+		if(colorValue = -1){
+			draw shape + 2°px color: rgb(120, 120, 120) border: rgb(120, 120, 120);
+		}
+		else {
+			draw shape + 2°px color: rgb(255, colorValue, 0) border:rgb(255, colorValue, 0);
+		}
 	}
 }
