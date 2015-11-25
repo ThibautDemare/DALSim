@@ -247,5 +247,14 @@ experiment exp_all type: gui {
 				data "Average time that the LPs took to deliver goods to FDMs" value: averageTimeToBeDelivered color: rgb('green') ;
 			}
 		}/**/
+
+		display chart_strategyShare refresh:every(1) {
+			chart  "Share of the different strategies adopted" type: series {
+				data "Strategy 1" value: nbLPStrat1 color: rgb('green') ;
+				data "Strategy 2" value: nbLPStrat2 color: rgb('red') ;
+				data "Strategy 3" value: nbLPStrat3 color: rgb('blue') ;
+				data "Strategy 4" value: nbLPStrat4 color: rgb('orange') ;
+			}
+		}/**/
 	}
 }
