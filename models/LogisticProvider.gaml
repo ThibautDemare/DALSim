@@ -26,11 +26,19 @@ species LogisticProvider schedules: [] {
 	int department;
 	int region;
 	list<int> timeToDeliver <- [];
+	int adoptedStrategy;
 	
 	list<Warehouse> lvl1Warehouses <- [];
 	list<Warehouse> lvl2Warehouses <- [];
 
 	init {
+		if(localStrategy){
+			adoptedStrategy <- rnd(3) + 1;
+		}
+		else {
+			adoptedStrategy <- globalAdoptedStrategy;
+		}
+
 		timeToDeliver <- [];
 		if(use_gs){
 			// Add a new node event for corresponding sender

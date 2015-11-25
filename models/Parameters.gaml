@@ -13,7 +13,8 @@ import "./FinalDestinationManager.gaml"
 global {
 	float step <- 60 °mn;//60 minutes per step
 	
-	int adoptedStrategy <- 2;
+	bool localStrategy <- true;
+	int globalAdoptedStrategy <- 2;
 	int numberWarehouseSelected <- 15;
 
 	/*
