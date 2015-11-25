@@ -19,6 +19,11 @@ global {
 
 	bool saveObservations <- false;
 
+	int nbLPStrat1 <- 0;
+	int nbLPStrat2 <- 0;
+	int nbLPStrat3 <- 0;
+	int nbLPStrat4 <- 0;
+
 	list<float> averagesLPEfficiency <- [];
 	float averageLPEfficiency <- 0.0;
 	int numberofEmptyStockInFinalDests <- 0;
@@ -230,6 +235,27 @@ global {
 		}
 		if(i > 0){
 			averageTimeToBeDelivered <- (sum/i);
+		}
+	}
+
+	reflex countStrategyShare when: localStrategy{
+		nbLPStrat1 <- 0;
+		nbLPStrat2 <- 0;
+		nbLPStrat3 <- 0;
+		nbLPStrat4 <- 0;
+		ask FinalDestinationManager {
+			if(logisticProvider.adoptedStrategy = 1){
+				nbLPStrat1 <- nbLPStrat1 + 1;
+			}
+			else if(logisticProvider.adoptedStrategy = 2){
+				nbLPStrat2 <- nbLPStrat2 + 1;
+			}
+			else if(logisticProvider.adoptedStrategy = 3){
+				nbLPStrat3 <- nbLPStrat3 + 1;
+			}
+			else if(logisticProvider.adoptedStrategy = 4){
+				nbLPStrat4 <- nbLPStrat4 + 1;
+			}
 		}
 	}
 
