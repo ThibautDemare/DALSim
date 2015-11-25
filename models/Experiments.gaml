@@ -24,7 +24,7 @@ experiment exp_grid_surface type: gui {
 	output {
 		display display_grid_surface autosave: true refresh:every(1) {
 			species Warehouse aspect: base_condition;
-			grid cell_surface transparency: 0.3;
+		//	grid cell_surface transparency: 0.3;
 			species Road aspect: geom;
 		}
 	}
@@ -169,7 +169,7 @@ experiment exp_all type: gui {
 			//species Warehouse aspect: base_condition;
 			species FinalDestinationManager aspect: base;
 			grid cell_stock_shortage;
-			species Batch aspect: little_base;
+			//species Batch aspect: little_base;
 		}
 	}
 
@@ -248,9 +248,4 @@ experiment exp_all type: gui {
 			}
 		}/**/
 	}
-}
-
-experiment 'Batch simulations' type: batch repeat: 1 keep_seed: true until: ( time > 100 ) {
-	parameter "adoptedStrategy" var: adoptedStrategy among: [1, 2, 3, 4];
-	parameter "saver" var: saveObservations <- true;
 }
