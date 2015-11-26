@@ -31,6 +31,8 @@ species LogisticProvider schedules: [] {
 	list<Warehouse> lvl1Warehouses <- [];
 	list<Warehouse> lvl2Warehouses <- [];
 
+	list<FinalDestinationManager> customers <- [];
+
 	init {
 		if(localStrategy){
 			adoptedStrategy <- rnd(3) + 1;
@@ -82,6 +84,17 @@ species LogisticProvider schedules: [] {
 	 * When a logistic provider loose a customer (a FinalDestinationManager) he must update the stock on its warehouses
 	 */
 	TransferredStocks lostCustomer(FinalDestinationManager fdm){
+		int k <- 0;
+		bool notfound <- true;
+		loop while: k < length(customers) and notfound {
+			if(fdm = customers[k]){
+				remove index: k from: customers;
+				notfound <- false;
+			}
+			else{
+				k <- k + 1;
+			}
+		}
 		/*
 		 * Browse the warehouses to get the stocks to remove and the list of warehouses which could be deleted from the supply chain
 		 */
@@ -408,6 +421,7 @@ species LogisticProvider schedules: [] {
 		 */
 		do connectLvl2Warehouse(fdm, sceCloseWarehouse, stocksLvl2);
 
+		customers <- customers + fdm;
 	}
 	
 	/**
