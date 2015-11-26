@@ -256,5 +256,12 @@ experiment exp_all type: gui {
 				data "Strategy 4" value: nbLPStrat4 color: rgb('orange') ;
 			}
 		}/**/
+
+		display chart_stockAwaiting refresh:every(1) {
+			chart "Blocking level to make goods enter or leave buildings" type: series {
+				data "Number of stocks awaiting to enter a building" value: nbStocksAwaitingToEnter color: rgb('green') ;
+				data "Number of stocks awaiting to leave a building" value: nbStocksAwaitingToLeave color: rgb('red') ;
+			}
+		}/**/
 	}
 }

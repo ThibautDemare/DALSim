@@ -24,6 +24,9 @@ global {
 	int nbLPStrat3 <- 0;
 	int nbLPStrat4 <- 0;
 
+	int nbStocksAwaitingToEnter;
+	int nbStocksAwaitingToLeave;
+
 	list<float> averagesLPEfficiency <- [];
 	float averageLPEfficiency <- 0.0;
 
@@ -87,6 +90,17 @@ global {
 			}
 			self.localLPEfficiencies <- localLPEfficiencies + nbStockShortages;
 			freeSurfaceInFinalDest <- freeSurfaceInFinalDest + (surface - tempStock);
+		}
+	}
+
+	reflex updateNbStockAwaiting {
+		nbStocksAwaitingToEnter <- 0;
+		ask Building {
+			nbStocksAwaitingToEnter <- nbStocksAwaitingToEnter + length(entering_stocks);
+		}
+		nbStocksAwaitingToLeave <- 0;
+		ask RestockingBuilding {
+			nbStocksAwaitingToLeave <- nbStocksAwaitingToLeave + length(currentOrders);
 		}
 	}
 
@@ -292,5 +306,7 @@ global {
 			to: "CSV/" + date_simu_starts + "_average_time_to_be_delivered" + params  + ".csv" type: text rewrite: false;
 		save "" + ((time/3600.0) as int) + ";" + nbLPStrat1 + ";" + nbLPStrat2 + ";" + nbLPStrat3 + ";" + nbLPStrat4 + ";"
 			to: "CSV/" + date_simu_starts + "_strategies_adoption_share" + params  + ".csv" type: text rewrite: false;
+		save "" + ((time/3600.0) as int) + ";" + nbStocksAwaitingToEnter + ";" + nbStocksAwaitingToLeave + ";"
+			to: "CSV/" + date_simu_starts + "_nb_stocks_awaiting" + params  + ".csv" type: text rewrite: false;
 	}
 }
