@@ -290,5 +290,7 @@ global {
 			to: "CSV/" + date_simu_starts + "_average_time_to_deliver" + params  + ".csv" type: text rewrite: false;
 		save "" + ((time/3600.0) as int) + ";" + averageTimeToBeDelivered + ";"
 			to: "CSV/" + date_simu_starts + "_average_time_to_be_delivered" + params  + ".csv" type: text rewrite: false;
+		save "" + ((time/3600.0) as int) + ";" + nbLPStrat1 + ";" + nbLPStrat2 + ";" + nbLPStrat3 + ";" + nbLPStrat4 + ";"
+			to: "CSV/" + date_simu_starts + "_strategies_adoption_share" + params  + ".csv" type: text rewrite: false;
 	}
 }
