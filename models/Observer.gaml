@@ -26,6 +26,7 @@ global {
 
 	list<float> averagesLPEfficiency <- [];
 	float averageLPEfficiency <- 0.0;
+
 	int numberofEmptyStockInFinalDests <- 0;
 	int numberOfEmptyStockInWarehouses <- 0;
 	
@@ -88,7 +89,7 @@ global {
 			freeSurfaceInFinalDest <- freeSurfaceInFinalDest + (surface - tempStock);
 		}
 	}
-	
+
 	/*
 	 * This reflex updates every step the average efficiency of every logistic provider, but also the estimated efficiency at the FDM level.
 	 */
@@ -238,7 +239,7 @@ global {
 		}
 	}
 
-	reflex countStrategyShare when: localStrategy{
+	reflex countStrategyShare when: localStrategy and time > 0{
 		nbLPStrat1 <- 0;
 		nbLPStrat2 <- 0;
 		nbLPStrat3 <- 0;
