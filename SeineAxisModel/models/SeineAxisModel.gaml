@@ -31,17 +31,17 @@ global schedules: [world] +
 				Stock {
 	
 	//This data comes from "EuroRegionalMap" (EuroGeographics)
-	file roads_shapefile <- file("../../BD_SIG/Used/Roads/Roads_one_component/roads_v2.shp");
+	file roads_shapefile <- file("../../../BD_SIG/Used/Roads/Roads_one_component/roads_v2.shp");
 	graph road_network;
 	
 	// Logistic provider
-	file logistic_provider_shapefile <- file("../../BD_SIG/Used/LogisticProvider/LogisticProvider.shp");
+	file logistic_provider_shapefile <- file("../../../BD_SIG/Used/LogisticProvider/LogisticProvider.shp");
 	
 	// Warehouses classified by their size
-	file warehouse_shapefile <- file("../../BD_SIG/Used/Warehouses/warehouses_attractiveness_0.shp");
+	file warehouse_shapefile <- file("../../../BD_SIG/Used/Warehouses/warehouses_attractiveness_0.shp");
 	
 	// Final destination (for instance : shop)
-	string destination_path <- "../../BD_SIG/Used/FinalDestination/";
+	string destination_path <- "../../../BD_SIG/Used/FinalDestination/";
 	string destination_file_name <- "FinalDestinationManager";
 	//string destination_file_name <- "FinalDestinationManager_subset_Paris_1";
 	//string destination_file_name <- "FinalDestinationManager_subset_Paris_20";
@@ -51,7 +51,7 @@ global schedules: [world] +
 	file destination_shapefile <- file(destination_path+destination_file_name+".shp");
 	
 	// A unique provider
-	file provider_shapefile <- file("../../BD_SIG/Used/Provider/Provider.shp");
+	file provider_shapefile <- file("../../../BD_SIG/Used/Provider/Provider.shp");
 	
 	// The only one provider
 	Provider provider;
