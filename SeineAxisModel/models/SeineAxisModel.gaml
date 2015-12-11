@@ -31,7 +31,8 @@ global schedules: [world] +
 				Stock {
 	
 	//This data comes from "EuroRegionalMap" (EuroGeographics)
-	file roads_shapefile <- file("../../../BD_SIG/Used/Roads/Roads_one_component/roads_v2.shp");
+	//file roads_shapefile <- file("../../../BD_SIG/Used/Roads/Roads_one_component/roads_v2.shp");
+	file roads_shapefile <- file("../../../BD_SIG/Used/Roads/roads_two_provider/roads_speed_length_km.shp");
 	graph road_network;
 	
 	// Logistic provider
@@ -52,10 +53,7 @@ global schedules: [world] +
 	
 	// A unique provider
 	file provider_shapefile <- file("../../../BD_SIG/Used/Provider/Provider.shp");
-	
-	// The only one provider
-	Provider provider;
-	
+
 	//Define the border of the environnement according to the road network
 	geometry shape <- envelope(roads_shapefile);
 	
@@ -80,10 +78,7 @@ global schedules: [world] +
 		
 		// Creation of a SuperProvider
 		create Provider from: provider_shapefile returns:p;
-		ask p {
-			provider <- self;
-		}
-		
+
 		// Warehouses
 		create Warehouse from: warehouse_shapefile returns: lw with: [probaAnt::read("probaAnt") as float, totalSurface::read("surface") as float];
 		ask Warehouse {

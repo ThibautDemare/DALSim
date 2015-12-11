@@ -33,12 +33,19 @@ species LogisticProvider schedules: [] {
 
 	list<FinalDestinationManager> customers <- [];
 
+	Provider provider;
+
 	init {
 		if(localStrategy){
 			adoptedStrategy <- rnd(3) + 1;
 		}
 		else {
 			adoptedStrategy <- globalAdoptedStrategy;
+		}
+
+		provider <- one_of(Provider);
+		ask provider {
+			do addCustomer(myself);
 		}
 
 		timeToDeliver <- [];
@@ -216,7 +223,7 @@ species LogisticProvider schedules: [] {
 	action connectRoot {
 		// Build the root of this almost-tree
 		create SupplyChainElement number:1 returns:rt {
-			building <- provider;
+			building <- myself.provider;
 			sons <- [];
 			position <- 0;
 		}

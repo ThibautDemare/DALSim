@@ -14,6 +14,7 @@ import "./GraphStreamConnection.gaml"
 import "./Order.gaml"
 
 species Provider parent: RestockingBuilding schedules: [] {
+	list<LogisticProvider> customers <- [];
 	
 	init {
 		if(use_gs){
@@ -27,7 +28,11 @@ species Provider parent: RestockingBuilding schedules: [] {
 			}
 		}
 	}
-	
+
+	action addCustomer(LogisticProvider lp){
+		customers <- customers + lp;
+	}
+
 	/*
 	 * Receive a request from a logistic provider to restock another building
 	 */
@@ -37,54 +42,54 @@ species Provider parent: RestockingBuilding schedules: [] {
 		int i <- 0;
 		loop while: i<length(currentOrders) {
 			Order order <- currentOrders[i];
-			
-			// And create a Stock agent which will move within a Batch
-			create Stock number:1 returns:sendedStock {
-				self.product <- order.product;
-				self.quantity <- order.quantity;
-				self.fdm <- order.fdm;
-				self.lp <- order.logisticProvider;
-			}
-			
-			// Looking for a batch which go to the same building
-			bool foundBatch <- false;
-			int j <- 0;
-			loop while: j < length(leavingBatches) and !foundBatch {
-				if( (leavingBatches[j] as Batch).dest = order.building  and order.position = (leavingBatches[j] as Batch).position){
-					foundBatch <- true;
+			if(customers contains (order.logisticProvider)){
+				// And create a Stock agent which will move within a Batch
+				create Stock number:1 returns:sendedStock {
+					self.product <- order.product;
+					self.quantity <- order.quantity;
+					self.fdm <- order.fdm;
+					self.lp <- order.logisticProvider;
+				}
+
+				// Looking for a batch which go to the same building
+				bool foundBatch <- false;
+				int j <- 0;
+				loop while: j < length(leavingBatches) and !foundBatch {
+					if( (leavingBatches[j] as Batch).dest = order.building  and order.position = (leavingBatches[j] as Batch).position){
+						foundBatch <- true;
+					}
+					else {
+						j <- j + 1;
+					}
+				}
+				Batch lb <- nil;
+				// There is such a Batch, we update it
+				if(foundBatch){
+					lb <- leavingBatches[j];
 				}
 				else {
-					j <- j + 1;
+					// else, we create one
+					create Batch number: 1 returns:rlb {
+						self.target <- order.building.location;
+						self.location <- myself.location;
+						self.position <- order.position;
+						self.dest <- order.building;
+						self.stepOrderMade <- order.stepOrderMade;
+					}
+					lb <- first(rlb);
+					leavingBatches <- leavingBatches + lb;
 				}
-			}
-			Batch lb <- nil;
-			// There is such a Batch, we update it
-			if(foundBatch){
-				lb <- leavingBatches[j];
-			}
-			else {
-				// else, we create one
-				create Batch number: 1 returns:rlb {
-					self.target <- order.building.location;
-					self.location <- myself.location;
-					self.position <- order.position;
-					self.dest <- order.building;
-					self.stepOrderMade <- order.stepOrderMade;
-				}
-				lb <- first(rlb);
-				leavingBatches <- leavingBatches + lb;
-			}
-			
-			lb.overallQuantity <- lb.overallQuantity + order.quantity;
-			lb.stocks <- lb.stocks + sendedStock;
 
-			outflow <- outflow + first(sendedStock).quantity;
-			outflow_updated <- true;
+				lb.overallQuantity <- lb.overallQuantity + order.quantity;
+				lb.stocks <- lb.stocks + sendedStock;
 
-			i <- i + 1;
+				outflow <- outflow + first(sendedStock).quantity;
+				outflow_updated <- true;
+			}
 			ask order {
 				do die;
 			}
+			remove index: 0 from: currentOrders;
 		}
 		currentOrders <- [];
 	}
