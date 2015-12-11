@@ -9,12 +9,12 @@ model Order
 import "./LogisticProvider.gaml"
 
 species Order schedules: [] {
-	int product;
-	float quantity;
-	Building building;
-	LogisticProvider logisticProvider;
+	int product; // The kind of goods ordered
+	float quantity; // the ordered quantity
+	Building building; // which building has made the order
+	LogisticProvider logisticProvider; // the LSP who manages the ordered goods
 	int position;// The position in the supply chain
-	FinalDestinationManager fdm;
-	Stock reference;
-	int stepOrderMade;
+	FinalDestinationManager fdm; // The FDM who posseses these goods
+	Stock reference; // a reference to the stock which suffer of stock shortage
+	int stepOrderMade; // when does the order has been made
 }

@@ -26,9 +26,6 @@ species FinalDestinationManager schedules: [] {
 	Building building;
 	float huffValue;// number of customer according to huff model => this value cant be used like this because the Huff model does not take care of time.
 	int decreasingRateOfStocks;
-	string color;
-	int department;
-	int region;
 	float surface;
 	list<int> timeToBeDelivered <- []; // This variable is used to have an idea of the efficicency of the LP to deliver quickly the goods
 	float localTimeToBeDelivered <- 0.0;
@@ -39,7 +36,6 @@ species FinalDestinationManager schedules: [] {
 		create Building number: 1 returns: buildings {
 			location <- myself.location;
 			totalSurface <- myself.surface;
-			surfaceUsedForLH <- myself.surface;
 			occupiedSurface <- 0.0;
 			myself.building <- self;
 		}
@@ -49,30 +45,20 @@ species FinalDestinationManager schedules: [] {
 			// Add new node/edge events for corresponding sender
 			if(use_r1){
 				gs_add_node gs_sender_id:"actor" gs_node_id:name;
-				gs_add_node_attribute gs_sender_id:"actor" gs_node_id:name gs_attribute_name:"region" gs_attribute_value:region;
-				gs_add_node_attribute gs_sender_id:"actor" gs_node_id:name gs_attribute_name:"department" gs_attribute_value:department;
 				gs_add_edge gs_sender_id:"actor" gs_edge_id:(name + logisticProvider.name) gs_node_id_from:name gs_node_id_to:logisticProvider.name gs_is_directed:false;
 			}
 			if(use_r2){
 				gs_add_node gs_sender_id:"neighborhood_all" gs_node_id:name;
-				gs_add_node_attribute gs_sender_id:"neighborhood_all" gs_node_id:name gs_attribute_name:"region" gs_attribute_value:region;
-				gs_add_node_attribute gs_sender_id:"neighborhood_all" gs_node_id:name gs_attribute_name:"department" gs_attribute_value:department;
 				gs_add_node_attribute gs_sender_id:"neighborhood_all" gs_node_id:name gs_attribute_name:"type" gs_attribute_value:"final_dest";
 			}
 			if(use_r4){
 				gs_add_node gs_sender_id:"neighborhood_final_destination" gs_node_id:name;
-				gs_add_node_attribute gs_sender_id:"neighborhood_final_destination" gs_node_id:name gs_attribute_name:"region" gs_attribute_value:region;
-				gs_add_node_attribute gs_sender_id:"neighborhood_final_destination" gs_node_id:name gs_attribute_name:"department" gs_attribute_value:department;
 			}
 			if(use_r6){
 				gs_add_node gs_sender_id:"neighborhood_warehouse_final" gs_node_id:name;
-				gs_add_node_attribute gs_sender_id:"neighborhood_warehouse_final" gs_node_id:name gs_attribute_name:"region" gs_attribute_value:region;
-				gs_add_node_attribute gs_sender_id:"neighborhood_warehouse_final" gs_node_id:name gs_attribute_name:"department" gs_attribute_value:department;
 			}
 			if(use_r7){
 				gs_add_node gs_sender_id:"neighborhood_logistic_final" gs_node_id:name;
-				gs_add_node_attribute gs_sender_id:"neighborhood_logistic_final" gs_node_id:name gs_attribute_name:"region" gs_attribute_value:region;
-				gs_add_node_attribute gs_sender_id:"neighborhood_logistic_final" gs_node_id:name gs_attribute_name:"department" gs_attribute_value:department;
 			}
 			
 			if(use_r9){
@@ -177,7 +163,7 @@ species FinalDestinationManager schedules: [] {
 	
 	action buildRandStock{
 		// Built its stocks
- 		float freeSurface <- (building.surfaceUsedForLH - building.occupiedSurface);// The free surface of the building according to the max quantity
+ 		float freeSurface <- (building.totalSurface - building.occupiedSurface);// The free surface of the building according to the max quantity
 		float maxOccupiedSurface <- 0.0;// the occupied surface if the stock are maximum.
 		list<Stock> ls <- [];
 		int i <- 0;// useful to add an id to products
@@ -190,7 +176,7 @@ species FinalDestinationManager schedules: [] {
 				
 				// If the free surface is greater than 10 percent of the total surface,
 				// then we have : 10 percent of the free surface <= maxQuantity < freeSurface
-				if(freeSurface > myself.building.surfaceUsedForLH*0.1){
+				if(freeSurface > myself.building.totalSurface*0.1){
 					maxQuantity <- rnd(freeSurface - freeSurface*0.1)+freeSurface*0.1;
 				}
 				else{
@@ -199,7 +185,7 @@ species FinalDestinationManager schedules: [] {
 				}
 				
 				// If the remaining surface is very too tiny
-				if((freeSurface-maxQuantity) < myself.building.surfaceUsedForLH*0.1){
+				if((freeSurface-maxQuantity) < myself.building.totalSurface*0.1){
 					maxQuantity <- freeSurface;
 				}
 				
@@ -210,7 +196,7 @@ species FinalDestinationManager schedules: [] {
 				self.building <- myself.building;
 			}
 			ls <- ls + s;
-			freeSurface <- (building.surfaceUsedForLH - maxOccupiedSurface);
+			freeSurface <- (building.totalSurface - maxOccupiedSurface);
 		}
 		building.stocks <- ls;
 	}
@@ -221,7 +207,7 @@ species FinalDestinationManager schedules: [] {
 		ask s {
 			// The id of the product
 			product <- 0;
-			maxQuantity <- myself.building.surfaceUsedForLH;
+			maxQuantity <- myself.building.totalSurface;
 			quantity <- rnd(maxQuantity as int) as float;
 			myself.building.occupiedSurface <- myself.building.occupiedSurface + maxQuantity; 
 			fdm <- myself;
@@ -233,7 +219,7 @@ species FinalDestinationManager schedules: [] {
 	action buildFourStock {
 		// use exactly 4 products occupying the same surface
 		int i <- 0;
-		float freeSurface <- building.surfaceUsedForLH;// The free surface of the building according to the max quantity
+		float freeSurface <- building.totalSurface;// The free surface of the building according to the max quantity
 		float surfaceByProduct <- freeSurface / 4.0;
 		float maxOccupiedSurface <- 0.0;// the occupied surface if the stock are maximum.
 		list<Stock> ls <- [];
@@ -258,7 +244,7 @@ species FinalDestinationManager schedules: [] {
 		// use between 2 and 6 products occupying the same surface
 		int i <- 0;
 		int nbProduct <- rnd(2)+2;
-		float freeSurface <- building.surfaceUsedForLH;// The free surface of the building according to the max quantity
+		float freeSurface <- building.totalSurface;// The free surface of the building according to the max quantity
 		float surfaceByProduct <- freeSurface / nbProduct;
 		float maxOccupiedSurface <- 0.0;// the occupied surface if the stock are maximum.
 		list<Stock> ls <- [];

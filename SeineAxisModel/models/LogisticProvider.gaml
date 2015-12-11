@@ -21,18 +21,12 @@ import "./Strategies.gaml"
 
 species LogisticProvider schedules: [] {
 	int timeShifting <- rnd(23);
-	SupplyChain supplyChain <- nil;
-	string color;
-	int department;
-	int region;
-	list<int> timeToDeliver <- [];
 	int adoptedStrategy;
-	
+	SupplyChain supplyChain <- nil;
+	list<int> timeToDeliver <- [];
 	list<Warehouse> lvl1Warehouses <- [];
 	list<Warehouse> lvl2Warehouses <- [];
-
 	list<FinalDestinationManager> customers <- [];
-
 	Provider provider;
 
 	init {
@@ -53,24 +47,16 @@ species LogisticProvider schedules: [] {
 			// Add a new node event for corresponding sender
 			if(use_r1){
 				gs_add_node gs_sender_id:"actor" gs_node_id:name;
-				gs_add_node_attribute gs_sender_id:"actor" gs_node_id:name gs_attribute_name:"region" gs_attribute_value:region;
-				gs_add_node_attribute gs_sender_id:"actor" gs_node_id:name gs_attribute_name:"department" gs_attribute_value:department;
 			}
 			if(use_r2){
 				gs_add_node gs_sender_id:"neighborhood_all" gs_node_id:name;
-				gs_add_node_attribute gs_sender_id:"neighborhood_all" gs_node_id:name gs_attribute_name:"region" gs_attribute_value:region;
-				gs_add_node_attribute gs_sender_id:"neighborhood_all" gs_node_id:name gs_attribute_name:"department" gs_attribute_value:department;
 				gs_add_node_attribute gs_sender_id:"neighborhood_all" gs_node_id:name gs_attribute_name:"type" gs_attribute_value:"logistic_provider";
 			}
 			if(use_r5){
 				gs_add_node gs_sender_id:"neighborhood_logistic_provider" gs_node_id:name;
-				gs_add_node_attribute gs_sender_id:"neighborhood_logistic_provider" gs_node_id:name gs_attribute_name:"region" gs_attribute_value:region;
-				gs_add_node_attribute gs_sender_id:"neighborhood_logistic_provider" gs_node_id:name gs_attribute_name:"department" gs_attribute_value:department;
 			}
 			if(use_r7){
 				gs_add_node gs_sender_id:"neighborhood_logistic_final" gs_node_id:name;
-				gs_add_node_attribute gs_sender_id:"neighborhood_logistic_final" gs_node_id:name gs_attribute_name:"region" gs_attribute_value:region;
-				gs_add_node_attribute gs_sender_id:"neighborhood_logistic_final" gs_node_id:name gs_attribute_name:"department" gs_attribute_value:department;
 			}
 		}
 	}
@@ -324,7 +310,7 @@ species LogisticProvider schedules: [] {
 		int i <- 0;
 		loop while: i<length(supplyChain.root.sons) and !found {
 			sceLarge <- supplyChain.root.sons[i];
-			if( ((sceLarge.building as Building).surfaceUsedForLH - (sceLarge.building as Building).occupiedSurface ) >= ((fdm.building as Building).occupiedSurface * sizeOfStockLargeWarehouse) ){
+			if( ((sceLarge.building as Building).totalSurface - (sceLarge.building as Building).occupiedSurface ) >= ((fdm.building as Building).occupiedSurface * sizeOfStockLargeWarehouse) ){
 				found <- true;
 				do initStock( (sceLarge.building as Warehouse), fdm, stocksLvl2, sizeOfStockLargeWarehouse);
 			}

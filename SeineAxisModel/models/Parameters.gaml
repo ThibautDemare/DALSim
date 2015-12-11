@@ -14,7 +14,7 @@ global {
 	float step <- 60 °mn;//60 minutes per step
 	
 	bool localStrategy <- true;
-	int globalAdoptedStrategy <- 2;
+	int globalAdoptedStrategy <- 3;
 	int numberWarehouseSelected <- 15;
 
 	/*

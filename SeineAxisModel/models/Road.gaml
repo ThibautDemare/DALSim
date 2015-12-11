@@ -9,10 +9,9 @@ model Road
 import "./Batch.gaml"
 
 species Road schedules: [] {
-	//geometry display_shape <- shape + 2.0;
 	float speed;
 	float length;
-	int colorValue <- -1;
+	int colorValue <- -1; // This value is filled by the custom GAMA Plugin : MovingOnNetwork. It allows to colour the road according to the quantity of goods on the road.
 	aspect geom {
 		if(colorValue = -1){
 			draw shape + 2°px color: rgb(120, 120, 120) border: rgb(120, 120, 120);

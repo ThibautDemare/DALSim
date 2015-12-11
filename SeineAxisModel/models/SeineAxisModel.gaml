@@ -29,19 +29,24 @@ global schedules: [world] +
 				shuffle(Warehouse) +
 				Batch + 
 				Stock {
-	
-	//This data comes from "EuroRegionalMap" (EuroGeographics)
+
+	//This data comes from "EuroGlobalMap" (EuroGeographics)
+	// Each road has an attribute giving the speed in km/h
 	//file roads_shapefile <- file("../../../BD_SIG/Used/Roads/Roads_one_component/roads_v2.shp");
 	file roads_shapefile <- file("../../../BD_SIG/Used/Roads/roads_two_provider/roads_speed_length_km.shp");
 	graph road_network;
-	
+
 	// Logistic provider
+	// The list of logistics service provider. The data comes from the list of "commissionaire de transport" build by Devport
 	file logistic_provider_shapefile <- file("../../../BD_SIG/Used/LogisticProvider/LogisticProvider.shp");
-	
+
 	// Warehouses classified by their size
+	// The list of warehouses with their storage surface
 	file warehouse_shapefile <- file("../../../BD_SIG/Used/Warehouses/warehouses_attractiveness_0.shp");
-	
+
 	// Final destination (for instance : shop)
+	// The list of wholesaler on the Seine axis territory. They have an attribute giving the number of customers according to the Huff model.
+	// The surface is in m^2. In the shapefile used, it is an estimation.
 	string destination_path <- "../../../BD_SIG/Used/FinalDestination/";
 	string destination_file_name <- "FinalDestinationManager";
 	//string destination_file_name <- "FinalDestinationManager_subset_Paris_1";
@@ -50,47 +55,46 @@ global schedules: [world] +
 	//string destination_file_name <- "FinalDestinationManager_subset_scattered_24";
 	//string destination_file_name <- "FinalDestinationManager_subset_scattered_592";
 	file destination_shapefile <- file(destination_path+destination_file_name+".shp");
-	
-	// A unique provider
+
+	// The list of providers. They represent where the goods come in the territory.
+	// In this simulation there are only two providers: one for the port of Le Havre, and one for the port of Antwerp
 	file provider_shapefile <- file("../../../BD_SIG/Used/Provider/Provider.shp");
 
 	//Define the border of the environnement according to the road network
 	geometry shape <- envelope(roads_shapefile);
-	
+
 	init {
 		if(use_gs){
 			// Init senders in order to create nodes/edges when we create agent
 			do init_senders;
 		}
-		
+
 		// Road network creation
 		create Road from: roads_shapefile with: [speed::read("speed") as float];
-		//map<Road,float> move_weights <- Road as_map (each::(each.speed*each.length));
-		road_network <- as_edge_graph(Road);// with_weights move_weights;
-		
+		road_network <- as_edge_graph(Road);
+
 		if(use_gs){
 			if(use_r8){
 				// Send the road network to Graphstream
 				do init_use_road_network;
 			}
 		}
-		
-		
+
 		// Creation of a SuperProvider
-		create Provider from: provider_shapefile returns:p;
+		create Provider from: provider_shapefile;
 
 		// Warehouses
-		create Warehouse from: warehouse_shapefile returns: lw with: [probaAnt::read("probaAnt") as float, totalSurface::read("surface") as float];
-		ask Warehouse {
-			surfaceUsedForLH <- totalSurface*(1-probaAnt);
-		}
-		
+		create Warehouse from: warehouse_shapefile returns: lw with: [totalSurface::read("surface") as float];
+
 		//  Logistic providers
 		create LogisticProvider from: logistic_provider_shapefile;
-		
+
 		// Final destinations
-		create FinalDestinationManager from: destination_shapefile with: [huffValue::read("huff") as float, surface::read("surface") as float, color::read("color") as string];
-		/*
+		create FinalDestinationManager from: destination_shapefile with: [huffValue::read("huff") as float, surface::read("surface") as float];
+		/* 
+		 * The following code can be commented or not, depending if the user want to execute the simulation with every FDM 
+		 * It is mainly used for tests to avoid CPU overload.
+		 */
 		int i <- 500;
 		list<FinalDestinationManager> lfdm <- shuffle(FinalDestinationManager);
 		loop while: i < length(lfdm) {
@@ -116,44 +120,6 @@ global schedules: [world] +
 	reflex second_init when: time = 0 {
 		ask FinalDestinationManager sort_by (-1*each.surface){
 			do second_init;
-		}
-	}
-}
-
-grid cell_surface width:50 height:50  {
-	rgb color <- rgb(255,255,255);
-	float surface;
-	float maxSurface;
-
-	reflex coloration {
-		surface <- 0;
-		maxSurface <- 0;
-		list<Building> buildings <- (Warehouse inside self) + (Building inside self);
-
-		loop b over: buildings {
-			ask (b as Building).stocks {
-				myself.maxSurface <- myself.maxSurface + self.maxQuantity;
-				myself.surface <- myself.surface + self.quantity;
-			}
-		}
-
-		if(maxSurface = 0){
-			color <- rgb(255, 255, 255);
-		}
-		else{
-			float ratio <- surface/maxSurface;
-			if(ratio < 0.25){
-				color <- rgb(237,248,251);
-			}
-			else if(ratio < 0.5){
-				color <- rgb(178,226,226);
-			}
-			else if(ratio < 0.75){
-				color <- rgb(102,194,164);
-			}
-			else{
-				color <- rgb(35,139,69);
-			}
 		}
 	}
 }
@@ -212,44 +178,6 @@ grid cell_stock_shortage width:50 height:50  {
 		}
 		else{
 			color <- rgb(rgb(0,88,36),0.8);
-		}
-	}
-}
-
-grid cell_saturation width:50 height:50  {
-	rgb color <- rgb(255,255,255);
-	float surface;
-	float maxSurface;
-
-	reflex coloration {
-		surface <- 0;
-		maxSurface <- 0;
-		list<Building> buildings <- (Warehouse inside self) + (Building inside self);
-
-		loop b over: buildings {
-			maxSurface <- maxSurface + b.surfaceUsedForLH;
-			ask (b as Building).stocks {
-				myself.surface <- myself.surface + self.quantity;
-			}
-		}
-
-		if(maxSurface = 0){
-			color <- rgb(255, 255, 255);
-		}
-		else{
-			float ratio <- surface/maxSurface;
-			if(ratio < 0.25){
-				color <- rgb(237,248,251);
-			}
-			else if(ratio < 0.5){
-				color <- rgb(178,226,226);
-			}
-			else if(ratio < 0.75){
-				color <- rgb(102,194,164);
-			}
-			else{
-				color <- rgb(35,139,69);
-			}
 		}
 	}
 }

@@ -39,19 +39,18 @@ global {
 		// I assume that there is always at least one warehouse which has a free space greater than the occupied surface of the stock to outsource.
 		// According to results, it doesn't seem foolish.
 		loop while:
-				( (lw[f] as Building).surfaceUsedForLH - (lw[f] as Building).occupiedSurface) <= 0 or
-				( (lw[f] as Building).surfaceUsedForLH - (lw[f] as Building).occupiedSurface - (fdm.building as Building).occupiedSurface * sizeOfStock)	< 0 {
+				( (lw[f] as Building).totalSurface - (lw[f] as Building).occupiedSurface) <= 0 or
+				( (lw[f] as Building).totalSurface - (lw[f] as Building).occupiedSurface - (fdm.building as Building).occupiedSurface * sizeOfStock)	< 0 {
 			f <- ((rnd(10000)/10000)^32)*(length(lw)-1);
 		}
 		return lw[f];/**/
-		//return one_of(average_warehouse);
 	}
 	
 	/**
 	 * Return a large warehouse : the more the warehouse has a big free surface, the more he has a chance to be selected.
 	 */
 	Warehouse findWarehouseLvl2Strat1(FinalDestinationManager fdm, int sizeOfStock, list<Warehouse> lvl1Warehouses){
-		list<Warehouse> lw <- copy(Warehouse) sort_by (each.surfaceUsedForLH-each.occupiedSurface);
+		list<Warehouse> lw <- copy(Warehouse) sort_by (each.totalSurface-each.occupiedSurface);
 
 		// Remove the ones which cannot welcome the stocks of the customer because they are already a warehouse of level 1
 		int i <- 0;
@@ -68,15 +67,14 @@ global {
 		// I assume that there is always at least one warehouse which has a free space greater than the occupied surface of the stock to outsource.
 		// It probably needs a piece of code to avoid problem of no free available surface
 		loop while:
-				( (lw[(length(lw)-1) - f] as Building).surfaceUsedForLH - (lw[(length(lw)-1) - f] as Building).occupiedSurface ) <= 0 or
-				(   (lw[(length(lw)-1) - f] as Building).surfaceUsedForLH - 
+				( (lw[(length(lw)-1) - f] as Building).totalSurface - (lw[(length(lw)-1) - f] as Building).occupiedSurface ) <= 0 or
+				(   (lw[(length(lw)-1) - f] as Building).totalSurface - 
 					(lw[(length(lw)-1) - f] as Building).occupiedSurface - 
 					((fdm.building as Building).occupiedSurface * sizeOfStock)
 				) < 0 {
 			f <- ((rnd(10000)/10000)^6)*(length(lw)-1);
 		}
 		return lw[(length(lw)-1) - f];/**/
-		//return one_of(large_warehouse);
 	}
 
 	/*
@@ -115,7 +113,7 @@ global {
 		// Remove the ones which cannot welcome the stocks of the customer because they don't have enough space
 		i <- 0;
 		loop while: i < length(lw) {
-			if(( lw[i] as Building).surfaceUsedForLH - (lw[i] as Building).occupiedSurface - ((fdm.building as Building).occupiedSurface * sizeOfStock ) < 0) {
+			if(( lw[i] as Building).totalSurface - (lw[i] as Building).occupiedSurface - ((fdm.building as Building).occupiedSurface * sizeOfStock ) < 0) {
 				remove index: i from: lw;
 			}
 			else{
@@ -182,7 +180,7 @@ global {
 		// Remove the ones which cannot welcome the stocks of the customer because they don't have enough space
 		i <- 0;
 		loop while: i < length(lw) {
-			if(( lw[i] as Building).surfaceUsedForLH - (lw[i] as Building).occupiedSurface - ((fdm.building as Building).occupiedSurface * sizeOfStock ) < 0) {
+			if(( lw[i] as Building).totalSurface - (lw[i] as Building).occupiedSurface - ((fdm.building as Building).occupiedSurface * sizeOfStock ) < 0) {
 				remove index: i from: lw;
 			}
 			else{
@@ -242,7 +240,7 @@ global {
 		// Remove the ones that cannot welcome the stocks of the customer
 		int i <- 0;
 		loop while: i < length(lw) {
-			if(( lw[i] as Building).surfaceUsedForLH - (lw[i] as Building).occupiedSurface - ((fdm.building as Building).occupiedSurface * sizeOfStock ) < 0) {
+			if(( lw[i] as Building).totalSurface - (lw[i] as Building).occupiedSurface - ((fdm.building as Building).occupiedSurface * sizeOfStock ) < 0) {
 				remove index: i from: lw;	
 			}
 			else{
@@ -289,7 +287,7 @@ global {
 		// Remove the ones that cannot welcome the stocks of the customer
 		int i <- 0;
 		loop while: i < length(lw) {
-			if(( lw[i] as Building).surfaceUsedForLH - (lw[i] as Building).occupiedSurface - ((fdm.building as Building).occupiedSurface * sizeOfStock ) < 0) {
+			if(( lw[i] as Building).totalSurface - (lw[i] as Building).occupiedSurface - ((fdm.building as Building).occupiedSurface * sizeOfStock ) < 0) {
 				remove index: i from: lw;	
 			}
 			else{
@@ -298,7 +296,7 @@ global {
 		}
 
 		// return the largest one
-		lw <- lw sort_by (each.surfaceUsedForLH - each.occupiedSurface);
+		lw <- lw sort_by (each.totalSurface - each.occupiedSurface);
 		return lw[length(lw) - 1];
 	}
 
@@ -326,7 +324,7 @@ global {
 		// Remove the ones that cannot welcome the stocks of the customer
 		int i <- 0;
 		loop while: i < length(lw) {
-			if(( lw[i] as Building).surfaceUsedForLH - (lw[i] as Building).occupiedSurface - ((fdm.building as Building).occupiedSurface * sizeOfStock ) < 0) {
+			if(( lw[i] as Building).totalSurface - (lw[i] as Building).occupiedSurface - ((fdm.building as Building).occupiedSurface * sizeOfStock ) < 0) {
 				remove index: i from: lw;
 			}
 			else{
@@ -335,7 +333,7 @@ global {
 		}
 
 		// Remove the ones which cannot welcome the stocks of the customer because they are already a warehouse of level 2
-		int i <- 0;
+		i <- 0;
 		loop while: i < length(lw) {
 			if(otherLvlWarehouses contains lw[i]){
 				remove index: i from: lw;

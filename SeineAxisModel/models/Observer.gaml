@@ -149,7 +149,7 @@ global {
 					numberOfEmptyStockInWarehouses <- numberOfEmptyStockInWarehouses + 1;
 				}
 			}
-			freeSurfaceInWarehouse <- freeSurfaceInWarehouse + (surfaceUsedForLH - tempStock);
+			freeSurfaceInWarehouse <- freeSurfaceInWarehouse + (totalSurface - tempStock);
 		}
 	}
 	

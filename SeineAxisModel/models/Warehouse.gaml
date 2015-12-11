@@ -1,7 +1,7 @@
 /**
  *  Warehouse
  *  Author: Thibaut Démare
- *  Description: A warehouse contains some batch of goods and is owned by a logistic provider
+ *  Description: A warehouse contains some stock of goods. It is managed by one or many LSP. It can create Batch agent to satisfy orders.
  */
 
 model Warehouse
@@ -10,30 +10,21 @@ import "./Building.gaml"
 import "./GraphStreamConnection.gaml"
 
 species Warehouse parent: RestockingBuilding schedules: [] {
-	float probaAnt;
 	string color;
-	int department;
-	int region;
-	float accessibility <- -1;
+	float accessibility <- -1; // Will contain the Schimbel's index.
 	
 	init {
 		if(use_gs){
 			// Add a new node event for corresponding sender
 			if(use_r2){
 				gs_add_node gs_sender_id:"neighborhood_all" gs_node_id:name;
-				gs_add_node_attribute gs_sender_id:"neighborhood_all" gs_node_id:name gs_attribute_name:"region" gs_attribute_value:region;
-				gs_add_node_attribute gs_sender_id:"neighborhood_all" gs_node_id:name gs_attribute_name:"department" gs_attribute_value:department;
 				gs_add_node_attribute gs_sender_id:"neighborhood_all" gs_node_id:name gs_attribute_name:"type" gs_attribute_value:"warehouse";
 			}
 			if(use_r3){
 				gs_add_node gs_sender_id:"neighborhood_warehouse" gs_node_id:name;
-				gs_add_node_attribute gs_sender_id:"neighborhood_warehouse" gs_node_id:name gs_attribute_name:"region" gs_attribute_value:region;
-				gs_add_node_attribute gs_sender_id:"neighborhood_warehouse" gs_node_id:name gs_attribute_name:"department" gs_attribute_value:department;
 			}
 			if(use_r6){
 				gs_add_node gs_sender_id:"neighborhood_warehouse_final" gs_node_id:name;
-				gs_add_node_attribute gs_sender_id:"neighborhood_warehouse_final" gs_node_id:name gs_attribute_name:"region" gs_attribute_value:region;
-				gs_add_node_attribute gs_sender_id:"neighborhood_warehouse_final" gs_node_id:name gs_attribute_name:"department" gs_attribute_value:department;
 			}
 			if(use_r9){
 				gs_add_node gs_sender_id:"supply_chain" gs_node_id:name;
@@ -50,12 +41,6 @@ species Warehouse parent: RestockingBuilding schedules: [] {
 
 	aspect base_condition {
 		if(length(stocks) != 0){
-			draw shape+3°px color: rgb("RoyalBlue");
-		}
-	}
-
-	aspect base_saturation {
-		if(occupiedSurface > 0.9 * surfaceUsedForLH){
 			draw shape+3°px color: rgb("RoyalBlue");
 		}
 	}

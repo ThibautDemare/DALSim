@@ -18,10 +18,9 @@ species Building schedules:[] {
 	list<Stock> entering_stocks;
 	list<int> listStepOrderMade <- [];
 	list<Batch> leavingBatches <- [];
-	float surfaceUsedForLH;
 	float totalSurface;
 	float occupiedSurface;
-	float outflow <- 0.0;
+	float outflow <- 0.0;// This data is sended to Graphstream for the supplying network
 	bool outflow_updated <- false;
 	int maxProcessEnteringGoodsCapacity <- 500;
 
