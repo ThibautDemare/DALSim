@@ -117,37 +117,6 @@ global schedules: [world] +
 		ask FinalDestinationManager sort_by (-1*each.surface){
 			do second_init;
 		}
-
-		// This part remove every useless agent among LPs and warehouses
-		int i <- 0;
-		list<LogisticProvider> llp <- LogisticProvider;
-		loop while: i < length(llp) {
-			if(length(llp[i].customers) = 0){
-				LogisticProvider lp <- llp[i];
-				remove index: i from: llp;
-				ask lp {
-					do die;
-				}
-			}
-			else {
-				i <- i + 1;
-			}
-		}
-
-		i <- 0;
-		list<Warehouse> lw <- Warehouse;
-		loop while: i < length(lw) {
-			if(length(lw[i].stocks) = 0){
-				Warehouse w <- lw[i];
-				remove index: i from: lw;
-				ask w {
-					do die;
-				}
-			}
-			else {
-				i <- i + 1;
-			}
-		}
 	}
 }
 
