@@ -115,10 +115,10 @@ experiment exp_all type: gui {
 
 		display chart_strategyShare refresh:every(1) {
 			chart  "Share of the different strategies adopted" type: series {
-				data "Strategy 1" value: nbLPStrat1 color: rgb('green') ;
-				data "Strategy 2" value: nbLPStrat2 color: rgb('red') ;
-				data "Strategy 3" value: nbLPStrat3 color: rgb('blue') ;
-				data "Strategy 4" value: nbLPStrat4 color: rgb('orange') ;
+				data "Strategy 1 (closest/largest warehouse according to a probability)" value: nbLPStrat1 color: rgb('green') ;
+				data "Strategy 2 (closest/largest warehouse according to its accessibility)" value: nbLPStrat2 color: rgb('red') ;
+				data "Strategy 3 (closest/largest warehouse)" value: nbLPStrat3 color: rgb('blue') ;
+				data "Strategy 4 (pure random)" value: nbLPStrat4 color: rgb('orange') ;
 			}
 		}/**/
 
