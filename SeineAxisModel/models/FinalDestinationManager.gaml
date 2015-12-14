@@ -89,7 +89,7 @@ species FinalDestinationManager schedules: [] {
 	/**
 	 * The consumption is between 0 and 1/decreasingRateOfStocks of the maximum stock.
 	 */
-	reflex decreasingStocks  when: (((time/3600.0) + timeShifting) mod numberOfHoursBeforeDS) = 0.0 {
+	reflex decreasingStocks  when: (((time/3600.0) + timeShifting) mod nbStepsbetweenDS) = 0.0 {
 		loop stock over: building.stocks {
 			float consumeQuantity <- 0.0;
 			loop while: consumeQuantity = 0 {

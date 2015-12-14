@@ -15,8 +15,9 @@ import "./Order.gaml"
 
 species Provider parent: RestockingBuilding schedules: [] {
 	list<LogisticProvider> customers <- [];
-	
+
 	init {
+		maxProcessOrdersCapacity <- 3;
 		if(use_gs){
 			// Add a new node event for corresponding sender
 			if(use_r9){
@@ -36,12 +37,12 @@ species Provider parent: RestockingBuilding schedules: [] {
 	/*
 	 * Receive a request from a logistic provider to restock another building
 	 */
-	reflex processOrders when: !empty(currentOrders){
+	reflex processOrders when: !empty(currentOrders) and (((time/3600.0) + timeShifting) mod nbStepsBetweenPPO) = 0.0 {
 		leavingBatches <- [];
 		// We empty progressively the list of orders after have processed them
 		int i <- 0;
-		loop while: i<length(currentOrders) {
-			Order order <- currentOrders[i];
+		loop while: ! empty(currentOrders) and i < maxProcessOrdersCapacity {
+			Order order <- currentOrders[0];
 			if(customers contains (order.logisticProvider)){
 				// And create a Stock agent which will move within a Batch
 				create Stock number:1 returns:sendedStock {
@@ -90,8 +91,8 @@ species Provider parent: RestockingBuilding schedules: [] {
 				do die;
 			}
 			remove index: 0 from: currentOrders;
+			i <- i + 1;
 		}
-		currentOrders <- [];
 	}
 	
 	aspect base { 

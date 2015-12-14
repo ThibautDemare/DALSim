@@ -61,7 +61,7 @@ species LogisticProvider schedules: [] {
 		}
 	}
 	
-	reflex testRestockNeeded when: supplyChain != nil and (((time/3600.0) + timeShifting) mod numberOfHoursBeforeTRN) = 0.0 and (time/3600.0) > 0 {
+	reflex testRestockNeeded when: supplyChain != nil and (((time/3600.0) + timeShifting) mod nbStepsbetweenTRN) = 0.0 and (time/3600.0) > 0 {
 		ask supplyChain.leafs { 
 			do recursiveTests([] as list<Order>);
 		}

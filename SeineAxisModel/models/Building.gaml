@@ -22,7 +22,8 @@ species Building schedules:[] {
 	float occupiedSurface;
 	float outflow <- 0.0;// This data is sended to Graphstream for the supplying network
 	bool outflow_updated <- false;
-	int maxProcessEnteringGoodsCapacity <- 500;
+	int maxProcessEnteringGoodsCapacity <- 1;
+	int timeShifting <- rnd(23);
 
 	/*
 	 * Receive a batch
@@ -123,7 +124,7 @@ species Building schedules:[] {
 
 species RestockingBuilding parent: Building schedules:[] {
 	list<Order> currentOrders <- [];
-	int maxProcessOrdersCapacity <- 500;
+	int maxProcessOrdersCapacity <- 1;
 
 	action addOrder(Order order){
 		currentOrders <- currentOrders + order;
@@ -132,10 +133,10 @@ species RestockingBuilding parent: Building schedules:[] {
 	/*
 	 * Receive a request from a logistic provider to restock another building
 	 */
-	reflex processOrders when: !empty(currentOrders) {
+	reflex processOrders when: !empty(currentOrders) and (((time/3600.0) + timeShifting) mod nbStepsBetweenWPO) = 0.0 {
 		// We empty progressively the list of orders after have processed them
 		int k <- 0;
-		loop while: length(currentOrders) > 0 and k < maxProcessOrdersCapacity {
+		loop while: !empty(currentOrders) and k < maxProcessOrdersCapacity {
 			Order order <- currentOrders[0];
 			if(!dead(order)){// when we test the restock, a son send his orders to all of his fathers. Therefore, a building can receive an order which is not for him in reality.
 				// We compare the product and the owner of each stock to the product and owner of this current order

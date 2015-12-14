@@ -131,7 +131,7 @@ global {
 		}
 		currentLPEfficiency <- currentLPEfficiency / length(FinalDestinationManager);
 		averagesLPEfficiency <- averagesLPEfficiency + 0.0;
-		if(length(averagesLPEfficiency) > numberOfStepConsideredForLPEfficiency){
+		if(length(averagesLPEfficiency) > nbStepsConsideredForLPEfficiency){
 			remove index: 0 from: averagesLPEfficiency;
 		}
 		averagesLPEfficiency[length(averagesLPEfficiency)-1] <- averagesLPEfficiency[length(averagesLPEfficiency)-1] + currentLPEfficiency;

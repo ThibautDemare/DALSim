@@ -23,14 +23,18 @@ global {
 	 
 	// The minimal number of days a final destination manager must wait before he can decide if he wants to change of logistic provider
 	int minimalNumberOfHoursOfContract <- 336;
-	// This is the number of step considered to compute the logistic provider efficiency
-	int numberOfStepConsideredForLPEfficiency <- 336; // number of steps for two weeks
-	// The numbers of hours between each calls to the reflex "decreasingStocks"
-	float numberOfHoursBeforeDS <- 24.0;
-	// The numbers of hours between each calls to the reflex "testRestockNeeded"
-	float numberOfHoursBeforeTRN <- 24.0;
-	// The numbers of hours between each calls to the reflex "processOrders"
-	float numberofHoursBeforePO <- 24.0;
+	// The number of steps considered to compute the logistic provider efficiency
+	int nbStepsConsideredForLPEfficiency <- 336; // number of steps for two weeks
+	// The numbers of steps between each calls to the reflex "decreasingStocks"
+	int nbStepsbetweenDS <- 24;
+	// The numbers of steps between each calls to the reflex "testRestockNeeded"
+	int nbStepsbetweenTRN <- 24;
+	// The numbers of steps between each calls to the reflex "processOrders" by Warehouse agents
+	int nbStepsBetweenWPO <- 12;
+	// The numbers of steps between each calls to the reflex "processOrders" by Provider agents
+	int nbStepsBetweenPPO <- 6;
+	// The numbers of steps between each calls to the reflex "processEnteringGoods" by Warehouse and Building agents
+	int nbStepsBetweenPEG <- 12;
 	
 	int sizeOfStockLocalWarehouse <- 2;
 	int sizeOfStockLargeWarehouse <- 3;
