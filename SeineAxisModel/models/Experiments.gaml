@@ -124,8 +124,10 @@ experiment exp_all type: gui {
 
 		display chart_stockAwaiting refresh:every(1) {
 			chart "Blocking level to make goods enter or leave buildings" type: series {
-				data "Number of stocks awaiting to enter a building" value: nbStocksAwaitingToEnter color: rgb('green') ;
-				data "Number of stocks awaiting to leave a building" value: nbStocksAwaitingToLeave color: rgb('red') ;
+				data "Number of stocks awaiting to enter buildings" value: nbStocksAwaitingToEnterBuilding color: rgb('green') ;
+				data "Number of stocks awaiting to enter warehouses" value: nbStocksAwaitingToEnterWarehouse color: rgb('red') ;
+				data "Number of stocks awaiting to leave warehouses" value: nbStocksAwaitingToLeaveWarehouse color: rgb('blue') ;
+				data "Number of stocks awaiting to leave providers" value: nbStocksAwaitingToLeaveProvider color: rgb('violet') ;
 			}
 		}/**/
 	}

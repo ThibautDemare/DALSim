@@ -24,8 +24,10 @@ global {
 	int nbLPStrat3 <- 0;
 	int nbLPStrat4 <- 0;
 
-	int nbStocksAwaitingToEnter;
-	int nbStocksAwaitingToLeave;
+	int nbStocksAwaitingToEnterBuilding;
+	int nbStocksAwaitingToEnterWarehouse;
+	int nbStocksAwaitingToLeaveWarehouse;
+	int nbStocksAwaitingToLeaveProvider;
 
 	list<float> averagesLPEfficiency <- [];
 	float averageLPEfficiency <- 0.0;
@@ -94,13 +96,21 @@ global {
 	}
 
 	reflex updateNbStockAwaiting {
-		nbStocksAwaitingToEnter <- 0;
+		nbStocksAwaitingToEnterBuilding <- 0;
 		ask Building {
-			nbStocksAwaitingToEnter <- nbStocksAwaitingToEnter + length(entering_stocks);
+			nbStocksAwaitingToEnterBuilding <- nbStocksAwaitingToEnterBuilding + length(entering_stocks);
 		}
-		nbStocksAwaitingToLeave <- 0;
-		ask RestockingBuilding {
-			nbStocksAwaitingToLeave <- nbStocksAwaitingToLeave + length(currentOrders);
+		nbStocksAwaitingToEnterWarehouse <- 0;
+		ask Warehouse {
+			nbStocksAwaitingToEnterWarehouse <- nbStocksAwaitingToEnterWarehouse + length(entering_stocks);
+		}
+		nbStocksAwaitingToLeaveWarehouse <- 0;
+		ask Warehouse {
+			nbStocksAwaitingToLeaveWarehouse <- nbStocksAwaitingToLeaveWarehouse + length(currentOrders);
+		}
+		nbStocksAwaitingToLeaveProvider <- 0;
+		ask Provider {
+			nbStocksAwaitingToLeaveProvider <- nbStocksAwaitingToLeaveProvider + length(currentOrders);
 		}
 	}
 
@@ -306,7 +316,7 @@ global {
 			to: filePath + date_simu_starts + "_average_time_to_be_delivered" + params  + ".csv" type: text rewrite: false;
 		save "" + ((time/3600.0) as int) + ";" + nbLPStrat1 + ";" + nbLPStrat2 + ";" + nbLPStrat3 + ";" + nbLPStrat4 + ";"
 			to: filePath + date_simu_starts + "_strategies_adoption_share" + params  + ".csv" type: text rewrite: false;
-		save "" + ((time/3600.0) as int) + ";" + nbStocksAwaitingToEnter + ";" + nbStocksAwaitingToLeave + ";"
+		save "" + ((time/3600.0) as int) + ";" + nbStocksAwaitingToEnterBuilding + ";" + nbStocksAwaitingToEnterWarehouse + ";" + ";" + nbStocksAwaitingToLeaveWarehouse + ";" + nbStocksAwaitingToLeaveProvider + ";"
 			to: filePath + date_simu_starts + "_nb_stocks_awaiting" + params  + ".csv" type: text rewrite: false;
 	}
 }
