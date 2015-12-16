@@ -15,7 +15,7 @@ species Batch skills:[MovingOnNetwork] schedules:[] {
 	list<Stock> stocks;
 	point target;
 	float speed <- 70.0 °km/°h;
-	int position;
+	int position; // The position allows to make distinction between Batch agents coming from Provider (position = 1), national warehouse (position = 2), or local warehouse (position = 3).
 	Building dest;
 	int stepOrderMade;
 	bool marked <- false;// useful for the Observer in order to avoid to count the batch two times
