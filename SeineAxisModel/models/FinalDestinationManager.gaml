@@ -156,7 +156,13 @@ species FinalDestinationManager schedules: [] {
 //		return llp[f];
 		return one_of(LogisticProvider);
 	}
-	
+
+	action manageLostStock(AwaitingStock aws) {
+		ask logisticProvider {
+			do manageLostStock(aws);
+		}
+	}
+
 	aspect base { 
 		draw shape+3°px color: rgb("DarkOrange") ;
 	}

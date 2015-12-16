@@ -24,8 +24,8 @@ species LogisticProvider schedules: [] {
 	int adoptedStrategy;
 	SupplyChain supplyChain <- nil;
 	list<int> timeToDeliver <- [];
-	list<Warehouse> lvl1Warehouses <- [];
-	list<Warehouse> lvl2Warehouses <- [];
+	list<Warehouse> lvl1Warehouses <- []; // close warehouse
+	list<Warehouse> lvl2Warehouses <- []; // large warehouse
 	list<FinalDestinationManager> customers <- [];
 	Provider provider;
 
@@ -64,6 +64,38 @@ species LogisticProvider schedules: [] {
 	reflex testRestockNeeded when: supplyChain != nil and (((time/3600.0) + timeShifting) mod nbStepsbetweenTRN) = 0.0 and (time/3600.0) > 0 {
 		ask supplyChain.leafs { 
 			do recursiveTests([] as list<Order>);
+		}
+	}
+
+
+	/*
+	 * This method looks for the warehouse of his supply chain which need to be restocked
+	 */
+	action manageLostStock(AwaitingStock aws) {
+		list<Warehouse> lw;
+		if(aws.position = 1){
+			lw <- lvl2Warehouses;
+		}
+		else {
+			lw <- lvl1Warehouses;
+		}
+		int i <- 0;
+		bool notfound <- true;
+		loop while: i < length(lw) and notfound {
+			Warehouse w <- lw[i];
+			int j <- 0;
+			loop while: j < length(w.stocks) and notfound {
+				if(aws.stock.product = w.stocks[j].product and w.stocks[j].lp = self){
+					create Batch number: 1 {
+						self.target <- w.location;
+						self.location <- aws.location;
+						self.position <- aws.position;
+						self.dest <- w;
+						self.stepOrderMade <- int(time/3600);// We update the stepOrderMade because, if the stock is lost, it means that the order has been made by a previous LSP, therefore, we should not depreciate the current LSP
+					}
+					notfound <- false;
+				}
+			}
 		}
 	}
 
@@ -448,7 +480,6 @@ species LogisticProvider schedules: [] {
 				(stock as Stock).fdm <- fdm;
 				(stock as Stock).lp <- self;
 				(stock as Stock).building <- warehouse;
-				(stock as Stock).status <- 0;
 			}
 		}
 	}
