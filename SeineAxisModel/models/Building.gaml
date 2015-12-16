@@ -124,7 +124,7 @@ species Building schedules:[] {
 
 species RestockingBuilding parent: Building schedules:[] {
 	list<Order> currentOrders <- [];
-	int maxProcessOrdersCapacity <- 1;
+	int maxProcessOrdersCapacity;
 
 	action addOrder(Order order){
 		currentOrders <- currentOrders + order;

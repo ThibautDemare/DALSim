@@ -58,4 +58,21 @@ global {
 			i <- i + 1;
 		}
 	}
+
+	/**
+	 * Each warehouse has a capacity to process order by time unit. This capacity is determined according to the total surface of this warehouse.
+	 * Indeed, we assume that the larger the warehouse is, the more it has ressources to process the orders.
+	 */
+	float valForMinCapacity <- 1.0;
+	float valForMaxCapacity <- 4.0;
+	action init_Order_Processing_Capacity {
+		list<Warehouse> lw <- Warehouse sort_by each.totalSurface;
+		int i <- 0;
+		int ld <- length(lw);
+		loop while: i < ld {
+			Warehouse w <- lw[i];
+			w.maxProcessOrdersCapacity <- round(((valForMaxCapacity-valForMinCapacity) / (length(lw)-1)) * (i) + valForMinCapacity);
+			i <- i + 1;
+		}
+	}
 }
