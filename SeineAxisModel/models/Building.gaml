@@ -17,7 +17,6 @@ import "./LogisticProvider.gaml"
 species Building schedules:[] {
 	list<Stock> stocks;
 	list<AwaitingStock> entering_stocks;
-	list<Batch> leavingBatches <- [];
 	float totalSurface;
 	float occupiedSurface;
 	float outflow <- 0.0;// This data is sended to Graphstream for the supplying network
@@ -89,12 +88,12 @@ species Building schedules:[] {
 				}
 			}
 		}
-		leavingBatches <- [];
 	}
 }
 
 species RestockingBuilding parent: Building schedules:[] {
 	list<Order> currentOrders <- [];
+	list<Batch> leavingBatches <- [];
 	int maxProcessOrdersCapacity;
 
 	action addOrder(Order order){
