@@ -85,7 +85,7 @@ species LogisticProvider schedules: [] {
 			Warehouse w <- lw[i];
 			int j <- 0;
 			loop while: j < length(w.stocks) and notfound {
-				if(aws.stock.product = w.stocks[j].product and w.stocks[j].lp = self){
+				if(aws.stock.product = w.stocks[j].product and w.stocks[j].lp = self and aws.stock.fdm = w.stocks[j].fdm){
 					create Batch number: 1 {
 						self.target <- w.location;
 						self.location <- aws.location;
