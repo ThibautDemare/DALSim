@@ -70,9 +70,7 @@ global {
 		int ld <- length(lw);
 		loop while: i < ld {
 			Warehouse w <- lw[i];
-			//w.maxProcessOrdersCapacity <- round(((valForMaxCapacity-valForMinCapacity) / (length(lw)-1)) * (i) + valForMinCapacity);
 			w.cost <- round(((valForMaxCost-valForMinCost) / (length(lw)-1)) * (i) + valForMinCost);
-			write "surface : "+w.totalSurface+" et cost : "+w.cost;
 			i <- i + 1;
 		}
 	}
