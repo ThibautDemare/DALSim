@@ -81,7 +81,7 @@ global schedules: [world] +
 		}
 
 		// Creation of a SuperProvider
-		create Provider from: provider_shapefile;
+		create Provider from: provider_shapefile with: [port::read("port") as float];
 
 		// Warehouses
 		create Warehouse from: warehouse_shapefile returns: lw with: [totalSurface::read("surface") as float];
@@ -108,7 +108,7 @@ global schedules: [world] +
 		
 		// Init the decreasing rate of consumption
 		do init_decreasingRateOfStocks;
-		do init_Order_Processing_Capacity;
+		do init_cost;
 
 		// I create one batch who will do nothing, because, if there is no batch at all, it slows down the simulation... Weird...
 		create Batch number:1;

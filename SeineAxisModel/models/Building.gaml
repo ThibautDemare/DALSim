@@ -95,6 +95,7 @@ species RestockingBuilding parent: Building schedules:[] {
 	list<Order> currentOrders <- [];
 	list<Batch> leavingBatches <- [];
 	int maxProcessOrdersCapacity;
+	float cost;
 
 	action addOrder(Order order){
 		currentOrders <- currentOrders + order;

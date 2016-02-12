@@ -28,6 +28,8 @@ species LogisticProvider schedules: [] {
 	list<Warehouse> lvl2Warehouses <- []; // large warehouse
 	list<FinalDestinationManager> customers <- [];
 	Provider provider;
+	float cumulateCosts <- 0;
+	float averageCosts <- 0;
 
 	init {
 		if(localStrategy){

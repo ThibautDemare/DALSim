@@ -15,9 +15,16 @@ import "./Order.gaml"
 
 species Provider parent: RestockingBuilding schedules: [] {
 	list<LogisticProvider> customers <- [];
+	string port;
 
 	init {
-		maxProcessOrdersCapacity <- 3;
+		if(port = "ANTWERP"){
+			cost <- 200;
+		}
+		else {
+			cost <- 400;
+		}
+		maxProcessOrdersCapacity <- 10;
 		if(use_gs){
 			// Add a new node event for corresponding sender
 			if(use_r9){

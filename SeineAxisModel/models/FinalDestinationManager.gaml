@@ -110,7 +110,8 @@ species FinalDestinationManager schedules: [] {
 		numberOfHoursOfContract <- numberOfHoursOfContract + 1;
 		if(numberOfHoursOfContract > minimalNumberOfHoursOfContract){
 			//if(localAverageLPEfficiency < averageLPEfficiency ){
-			if(localTimeToBeDelivered > averageTimeToBeDelivered ){
+			//if(localTimeToBeDelivered > averageTimeToBeDelivered ){
+			if(logisticProvider.averageCosts < averageCosts){
 				// the logsitic provider is not efficient enough. He must be replaced by another one.
 				// Inform the current logistic provider that he losts a customer
 				TransferredStocks stocksRemoved;

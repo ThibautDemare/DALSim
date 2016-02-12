@@ -62,6 +62,8 @@ global {
 	float averageTimeToDeliver <- 0.0;
 	float averageTimeToBeDelivered <- 0.0;
 
+	float averageCosts;
+
 	reflex updateStockInBuildings {
 		do computeStockInFinalDests;
 		do computeStockInWarehouses;
@@ -318,5 +320,30 @@ global {
 			to: filePath + date_simu_starts + "_strategies_adoption_share" + params  + ".csv" type: text rewrite: false;
 		save "" + ((time/3600.0) as int) + ";" + nbStocksAwaitingToEnterBuilding + ";" + nbStocksAwaitingToEnterWarehouse + ";" + nbStocksAwaitingToLeaveWarehouse + ";" + nbStocksAwaitingToLeaveProvider + ";"
 			to: filePath + date_simu_starts + "_nb_stocks_awaiting" + params  + ".csv" type: text rewrite: false;
+	}
+
+	reflex computeLPCost{
+		averageCosts <- 0;
+		int nbLP <- 0;
+		ask LogisticProvider {
+			if(length(customers) > 0){
+				nbLP <- nbLP + 1;
+				cumulateCosts <- 0;
+				int i <- 0;
+				loop while: i<length(lvl1Warehouses) {
+					cumulateCosts <- cumulateCosts + lvl1Warehouses[i].cost;
+					i <- i + 1;
+				}
+				i <- 0;
+				loop while: i<length(lvl2Warehouses) {
+					cumulateCosts <- cumulateCosts + lvl2Warehouses[i].cost;
+					i <- i + 1;
+				}
+				cumulateCosts <- cumulateCosts + provider.cost;
+				self.averageCosts <- cumulateCosts/length(customers);
+				myself.averageCosts <- averageCosts + self.averageCosts;
+			}
+		}
+		averageCosts <- averageCosts / nbLP;
 	}
 }
