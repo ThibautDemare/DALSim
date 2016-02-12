@@ -344,6 +344,8 @@ global {
 				myself.averageCosts <- averageCosts + self.averageCosts;
 			}
 		}
-		averageCosts <- averageCosts / nbLP;
+		if(nbLP > 0){
+			averageCosts <- averageCosts / nbLP;
+		}
 	}
 }
