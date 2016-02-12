@@ -21,7 +21,7 @@ species Building schedules:[] {
 	float occupiedSurface;
 	float outflow <- 0.0;// This data is sended to Graphstream for the supplying network
 	bool outflow_updated <- false;
-	int maxProcessEnteringGoodsCapacity <- 1;
+	int maxProcessEnteringGoodsCapacity <- 5;
 	int timeShifting <- rnd(23);
 
 	/*
@@ -106,10 +106,12 @@ species RestockingBuilding parent: Building schedules:[] {
 	reflex processOrders when: !empty(currentOrders) and (((time/3600.0) + timeShifting) mod nbStepsBetweenWPO) = 0.0 {
 		// We empty progressively the list of orders after have processed them
 		int k <- 0;
+		list<Order> awaitingOrder <- [];
 		loop while: !empty(currentOrders) and k < maxProcessOrdersCapacity {
 			Order order <- currentOrders[0];
 			if(!dead(order)){// when we test the restock, a son send his orders to all of his fathers. Therefore, a building can receive an order which is not for him in reality.
 				// We compare the product and the owner of each stock to the product and owner of this current order
+				float sendedQuantity <- 0.0;
 				bool foundStock <- false;
 				int i <- 0;
 				loop while: i < length(stocks) and !foundStock {
@@ -119,40 +121,48 @@ species RestockingBuilding parent: Building schedules:[] {
 						foundStock <- true;
 						order.reference.status <- 3;
 						// Compute the right quantity to send
-						float sendedQuantity <- 0.0;
 						if((stock.quantity -  order.quantity) > 0){
 							sendedQuantity <- order.quantity;
 						}
 						else{
 							sendedQuantity <- stock.quantity;
 						}
-						stock.quantity <- stock.quantity - sendedQuantity;
+						// We only send something if the quantity is not empty
+						if(sendedQuantity > 0){
+							stock.quantity <- stock.quantity - sendedQuantity;
 
-						outflow <- outflow + sendedQuantity;
-						outflow_updated <- true;
+							outflow <- outflow + sendedQuantity;
+							outflow_updated <- true;
 
-						// And create a Stock agent which will move within a Batch
-						create Stock number:1 returns:sendedStock {
-							self.product <- order.product;
-							self.quantity <- sendedQuantity;
-							self.fdm <- order.fdm;
-							self.lp <- order.logisticProvider;
+							// And create a Stock agent which will move within a Batch
+							create Stock number:1 returns:sendedStock {
+								self.product <- order.product;
+								self.quantity <- sendedQuantity;
+								self.fdm <- order.fdm;
+								self.lp <- order.logisticProvider;
+							}
+
+							do sendStock(sendedStock[0], order.building, order.position, order.stepOrderMade);
 						}
-
-						do sendStock(sendedStock[0], order.building, order.position, order.stepOrderMade);
 					}
 					i <- i + 1;
 				}
 
 				if(foundStock){
 					k <- k + 1;
-					ask order {
-						do die;
+					if(sendedQuantity > 0){
+						ask order {
+							do die;
+						}
+					}
+					else {
+						awaitingOrder <- awaitingOrder + order;
 					}
 				}
 			}
 			remove index: 0 from: currentOrders;
 		}
+		currentOrders <- awaitingOrder + currentOrders;
 		leavingBatches <- [];
 	}
 
