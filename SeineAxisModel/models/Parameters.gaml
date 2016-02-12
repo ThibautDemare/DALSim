@@ -30,11 +30,11 @@ global {
 	// The numbers of steps between each calls to the reflex "testRestockNeeded"
 	int nbStepsbetweenTRN <- 24;
 	// The numbers of steps between each calls to the reflex "processOrders" by Warehouse agents
-	int nbStepsBetweenWPO <- 12;
+	int nbStepsBetweenWPO <- 6;
 	// The numbers of steps between each calls to the reflex "processOrders" by Provider agents
 	int nbStepsBetweenPPO <- 6;
 	// The numbers of steps between each calls to the reflex "processEnteringGoods" by Warehouse and Building agents
-	int nbStepsBetweenPEG <- 12;
+	int nbStepsBetweenPEG <- 24;
 	
 	int sizeOfStockLocalWarehouse <- 2;
 	int sizeOfStockLargeWarehouse <- 3;
@@ -63,16 +63,18 @@ global {
 	 * Each warehouse has a capacity to process order by time unit. This capacity is determined according to the total surface of this warehouse.
 	 * Indeed, we assume that the larger the warehouse is, the more it has ressources to process the orders.
 	 */
-	float valForMinCapacity <- 1.0;
-	float valForMaxCapacity <- 4.0;
-	action init_Order_Processing_Capacity {
-		list<Warehouse> lw <- Warehouse sort_by each.totalSurface;
-		int i <- 0;
-		int ld <- length(lw);
-		loop while: i < ld {
-			Warehouse w <- lw[i];
-			w.maxProcessOrdersCapacity <- round(((valForMaxCapacity-valForMinCapacity) / (length(lw)-1)) * (i) + valForMinCapacity);
-			i <- i + 1;
-		}
-	}
+//	float valForMinCapacity <- 5.0;
+//	float valForMaxCapacity <- 50.0;
+//	action init_Order_Processing_Capacity {
+//		list<Warehouse> lw <- Warehouse sort_by each.totalSurface;
+//		int i <- 0;
+//		int ld <- length(lw);
+//		loop while: i < ld {
+//			Warehouse w <- lw[i];
+//			//w.maxProcessOrdersCapacity <- round(((valForMaxCapacity-valForMinCapacity) / (length(lw)-1)) * (i) + valForMinCapacity);
+//			w.maxProcessOrdersCapacity <- 50;
+//			i <- i + 1;
+//		}
+//	}
+
 }

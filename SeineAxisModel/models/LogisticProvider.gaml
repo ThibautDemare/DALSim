@@ -193,6 +193,9 @@ species LogisticProvider schedules: [] {
 		list<SupplyChainElement> uselessSCE <- deleteUselessSCE(supplyChain.root, fdm, uselessWarehouses);
 		loop while: 0 < length(uselessSCE) {
 			ask uselessSCE[0] {
+				if(building != myself.provider and building != fdm.building){
+					(building as RestockingBuilding).maxProcessOrdersCapacity <- (building as RestockingBuilding).maxProcessEnteringGoodsCapacity - 1;
+				}
 				do die;
 			}
 			remove index: 0 from: uselessSCE;
@@ -323,6 +326,10 @@ species LogisticProvider schedules: [] {
 			fdmLeaf.fathers <- [] + sceCloseWarehouse;
 		}
 
+		ask sceCloseWarehouse {
+			(building as RestockingBuilding).maxProcessOrdersCapacity <- (building as RestockingBuilding).maxProcessEnteringGoodsCapacity + 1;
+		}
+
 		if(use_gs){
 			if(use_r9){
 				gs_add_edge gs_sender_id:"supply_chain" gs_edge_id:(fdm.name + sceCloseWarehouse.building.name) gs_node_id_from:fdm.name gs_node_id_to:sceCloseWarehouse.building.name gs_is_directed:false;
@@ -407,6 +414,10 @@ species LogisticProvider schedules: [] {
 		}
 		if(!found){
 			sceLarge.sons <- sceLarge.sons + sceCloseWarehouse;
+		}
+
+		ask sceLarge {
+			(building as RestockingBuilding).maxProcessOrdersCapacity <- (building as RestockingBuilding).maxProcessEnteringGoodsCapacity + 1;
 		}
 
 		if(use_gs){
