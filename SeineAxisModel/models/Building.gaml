@@ -108,6 +108,17 @@ species RestockingBuilding parent: Building schedules:[] {
 		// We empty progressively the list of orders after have processed them
 		int k <- 0;
 		list<Order> awaitingOrder <- [];
+
+		// If the warehouse does not belong to a LSP anymore, then we have to empty the list of orders
+		if(length(currentOrders) > 0 and maxProcessOrdersCapacity = 0){
+			loop while: !empty(currentOrders) {
+				ask currentOrders[0] {
+					do die;
+				}
+				remove index: 0 from: currentOrders;
+			}
+		}
+
 		loop while: !empty(currentOrders) and k < maxProcessOrdersCapacity {
 			Order order <- currentOrders[0];
 			if(!dead(order)){// when we test the restock, a son send his orders to all of his fathers. Therefore, a building can receive an order which is not for him in reality.
