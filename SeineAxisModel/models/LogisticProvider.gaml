@@ -196,7 +196,7 @@ species LogisticProvider schedules: [] {
 		loop while: 0 < length(uselessSCE) {
 			ask uselessSCE[0] {
 				if(building != myself.provider and building != fdm.building){
-					(building as RestockingBuilding).maxProcessOrdersCapacity <- (building as RestockingBuilding).maxProcessEnteringGoodsCapacity - 1;
+					(building as RestockingBuilding).maxProcessOrdersCapacity <- (building as RestockingBuilding).maxProcessOrdersCapacity - 5;
 				}
 				do die;
 			}
@@ -329,7 +329,7 @@ species LogisticProvider schedules: [] {
 		}
 
 		ask sceCloseWarehouse {
-			(building as RestockingBuilding).maxProcessOrdersCapacity <- (building as RestockingBuilding).maxProcessEnteringGoodsCapacity + 1;
+			(building as RestockingBuilding).maxProcessOrdersCapacity <- (building as RestockingBuilding).maxProcessOrdersCapacity + 5;
 		}
 
 		if(use_gs){
@@ -419,7 +419,7 @@ species LogisticProvider schedules: [] {
 		}
 
 		ask sceLarge {
-			(building as RestockingBuilding).maxProcessOrdersCapacity <- (building as RestockingBuilding).maxProcessEnteringGoodsCapacity + 1;
+			(building as RestockingBuilding).maxProcessOrdersCapacity <- (building as RestockingBuilding).maxProcessOrdersCapacity + 5;
 		}
 
 		if(use_gs){
@@ -495,6 +495,7 @@ species LogisticProvider schedules: [] {
 				(stock as Stock).fdm <- fdm;
 				(stock as Stock).lp <- self;
 				(stock as Stock).building <- warehouse;
+				(stock as Stock).status <- 0;
 			}
 		}
 	}
