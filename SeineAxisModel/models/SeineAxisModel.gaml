@@ -81,7 +81,7 @@ global schedules: [world] +
 		}
 
 		// Creation of a SuperProvider
-		create Provider from: provider_shapefile with: [port::read("port") as float];
+		create Provider from: provider_shapefile with: [port::read("Port") as string];
 
 		// Warehouses
 		create Warehouse from: warehouse_shapefile returns: lw with: [totalSurface::read("surface") as float];
