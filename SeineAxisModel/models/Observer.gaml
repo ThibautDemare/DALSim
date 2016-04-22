@@ -64,6 +64,9 @@ global {
 
 	float averageCosts;
 
+	int nbHavre;
+	int nbAntwerp;
+
 	reflex updateStockInBuildings {
 		do computeStockInFinalDests;
 		do computeStockInWarehouses;
@@ -223,16 +226,18 @@ global {
 		int i <- 0;
 		int sum <- 0;
 		ask LogisticProvider {
-			int j <- 0;
+			if(length(customers) > 0){
+				int j <- 0;
 
-			loop while: 50 < length(timeToDeliver) {
-				remove index: 0 from: timeToDeliver;
-			}
+				loop while: 50 < length(timeToDeliver) {
+					remove index: 0 from: timeToDeliver;
+				}
 
-			loop while: j<length(timeToDeliver) {
-				sum <- sum + timeToDeliver[j];
-				j <- j + 1;
-				i <- i + 1;
+				loop while: j<length(timeToDeliver) {
+					sum <- sum + timeToDeliver[j];
+					j <- j + 1;
+					i <- i + 1;
+				}
 			}
 		}
 		if(i > 0){
@@ -341,11 +346,26 @@ global {
 				}
 				cumulateCosts <- cumulateCosts + provider.cost;
 				self.averageCosts <- cumulateCosts/length(customers);
-				myself.averageCosts <- averageCosts + self.averageCosts;
+				myself.averageCosts <- myself.averageCosts + self.averageCosts;
 			}
 		}
 		if(nbLP > 0){
 			averageCosts <- averageCosts / nbLP;
+		}
+	}
+
+	reflex portsShare {
+		nbAntwerp <- 0;
+		nbHavre <- 0;
+		ask LogisticProvider {
+			if(length(customers) > 0){
+				if(provider.port = "ANTWERP"){
+					nbAntwerp <- nbAntwerp + 1;
+				}
+				else {
+					nbHavre <- nbHavre + 1;
+				}
+			}
 		}
 	}
 }
