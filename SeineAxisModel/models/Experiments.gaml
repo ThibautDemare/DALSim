@@ -36,6 +36,13 @@ experiment exp_all type: gui {
 			grid cell_stock_shortage;
 			species Batch aspect: little_base;
 		}
+
+		display display_traffic autosave: true refresh:every(1) {
+			species Road aspect: geom;
+			species Warehouse aspect: base_condition;
+			species FinalDestinationManager aspect: base;
+			species Provider aspect: base;
+		}
 	}
 
 	output {
@@ -133,6 +140,19 @@ experiment exp_all type: gui {
 			chart "Blocking level to make goods enter or leave buildings" type: series {
 				data "Number of stocks awaiting to enter buildings" value: nbStocksAwaitingToEnterBuilding color: rgb('green') ;
 				data "Number of stocks awaiting to enter warehouses" value: nbStocksAwaitingToEnterWarehouse color: rgb('red') ;
+			}
+		}/**/
+
+		display chart_AverageCosts refresh:every(1) {
+			chart "Average Costs" type: series {
+				data "average costs" value: averageCosts color: rgb('green') ;
+			}
+		}/**/
+
+		display chart_PortsShare refresh:every(1) {
+			chart "Competition between the ports of Le Havre and Antwerp" type: series {
+				data "Number of LP using Le Havre" value: nbHavre color: rgb('green') ;
+				data "Number of LP using Antwerp" value: nbAntwerp color: rgb('red') ;
 			}
 		}/**/
 	}
