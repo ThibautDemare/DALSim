@@ -2,8 +2,11 @@ package org.graphstream.gama.seineaxismodel;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -15,6 +18,8 @@ import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.SingleGraph;
 import org.graphstream.stream.GraphParseException;
+import org.graphstream.stream.file.FileSource;
+import org.graphstream.stream.file.FileSourceFactory;
 import org.graphstream.ui.swingViewer.Viewer;
 
 public class ConnectedComponentExtractor {
@@ -22,12 +27,17 @@ public class ConnectedComponentExtractor {
 		// Init the graph
 		Graph graph = new SingleGraph("");
 		try {
-			graph.read(System.getProperty("user.dir" )+File.separator+"DGS"+File.separator+"neighborhood_warehouse_with_region_3000.0.dgs");
-		} catch (ElementNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (GraphParseException e) {
+			String filePath = System.getProperty("user.dir" )+File.separator+"DGS"+File.separator+"neighborhood_actor_with_region3000.0.dgs";
+			FileSource fs = FileSourceFactory.sourceFor(filePath);
+
+			fs.addSink(graph);
+			fs.begin(filePath);
+
+			while (fs.nextEvents()) {
+				// Optionally some code here ...
+			}
+			fs.end();
+		} catch( IOException e) {
 			e.printStackTrace();
 		}
 		graph.display(false);
@@ -37,6 +47,44 @@ public class ConnectedComponentExtractor {
 		ccs.init(graph);
 		ccs.setCountAttribute("connectedComponent");
 		ccs.compute();
+
+		// Get size of each connected components
+		ArrayList<Integer> sizeConnectedComponents = new ArrayList<Integer>();
+		Iterator<ConnectedComponent> it1 = ccs.iterator();
+		int maxSize = 0;
+		while(it1.hasNext()){
+			int i = 0;
+			ConnectedComponent cc = it1.next();
+			for(Node n : cc.getEachNode()){
+				i++;
+			}
+			if(maxSize < i)
+				maxSize = i;
+			sizeConnectedComponents.add(i);
+		}
+		// Compute distribution
+		int[] connectedComponentsDistribution = new int[maxSize+1];
+		for(int i = 0; i<sizeConnectedComponents.size(); i++){
+			connectedComponentsDistribution[sizeConnectedComponents.get(i)]++;
+		}
+		graph.addAttribute("SizeConnectedComponentsDistribution", connectedComponentsDistribution);
+
+		PrintWriter writer_sizeConnectedComponentsDistribution;
+		try {
+			writer_sizeConnectedComponentsDistribution = new PrintWriter(System.getProperty("user.dir" )+File.separator+"ConnectedComponents"+File.separator+"sizeConnectedComponentsDistribution.csv", "UTF-8");
+			int[] sizeConnectedComponentsDistribution = graph.getAttribute("SizeConnectedComponentsDistribution");
+			for(int i = 0; i < sizeConnectedComponentsDistribution.length; i++){
+				writer_sizeConnectedComponentsDistribution.println(i+"; "+sizeConnectedComponentsDistribution[i]);
+			}
+			writer_sizeConnectedComponentsDistribution.close();
+		} catch (FileNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (UnsupportedEncodingException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
 
 		/*
 		 *  Extract the five biggest connected component
@@ -62,6 +110,13 @@ public class ConnectedComponentExtractor {
 			for(Node n : cc.getEachNode()){
 				i++;
 			}
+			int j = 0;
+			for(Edge e : cc.getEachEdge()){
+				j++;
+			}
+			//i = j; // If you want to sort according to the number of edges
+			//i = i; // If you want to sort according to the number of nodes
+			//i = j/i; // If you want to sort according to the average degree of each CC
 			if(sizeCC1 < i){
 				sizeCC5 = sizeCC4;
 				sizeCC4 = sizeCC3;
@@ -146,8 +201,11 @@ public class ConnectedComponentExtractor {
 						style += "fill-color: LightSlateGray;";
 						nb_5++;
 					}
-					no.addAttribute("ui.style", style+"size: 10px;");
-					subgraphs[i].addNode(n.getId()).addAttribute("ui.style", no.getAttribute("ui.style"));
+					no.addAttribute("ui.style", style+"size: 5px;");
+					Node temp = subgraphs[i].addNode(n.getId());
+					temp.addAttribute("ui.style", style+"size: 10px;");
+					temp.addAttribute("y", no.getAttribute("y"));
+					temp.addAttribute("x", no.getAttribute("x"));
 				}
 			}
 
@@ -155,11 +213,13 @@ public class ConnectedComponentExtractor {
 			for(Edge e : cc.getEachEdge()){
 				subgraphs[i].addEdge(e.getId(), e.getNode0().getId(), e.getNode1().getId());
 			}
-			subgraphs[i].display(true);
+			System.out.println("Nb edge/n : " + 1.0*subgraphs[i].getEdgeCount()/subgraphs[i].getNodeCount());
+			subgraphs[i].display(false);
 			
 			// Remove the nodes of this component in the original graph to clear it
-			for(Node n : subgraphs[i])
-				graph.removeNode(n.getId());
+			// Uncomment possible only with small graph otherwise it is very long
+//			for(Node n : subgraphs[i])
+//				graph.removeNode(n.getId());
 			
 			//Ask for a SVG save of the display
 			System.out.println("============================");
@@ -170,7 +230,7 @@ public class ConnectedComponentExtractor {
 				choice = bufferRead.readLine();
 				if(choice.equals("Y") || choice.equals("y") || choice.equals("Yes") || choice.equals("yes") || choice.equals("YES")){
 					subgraphs[i].write(System.getProperty("user.dir" )+File.separator+"ConnectedComponents"+File.separator+"subgraph_"+i+".dgs");
-					subgraphs[i].addAttribute("ui.screenshot", System.getProperty("user.dir" )+File.separator+"ConnectedComponents"+File.separator+"subgraph_"+i+".svg");
+					subgraphs[i].addAttribute("ui.screenshot", System.getProperty("user.dir" )+File.separator+"ConnectedComponents"+File.separator+"subgraph_"+i+".png");
 					System.out.println("Saved.");
 				}
 				Thread.sleep(1000);
@@ -181,5 +241,5 @@ public class ConnectedComponentExtractor {
 		}
 
 	}
-	
+
 }
