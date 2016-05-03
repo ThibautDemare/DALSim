@@ -15,6 +15,7 @@ import "./LogisticProvider.gaml"
 import "./Provider.gaml"
 import "./FinalDestinationManager.gaml"
 import "./Batch.gaml"
+import "Perturbator.gaml"
 
 experiment exp_no_output type: gui {
 	
@@ -39,13 +40,9 @@ experiment exp_all type: gui {
 
 		display display_traffic autosave: true refresh:every(1) {
 			species Road aspect: geom;
-			species Warehouse aspect: base_condition;
-			species FinalDestinationManager aspect: base;
-			species Provider aspect: base;
+			event mouse_down action: block_roads;
 		}
-	}
 
-	output {
 		display chart_number_of_batch refresh:every(1) {
 			chart  "Number of batches" type: series {
 				data "Total number of batch" value: totalNumberOfBatch color: rgb('purple') ;
