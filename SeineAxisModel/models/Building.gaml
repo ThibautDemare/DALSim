@@ -14,7 +14,7 @@ import "./Parameters.gaml"
 import "./GraphStreamConnection.gaml"
 import "./LogisticProvider.gaml"
 		
-species Building schedules:[] {
+species Building {
 	list<Stock> stocks;
 	list<AwaitingStock> entering_stocks;
 	float totalSurface;
@@ -91,7 +91,7 @@ species Building schedules:[] {
 	}
 }
 
-species RestockingBuilding parent: Building schedules:[] {
+species RestockingBuilding parent: Building {
 	list<Order> currentOrders <- [];
 	list<Batch> leavingBatches <- [];
 	int maxProcessOrdersCapacity;

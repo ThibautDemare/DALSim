@@ -17,7 +17,7 @@ import "./TransferredStocks.gaml"
 import "./GraphStreamConnection.gaml"
 import "./Parameters.gaml"
 
-species FinalDestinationManager schedules: [] {
+species FinalDestinationManager {
 	int timeShifting <- rnd(23);
 	LogisticProvider logisticProvider;
 	list<float> localLPEfficiencies <- [];

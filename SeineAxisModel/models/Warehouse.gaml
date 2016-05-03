@@ -9,7 +9,7 @@ model Warehouse
 import "./Building.gaml"
 import "./GraphStreamConnection.gaml"
 
-species Warehouse parent: RestockingBuilding schedules: [] {
+species Warehouse parent: RestockingBuilding {
 	string color;
 	float accessibility <- -1; // Will contain the Schimbel's index.
 	

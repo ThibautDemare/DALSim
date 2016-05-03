@@ -21,14 +21,7 @@ import "./Parameters.gaml"
 /*
  * Init global variables and agents
  */
-global schedules: [world] + 
-				shuffle(FinalDestinationManager) + 
-				shuffle(LogisticProvider)+
-				shuffle(Provider) + 
-				shuffle(Building) +
-				shuffle(Warehouse) +
-				Batch + 
-				Stock {
+global {
 
 	//This data comes from "EuroGlobalMap" (EuroGeographics)
 	// Each road has an attribute giving the speed in km/h

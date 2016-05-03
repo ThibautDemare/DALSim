@@ -13,7 +13,7 @@ import "./Building.gaml"
 import "./GraphStreamConnection.gaml"
 import "./Order.gaml"
 
-species Provider parent: RestockingBuilding schedules: [] {
+species Provider parent: RestockingBuilding {
 	list<LogisticProvider> customers <- [];
 	string port;
 
@@ -39,6 +39,11 @@ species Provider parent: RestockingBuilding schedules: [] {
 
 	action addCustomer(LogisticProvider lp){
 		customers <- customers + lp;
+	}
+	
+	reflex receive_batch {
+		// override reflex from RestockingBuilding
+		// It is useless for providers since they are never restocked
 	}
 
 	/*

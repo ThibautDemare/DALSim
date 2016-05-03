@@ -10,7 +10,7 @@ import "./SeineAxisModel.gaml"
 import "./Building.gaml"
 import "./FinalDestinationManager.gaml"
 
-species Batch skills:[MovingOnNetwork] schedules:[] {
+species Batch skills:[MovingOnNetwork] {
 	float overallQuantity;
 	list<Stock> stocks;
 	point target;

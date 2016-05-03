@@ -19,7 +19,7 @@ import "./GraphStreamConnection.gaml"
 import "./Parameters.gaml"
 import "./Strategies.gaml"
 
-species LogisticProvider schedules: [] {
+species LogisticProvider {
 	int timeShifting <- rnd(23);
 	int adoptedStrategy;
 	SupplyChain supplyChain <- nil;
@@ -62,7 +62,7 @@ species LogisticProvider schedules: [] {
 			}
 		}
 	}
-	
+
 	reflex testRestockNeeded when: supplyChain != nil and (((time/3600.0) + timeShifting) mod nbStepsbetweenTRN) = 0.0 and (time/3600.0) > 0 {
 		ask supplyChain.leafs { 
 			do recursiveTests([] as list<Order>);
