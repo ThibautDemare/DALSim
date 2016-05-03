@@ -375,10 +375,12 @@ global {
 		float nbLP <- 0.0;
 		ask LogisticProvider {
 			if(length(customers) > 0){
-				nbLP <- nbLP + 1;
-				sum <- sum + threshold;
+				nbLP <- nbLP + length(customers);
+				sum <- sum + threshold*length(customers);
 			}
 		}
-		averageThreshold <- sum/nbLP;
+		if(nbLP > 0){
+			averageThreshold <- sum/nbLP;
+		}
 	}
 }
