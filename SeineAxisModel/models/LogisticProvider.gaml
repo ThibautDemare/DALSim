@@ -30,6 +30,7 @@ species LogisticProvider {
 	Provider provider;
 	float cumulateCosts <- 0;
 	float averageCosts <- 0;
+	float threshold <- 0.3;
 
 	init {
 		if(localStrategy){

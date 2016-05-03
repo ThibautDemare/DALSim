@@ -45,7 +45,7 @@ species SupplyChainElement schedules: [] {
 		// Now, we can build an order with each product which needs to be restocked
 		list<Order> orders <- [];
 		loop stock over: b.stocks {
-			if stock.lp = supplyChain.logisticProvider and stock.quantity < threshold*stock.maxQuantity and stock.status = 0 {
+			if stock.lp = supplyChain.logisticProvider and stock.quantity < (supplyChain.logisticProvider.threshold)*stock.maxQuantity and stock.status = 0 {
 				stock.status <- 1;
 				create Order number: 1 returns: o {
 					self.product <- stock.product;

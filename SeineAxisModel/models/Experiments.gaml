@@ -126,6 +126,12 @@ experiment exp_all type: gui {
 			}
 		}/**/
 
+		display chart_averageThreshold refresh:every(1) {
+			chart  "Average threshold" type: series {
+				data "Average threshold (in percentage)" value: averageThreshold*100 color: rgb('blue') ;
+			}
+		}/**/
+
 		display chart_stockAwaitingToLeave refresh:every(1) {
 			chart "Blocking level to make goods enter or leave buildings" type: series {
 				data "Number of stocks awaiting to leave warehouses" value: nbStocksAwaitingToLeaveWarehouse color: rgb('blue') ;

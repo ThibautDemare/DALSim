@@ -9,6 +9,7 @@ model Parameters
 
 import "./SeineAxisModel.gaml"
 import "./FinalDestinationManager.gaml"
+import "./LogisticProvider.gaml"
 
 global {
 	float step <- 60 °mn;//60 minutes per step
@@ -38,9 +39,23 @@ global {
 	
 	int sizeOfStockLocalWarehouse <- 2;
 	int sizeOfStockLargeWarehouse <- 3;
-	
-	float threshold <- 0.3;
-	
+
+	bool localThreshold <- true;
+	float minlocalThreshold <- 0.15;
+	float maxlocalThreshold <- 0.45;
+	float globalThreshold <- 0.3;
+
+	action init_threshold {
+		ask LogisticProvider {
+			if(localThreshold) {
+				threshold <- rnd(minlocalThreshold, maxlocalThreshold);
+			}
+			else {
+				threshold <- globalThreshold;
+			}
+		}
+	}
+
 	/**
 	 * Each final destination manager is associated to a rate of decreasing of his stocks.
 	 * This rate is computed thanks to a linear function according to the previously computed Huff value associated to the building.

@@ -368,4 +368,17 @@ global {
 			}
 		}
 	}
+
+	float averageThreshold <- 0.0;
+	reflex computeAverageThreshold {
+		float sum <- 0.0;
+		float nbLP <- 0.0;
+		ask LogisticProvider {
+			if(length(customers) > 0){
+				nbLP <- nbLP + 1;
+				sum <- sum + threshold;
+			}
+		}
+		averageThreshold <- sum/nbLP;
+	}
 }

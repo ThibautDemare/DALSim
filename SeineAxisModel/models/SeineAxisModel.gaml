@@ -99,9 +99,10 @@ global {
 		}
 		/**/
 		
-		// Init the decreasing rate of consumption
+		// Init other parameters
 		do init_decreasingRateOfStocks;
 		do init_cost;
+		do init_threshold;
 
 		// I create one batch who will do nothing, because, if there is no batch at all, it slows down the simulation... Weird...
 		create Batch number:1;
