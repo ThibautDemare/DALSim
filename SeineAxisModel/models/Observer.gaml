@@ -291,44 +291,6 @@ global {
 		}
 	}
 
-	reflex saveObservations when: saveObservations {
-		if(date_simu_starts = nil) {
-			date_simu_starts <- machine_time as_system_date "%Y-%M-%D-%h-%m-%s";
-		}
-
-		string params <- "_LS" + localStrategy;
-		if(!localStrategy){
-			params <- params +"_GAS" + globalAdoptedStrategy;
-		}
-		string filePath <- "../results/CSV/";
-		save "" + ((time/3600.0) as int) + ";" +stockInWarehouse + ";" + freeSurfaceInWarehouse + ";"
-			to: filePath + date_simu_starts + "_stocks_warehouses" + params + ".csv" type: text rewrite: false;
-		save "" + ((time/3600.0) as int) + ";" +stockInFinalDest + ";" + freeSurfaceInFinalDest + ";"
-			to: filePath + date_simu_starts + "_stocks_final_dests" + params  + ".csv" type: text rewrite: false;
-		save "" + ((time/3600.0) as int) + ";" + cumulativeNumberOfBatch + ";" + cumulativeNumberOfBatchProviderToLarge + ";" + cumulativeNumberOfBatchLargeToClose + ";" + cumulativeNumberOfBatchCloseToFinal + ";"
-			to: filePath + date_simu_starts + "_cumulative_number_batches" + params  + ".csv" type: text rewrite: false;
-		save "" + ((time/3600.0) as int) + ";" + cumulativeStockOnRoads + ";" + cumulativeStockOnRoadsProviderToLarge + ";" + cumulativeStockOnRoadsLargeToClose + ";" + cumulativeStockOnRoadsCloseToFinal + ";"
-			to: filePath + date_simu_starts + "_cumulative_stock_on_roads" + params  + ".csv" type: text rewrite: false;
-		save "" + ((time/3600.0) as int) + ";" + totalNumberOfBatch + ";" + numberOfBatchProviderToLarge + ";" + numberOfBatchLargeToClose + ";" + numberOfBatchCloseToFinal + ";"
-			to: filePath + date_simu_starts + "_number_batches" + params  + ".csv" type: text rewrite: false;
-		save "" + ((time/3600.0) as int) + ";" + stockOnRoads + ";" + stockOnRoadsProviderToLarge + ";" + stockOnRoadsLargeToClose + ";" + stockOnRoadsCloseToFinal + ";"
-			to: filePath + date_simu_starts + "_stock_on_roads" + params  + ".csv" type: text rewrite: false;
-		save "" + ((time/3600.0) as int) + ";" + numberofEmptyStockInFinalDests + ";"
-			to: filePath + date_simu_starts + "_number_empty_stock_final_dest" + params  + ".csv" type: text rewrite: false;
-		save "" + ((time/3600.0) as int) + ";" + numberOfEmptyStockInWarehouses + ";"
-			to: filePath + date_simu_starts + "_number_empty_stock_warehouses" + params + ".csv" type: text rewrite: false;
-		save "" + ((time/3600.0) as int) + ";" + averageTimeToDeliver + ";"
-			to: filePath + date_simu_starts + "_average_time_to_deliver" + params  + ".csv" type: text rewrite: false;
-		save "" + ((time/3600.0) as int) + ";" + averageTimeToBeDelivered + ";"
-			to: filePath + date_simu_starts + "_average_time_to_be_delivered" + params  + ".csv" type: text rewrite: false;
-		save "" + ((time/3600.0) as int) + ";" + nbLPStrat1 + ";" + nbLPStrat2 + ";" + nbLPStrat3 + ";" + nbLPStrat4 + ";"
-			to: filePath + date_simu_starts + "_strategies_adoption_share" + params  + ".csv" type: text rewrite: false;
-		save "" + ((time/3600.0) as int) + ";" + nbStocksAwaitingToEnterBuilding + ";" + nbStocksAwaitingToEnterWarehouse + ";" + nbStocksAwaitingToLeaveWarehouse + ";" + nbStocksAwaitingToLeaveProvider + ";"
-			to: filePath + date_simu_starts + "_nb_stocks_awaiting" + params  + ".csv" type: text rewrite: false;
-		save "" + ((time/3600.0) as int) + ";" + averageThreshold + ";"
-			to: filePath + date_simu_starts + "_averageThreshold" + params  + ".csv" type: text rewrite: false;
-	}
-
 	reflex computeLPCost{
 		averageCosts <- 0;
 		int nbLP <- 0;
@@ -384,5 +346,43 @@ global {
 		if(nbLP > 0){
 			averageThreshold <- sum/nbLP;
 		}
+	}
+
+	reflex saveObservations when: saveObservations {
+		if(date_simu_starts = nil) {
+			date_simu_starts <- machine_time as_system_date "%Y-%M-%D-%h-%m-%s";
+		}
+
+		string params <- "_LS" + localStrategy;
+		if(!localStrategy){
+			params <- params +"_GAS" + globalAdoptedStrategy;
+		}
+		string filePath <- "../results/CSV/";
+		save "" + ((time/3600.0) as int) + ";" +stockInWarehouse + ";" + freeSurfaceInWarehouse + ";"
+			to: filePath + date_simu_starts + "_stocks_warehouses" + params + ".csv" type: text rewrite: false;
+		save "" + ((time/3600.0) as int) + ";" +stockInFinalDest + ";" + freeSurfaceInFinalDest + ";"
+			to: filePath + date_simu_starts + "_stocks_final_dests" + params  + ".csv" type: text rewrite: false;
+		save "" + ((time/3600.0) as int) + ";" + cumulativeNumberOfBatch + ";" + cumulativeNumberOfBatchProviderToLarge + ";" + cumulativeNumberOfBatchLargeToClose + ";" + cumulativeNumberOfBatchCloseToFinal + ";"
+			to: filePath + date_simu_starts + "_cumulative_number_batches" + params  + ".csv" type: text rewrite: false;
+		save "" + ((time/3600.0) as int) + ";" + cumulativeStockOnRoads + ";" + cumulativeStockOnRoadsProviderToLarge + ";" + cumulativeStockOnRoadsLargeToClose + ";" + cumulativeStockOnRoadsCloseToFinal + ";"
+			to: filePath + date_simu_starts + "_cumulative_stock_on_roads" + params  + ".csv" type: text rewrite: false;
+		save "" + ((time/3600.0) as int) + ";" + totalNumberOfBatch + ";" + numberOfBatchProviderToLarge + ";" + numberOfBatchLargeToClose + ";" + numberOfBatchCloseToFinal + ";"
+			to: filePath + date_simu_starts + "_number_batches" + params  + ".csv" type: text rewrite: false;
+		save "" + ((time/3600.0) as int) + ";" + stockOnRoads + ";" + stockOnRoadsProviderToLarge + ";" + stockOnRoadsLargeToClose + ";" + stockOnRoadsCloseToFinal + ";"
+			to: filePath + date_simu_starts + "_stock_on_roads" + params  + ".csv" type: text rewrite: false;
+		save "" + ((time/3600.0) as int) + ";" + numberofEmptyStockInFinalDests + ";"
+			to: filePath + date_simu_starts + "_number_empty_stock_final_dest" + params  + ".csv" type: text rewrite: false;
+		save "" + ((time/3600.0) as int) + ";" + numberOfEmptyStockInWarehouses + ";"
+			to: filePath + date_simu_starts + "_number_empty_stock_warehouses" + params + ".csv" type: text rewrite: false;
+		save "" + ((time/3600.0) as int) + ";" + averageTimeToDeliver + ";"
+			to: filePath + date_simu_starts + "_average_time_to_deliver" + params  + ".csv" type: text rewrite: false;
+		save "" + ((time/3600.0) as int) + ";" + averageTimeToBeDelivered + ";"
+			to: filePath + date_simu_starts + "_average_time_to_be_delivered" + params  + ".csv" type: text rewrite: false;
+		save "" + ((time/3600.0) as int) + ";" + nbLPStrat1 + ";" + nbLPStrat2 + ";" + nbLPStrat3 + ";" + nbLPStrat4 + ";"
+			to: filePath + date_simu_starts + "_strategies_adoption_share" + params  + ".csv" type: text rewrite: false;
+		save "" + ((time/3600.0) as int) + ";" + nbStocksAwaitingToEnterBuilding + ";" + nbStocksAwaitingToEnterWarehouse + ";" + nbStocksAwaitingToLeaveWarehouse + ";" + nbStocksAwaitingToLeaveProvider + ";"
+			to: filePath + date_simu_starts + "_nb_stocks_awaiting" + params  + ".csv" type: text rewrite: false;
+		save "" + ((time/3600.0) as int) + ";" + averageThreshold + ";"
+			to: filePath + date_simu_starts + "_averageThreshold" + params  + ".csv" type: text rewrite: false;
 	}
 }
