@@ -325,6 +325,8 @@ global {
 			to: filePath + date_simu_starts + "_strategies_adoption_share" + params  + ".csv" type: text rewrite: false;
 		save "" + ((time/3600.0) as int) + ";" + nbStocksAwaitingToEnterBuilding + ";" + nbStocksAwaitingToEnterWarehouse + ";" + nbStocksAwaitingToLeaveWarehouse + ";" + nbStocksAwaitingToLeaveProvider + ";"
 			to: filePath + date_simu_starts + "_nb_stocks_awaiting" + params  + ".csv" type: text rewrite: false;
+		save "" + ((time/3600.0) as int) + ";" + averageThreshold + ";"
+			to: filePath + date_simu_starts + "_averageThreshold" + params  + ".csv" type: text rewrite: false;
 	}
 
 	reflex computeLPCost{
