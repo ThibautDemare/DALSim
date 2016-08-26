@@ -146,9 +146,10 @@ grid cell_stock_shortage width:50 height:50  {
 		else{
 			ratio <- nb_stock_shortage/nb_stock;
 			ratios <- ratios + ratio;
-			if(length(ratios) > 72) { // 168 = 7 days
-				remove index: 0 from: ratios;
-			}
+		}
+
+		if(length(ratios) > 72) { // 168 = 7 days
+			remove index: 0 from: ratios;
 		}
 
 		int i <- 0;
