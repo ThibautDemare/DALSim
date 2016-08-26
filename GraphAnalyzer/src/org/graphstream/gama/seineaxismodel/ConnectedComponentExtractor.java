@@ -13,14 +13,11 @@ import java.util.Iterator;
 import org.graphstream.algorithm.ConnectedComponents;
 import org.graphstream.algorithm.ConnectedComponents.ConnectedComponent;
 import org.graphstream.graph.Edge;
-import org.graphstream.graph.ElementNotFoundException;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.SingleGraph;
-import org.graphstream.stream.GraphParseException;
 import org.graphstream.stream.file.FileSource;
 import org.graphstream.stream.file.FileSourceFactory;
-import org.graphstream.ui.swingViewer.Viewer;
 
 public class ConnectedComponentExtractor {
 	public static void main(String args[]){
