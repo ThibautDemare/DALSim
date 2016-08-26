@@ -58,6 +58,9 @@ global {
 	float stockOnRoadsCloseToFinal <- 0.0;
 	float cumulativeStockOnRoadsCloseToFinal <- 0.0;
 
+	float averageGoodsQuantityPerBatch <- 0.0;
+	float sumGoods <- 0.0;
+
 	// These variables are used to measure the efficiency of the logistic provider to deliver quickly the goods
 	float averageTimeToDeliver <- 0.0;
 	float averageTimeToBeDelivered <- 0.0;
@@ -181,6 +184,9 @@ global {
 		stockOnRoadsLargeToClose <- 0.0;
 		stockOnRoadsCloseToFinal <- 0.0;
 		
+		averageGoodsQuantityPerBatch <- 0.0;
+		sumGoods <- 0.0;
+		int nbBatchNotMarked <- 0;
 		// Filter the right agents
 		ask Batch {
 			if(!marked){
@@ -201,6 +207,8 @@ global {
 					cumulativeNumberOfBatch <- cumulativeNumberOfBatch + 1;
 					cumulativeStockOnRoads <- cumulativeStockOnRoads + self.overallQuantity;
 				}
+				sumGoods <- sumGoods + self.overallQuantity;
+				nbBatchNotMarked <- nbBatchNotMarked + 1;
 			}
 			if(self.position = 1){
 				numberOfBatchProviderToLarge <- numberOfBatchProviderToLarge + 1;
@@ -219,6 +227,12 @@ global {
 			}
 		}
 		stockOnRoads <- stockOnRoadsProviderToLarge + stockOnRoadsLargeToClose + stockOnRoadsCloseToFinal;
+		if(nbBatchNotMarked > 0){
+			averageGoodsQuantityPerBatch <- sumGoods / nbBatchNotMarked;
+		}
+		else {
+			averageGoodsQuantityPerBatch <- 0.0;
+		}
 	}
 
 	reflex update_average_time_to_deliver {
@@ -270,23 +284,113 @@ global {
 		}
 	}
 
-	reflex countStrategyShare when: localStrategy and time > 0{
+	// Strat 1
+	float nbLPStrat1LowThreshold;
+	float nbLPStrat1LowMediumThreshold;
+	float nbLPStrat1HighMediumThreshold;
+	float nbLPStrat1HighThreshold;
+	// Strat 2
+	float nbLPStrat2LowThreshold;
+	float nbLPStrat2LowMediumThreshold;
+	float nbLPStrat2HighMediumThreshold;
+	float nbLPStrat2HighThreshold;
+	// Strat 3
+	float nbLPStrat3LowThreshold;
+	float nbLPStrat3LowMediumThreshold;
+	float nbLPStrat3HighMediumThreshold;
+	float nbLPStrat3HighThreshold;
+	// Strat 4
+	float nbLPStrat4LowThreshold;
+	float nbLPStrat4LowMediumThreshold;
+	float nbLPStrat4HighMediumThreshold;
+	float nbLPStrat4HighThreshold;
+	reflex countStrategyShare when: time > 0{
 		nbLPStrat1 <- 0;
 		nbLPStrat2 <- 0;
 		nbLPStrat3 <- 0;
 		nbLPStrat4 <- 0;
+
+		nbLPStrat1LowThreshold <- 0;
+		nbLPStrat1LowMediumThreshold <- 0;
+		nbLPStrat1HighMediumThreshold <- 0;
+		nbLPStrat1HighThreshold <- 0;
+
+		nbLPStrat2LowThreshold <- 0;
+		nbLPStrat2LowMediumThreshold <- 0;
+		nbLPStrat2HighMediumThreshold <- 0;
+		nbLPStrat2HighThreshold <- 0;
+
+		nbLPStrat3LowThreshold <- 0;
+		nbLPStrat3LowMediumThreshold <- 0;
+		nbLPStrat3HighMediumThreshold <- 0;
+		nbLPStrat3HighThreshold <- 0;
+
+		nbLPStrat4LowThreshold <- 0;
+		nbLPStrat4LowMediumThreshold <- 0;
+		nbLPStrat4HighMediumThreshold <- 0;
+		nbLPStrat4HighThreshold <- 0;
+
+		float inter <- (maxlocalThreshold - minlocalThreshold)/4.0;
 		ask FinalDestinationManager {
 			if(logisticProvider.adoptedStrategy = 1){
 				nbLPStrat1 <- nbLPStrat1 + 1;
+				if(logisticProvider.threshold < (minlocalThreshold + inter)){
+					nbLPStrat1LowThreshold <- nbLPStrat1LowThreshold + 1;
+				}
+				else if(logisticProvider.threshold < (minlocalThreshold + 2*inter)){
+					nbLPStrat1LowMediumThreshold <- nbLPStrat1LowMediumThreshold + 1;
+				}
+				else if(logisticProvider.threshold < (minlocalThreshold + 3*inter)){
+					nbLPStrat1HighMediumThreshold <- nbLPStrat1HighMediumThreshold + 1;
+				}
+				else {
+					nbLPStrat1HighThreshold <- nbLPStrat1HighThreshold + 1;
+				}
 			}
 			else if(logisticProvider.adoptedStrategy = 2){
 				nbLPStrat2 <- nbLPStrat2 + 1;
+				if(logisticProvider.threshold < (minlocalThreshold + inter)){
+					nbLPStrat2LowThreshold <- nbLPStrat2LowThreshold + 1;
+				}
+				else if(logisticProvider.threshold < (minlocalThreshold + 2*inter)){
+					nbLPStrat2LowMediumThreshold <- nbLPStrat2LowMediumThreshold + 1;
+				}
+				else if(logisticProvider.threshold < (minlocalThreshold + 3*inter)){
+					nbLPStrat2HighMediumThreshold <- nbLPStrat2HighMediumThreshold + 1;
+				}
+				else {
+					nbLPStrat2HighThreshold <- nbLPStrat2HighThreshold + 1;
+				}
 			}
 			else if(logisticProvider.adoptedStrategy = 3){
 				nbLPStrat3 <- nbLPStrat3 + 1;
+				if(logisticProvider.threshold < (minlocalThreshold + inter)){
+					nbLPStrat3LowThreshold <- nbLPStrat3LowThreshold + 1;
+				}
+				else if(logisticProvider.threshold < (minlocalThreshold + 2*inter)){
+					nbLPStrat3LowMediumThreshold <- nbLPStrat3LowMediumThreshold + 1;
+				}
+				else if(logisticProvider.threshold < (minlocalThreshold + 3*inter)){
+					nbLPStrat3HighMediumThreshold <- nbLPStrat3HighMediumThreshold + 1;
+				}
+				else {
+					nbLPStrat3HighThreshold <- nbLPStrat3HighThreshold + 1;
+				}
 			}
 			else if(logisticProvider.adoptedStrategy = 4){
 				nbLPStrat4 <- nbLPStrat4 + 1;
+				if(logisticProvider.threshold < (minlocalThreshold + inter)){
+					nbLPStrat4LowThreshold <- nbLPStrat4LowThreshold + 1;
+				}
+				else if(logisticProvider.threshold < (minlocalThreshold + 2.0*inter)){
+					nbLPStrat4LowMediumThreshold <- nbLPStrat4LowMediumThreshold + 1;
+				}
+				else if(logisticProvider.threshold < (minlocalThreshold + 3.0*inter)){
+					nbLPStrat4HighMediumThreshold <- nbLPStrat4HighMediumThreshold + 1;
+				}
+				else {
+					nbLPStrat4HighThreshold <- nbLPStrat4HighThreshold + 1;
+				}
 			}
 		}
 	}
@@ -362,7 +466,9 @@ global {
 			to: filePath + date_simu_starts + "_stocks_warehouses" + params + ".csv" type: text rewrite: false;
 		save "" + ((time/3600.0) as int) + ";" +stockInFinalDest + ";" + freeSurfaceInFinalDest + ";"
 			to: filePath + date_simu_starts + "_stocks_final_dests" + params  + ".csv" type: text rewrite: false;
-		save "" + ((time/3600.0) as int) + ";" + cumulativeNumberOfBatch + ";" + cumulativeNumberOfBatchProviderToLarge + ";" + cumulativeNumberOfBatchLargeToClose + ";" + cumulativeNumberOfBatchCloseToFinal + ";"
+		save "" + ((time/3600.0) as int) + ";" + averageGoodsQuantityPerBatch
+			to: filePath + date_simu_starts + "averageGoodsQuantityPerBatch" + params  + ".csv" type: text rewrite: false;
+		save "" + ((time/3600.0) as int) + ";" + cumulativeNumberOfBatch + ";" + cumulativeNumberOfBatchProviderToLarge + ";" + cumulativeNumberOfBatchLargeToClose + ";" + cumulativeNumberOfBatchCloseToFinal + ";" 
 			to: filePath + date_simu_starts + "_cumulative_number_batches" + params  + ".csv" type: text rewrite: false;
 		save "" + ((time/3600.0) as int) + ";" + cumulativeStockOnRoads + ";" + cumulativeStockOnRoadsProviderToLarge + ";" + cumulativeStockOnRoadsLargeToClose + ";" + cumulativeStockOnRoadsCloseToFinal + ";"
 			to: filePath + date_simu_starts + "_cumulative_stock_on_roads" + params  + ".csv" type: text rewrite: false;
@@ -384,5 +490,13 @@ global {
 			to: filePath + date_simu_starts + "_nb_stocks_awaiting" + params  + ".csv" type: text rewrite: false;
 		save "" + ((time/3600.0) as int) + ";" + averageThreshold + ";"
 			to: filePath + date_simu_starts + "_averageThreshold" + params  + ".csv" type: text rewrite: false;
+		save "" + ((time/3600.0) as int) + ";" + nbLPStrat1LowThreshold + ";" + nbLPStrat1LowMediumThreshold + ";" + nbLPStrat1HighMediumThreshold + ";" + nbLPStrat1HighThreshold + ";"
+			to: filePath + date_simu_starts + "_strat1_threshold_adoption_share" + params  + ".csv" type: text rewrite: false;
+		save "" + ((time/3600.0) as int) + ";" + nbLPStrat2LowThreshold + ";" + nbLPStrat2LowMediumThreshold + ";" + nbLPStrat2HighMediumThreshold + ";" + nbLPStrat2HighThreshold + ";"
+			to: filePath + date_simu_starts + "_strat2_threshold_adoption_share" + params  + ".csv" type: text rewrite: false;
+		save "" + ((time/3600.0) as int) + ";" + nbLPStrat3LowThreshold + ";" + nbLPStrat3LowMediumThreshold + ";" + nbLPStrat3HighMediumThreshold + ";" + nbLPStrat3HighThreshold + ";"
+			to: filePath + date_simu_starts + "_strat3_threshold_adoption_share" + params  + ".csv" type: text rewrite: false;
+		save "" + ((time/3600.0) as int) + ";" + nbLPStrat4LowThreshold + ";" + nbLPStrat4LowMediumThreshold + ";" + nbLPStrat4HighMediumThreshold + ";" + nbLPStrat4HighThreshold + ";"
+			to: filePath + date_simu_starts + "_strat4_threshold_adoption_share" + params  + ".csv" type: text rewrite: false;
 	}
 }

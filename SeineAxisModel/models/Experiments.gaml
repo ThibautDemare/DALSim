@@ -126,6 +126,31 @@ experiment exp_all type: gui {
 			}
 		}/**/
 
+		display chart_strategySharePlusThreshold refresh:every(1) {
+			chart  "Share of the different strategies adopted" type: series {
+				data "Strategy 1 (closest/largest warehouse according to a probability) - Low threshold" value: nbLPStrat1LowThreshold color: rgb(7,127,47) ;
+				data "Strategy 1 (closest/largest warehouse according to a probability) - Low medium threshold" value: nbLPStrat1LowMediumThreshold color: rgb(41,204,95) ;
+				data "Strategy 1 (closest/largest warehouse according to a probability) - High medium threshold" value: nbLPStrat1HighMediumThreshold color: rgb(51,255,119) ;
+				data "Strategy 1 (closest/largest warehouse according to a probability) - High threshold)" value: nbLPStrat1HighThreshold color: rgb(99,255,151) ;
+
+				data "Strategy 2 (closest/largest warehouse according to its accessibility) - Low threshold" value: nbLPStrat2LowThreshold color: rgb(127,11,0) ;
+				data "Strategy 2 (closest/largest warehouse according to its accessibility) - Low medium threshold" value: nbLPStrat2LowMediumThreshold color: rgb(204,54,41) ;
+				data "Strategy 2 (closest/largest warehouse according to its accessibility) - High medium threshold" value: nbLPStrat2HighMediumThreshold color: rgb(255,68,51) ;
+				data "Strategy 2 (closest/largest warehouse according to its accessibility) - High threshold)" value: nbLPStrat2HighThreshold color: rgb(255,112,99) ;
+
+				data "Strategy 3 (closest/largest warehouse) - Low threshold" value: nbLPStrat3LowThreshold color: rgb(0,30,127) ;
+				data "Strategy 3 (closest/largest warehouse) - Low medium threshold" value: nbLPStrat3LowMediumThreshold color: rgb(55,85,204) ;
+				data "Strategy 3 (closest/largest warehouse) - High medium threshold" value: nbLPStrat3HighMediumThreshold color: rgb(69,106,255) ;
+				data "Strategy 3 (closest/largest warehouse) - High threshold)" value: nbLPStrat3HighThreshold color: rgb(137,161,255) ;
+
+				data "Strategy 4 (pure random) - Low threshold" value: nbLPStrat4LowThreshold color: rgb(112,38,127) ;
+				data "Strategy 4 (pure random) - Low medium threshold" value: nbLPStrat4LowMediumThreshold color: rgb(168,0,204) ;
+				data "Strategy 4 (pure random) - High medium threshold" value: nbLPStrat4HighMediumThreshold color: rgb(210,0,255) ;
+				data "Strategy 4 (pure random) - High threshold)" value: nbLPStrat4HighThreshold color: rgb(224,76,255) ;
+
+			}
+		}/**/
+
 		display chart_averageThreshold refresh:every(1) {
 			chart  "Average threshold" type: series {
 				data "Average threshold (in percentage)" value: averageThreshold*100 color: rgb('blue') ;
