@@ -202,6 +202,13 @@ public class MovingOnNetworkSkill extends Skill {
 		return null;
 	}
 
+	private ILocation getSource(final IScope scope) {
+		final Object source = scope.getArg(IKeywordMoNAdditional.SOURCE, IType.NONE);
+		if ( source != null && source instanceof IShape )
+			return ((ILocated) source).getLocation();
+		return null;
+	}
+
 	@getter(IKeywordMoNAdditional.DEFAULT_SPEED)
 	public Double getDefaultSpeed(final IAgent agent) {
 		return (Double) agent.getAttribute(IKeywordMoNAdditional.DEFAULT_SPEED);
@@ -252,6 +259,21 @@ public class MovingOnNetworkSkill extends Skill {
 			e.setAttribute("gama_time", (Double)e.getAttribute("old_gama_time"));
 		}
 		return 0.0;
+	}
+
+	@action(
+			name = "compute_path_length",
+			args = {
+					@arg(name = IKeywordMoNAdditional.SOURCE, type = { IType.AGENT, IType.POINT, IType.GEOMETRY }, optional = false, doc = @doc("the source of the path.")),
+					@arg(name = IKeywordMoNAdditional.TARGET, type = { IType.AGENT, IType.POINT, IType.GEOMETRY }, optional = false, doc = @doc("the target of the path."))
+			},
+			doc =
+			@doc(value = "Compute the path length", examples = { @example("") })
+			)
+	public double computeLengthPathAction(final IScope scope) throws GamaRuntimeException {
+		final ILocation source = getSource(scope);
+		final ILocation target = getTarget(scope);
+		return computeShortestPath(scope, source, target);
 	}
 
 	@action(

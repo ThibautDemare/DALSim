@@ -9,6 +9,7 @@ public class IKeywordMoNAdditional implements IKeyword {
 	public static final String DEFAULT_SPEED = "default_speed";
 	public static final String GRAPH = "network";
 	public static final String TARGET = "target";
+	public static final String SOURCE = "source";
 	public static final String ON = "on";
 	public static final String FILENAME = "Network";
 	public static final String MARK = "mark";
