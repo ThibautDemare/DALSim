@@ -1,0 +1,10 @@
+#
+#Thu Sep 15 14:55:02 CEST 2016
+operators=-~as~envelope~*~+~internal_at~as_matrix~point~length~\=~.~<~/~at_distance~\!\=~source_of~target_of~rnd~sort_by~round~copy~distance_to~contains~^~or~<\=~connect_to~first~shimbel_index~>~one_of~rgb~\!~empty~and~mod~>\=~square~triangle~flip~inside~dead~as_system_date~read~as_edge_graph~shuffle~every
+plugins=msi.gama.core~moving-on-network~org.graphstream.gama~analyse-network
+attributes=edges~x~y~location
+statements=action~arg~ask~if~else~set~do~let~loop~put~gs_clear_senders~gs_add_sender~gs_add_graph_attribute~gs_add_edge~gs_step~gs_add_node~gs_add_node_attribute~remove~return~aspect~draw~create~init~reflex~using~gs_add_edge_attribute~save~user_command~output~display~display_population~display_grid~event~chart~data
+skills=reflex~MovingOnNetwork~grid
+constants=minute~km~m~sec~pixels~h
+types=string~list~int~unknown~file~geometry~point~agent~rgb~float~bool~date~graph~container~matrix~topology
+actions=debug~error~tell~write~die~_init_~_step_~halt~pause~compute_path_length~block_road~goto~unblock_road
