@@ -1,0 +1,9 @@
+doc/
+images/
+include/
+.project
+*~
+log/
+*.csv
+seed.txt
+results/
