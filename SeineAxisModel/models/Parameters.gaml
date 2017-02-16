@@ -14,8 +14,8 @@ import "./LogisticProvider.gaml"
 global {
 	float step <- 60 °mn;//60 minutes per step
 	
-	bool localStrategy <- true;
-	int globalAdoptedStrategy <- 3;
+	bool localStrategy <- false;
+	int globalAdoptedStrategy <- 4;
 	int numberWarehouseSelected <- 15;
 
 	/*
@@ -40,15 +40,15 @@ global {
 	int sizeOfStockLocalWarehouse <- 2;
 	int sizeOfStockLargeWarehouse <- 3;
 
-	bool localThreshold <- true;
+	bool localThreshold <- false;
 	float minlocalThreshold <- 0.15;
-	float maxlocalThreshold <- 0.45;
+	float maxlocalThreshold <- 0.35;
 	float globalThreshold <- 0.3;
 
 	action init_threshold {
 		ask LogisticProvider {
 			if(localThreshold) {
-				threshold <- rnd(minlocalThreshold, maxlocalThreshold);
+				threshold <- rnd(minlocalThreshold, maxlocalThreshold);//truncated_gauss({minlocalThreshold, maxlocalThreshold});
 			}
 			else {
 				threshold <- globalThreshold;
@@ -62,7 +62,7 @@ global {
 	 * The more the Huff value is high, the more the stocks decrease quickly, the more the rate is down
 	 */
 	float valForMinHuff <- 6.0;
-	float valForMaxHuff <- 4.0;
+	float valForMaxHuff <- 2.0;
 	action init_decreasingRateOfStocks {
 		list<FinalDestinationManager> dests <- FinalDestinationManager sort_by each.huffValue;
 		int i <- 0;

@@ -56,6 +56,10 @@ global {
 	//Define the border of the environnement according to the road network
 	geometry shape <- envelope(roads_shapefile);
 
+	// Attractiveness parameters
+	float LHAttractiveness;
+	float AntAttractiveness;
+
 	init {
 		if(use_gs){
 			// Init senders in order to create nodes/edges when we create agent
@@ -83,7 +87,8 @@ global {
 		create LogisticProvider from: logistic_provider_shapefile;
 
 		// Final destinations
-		create FinalDestinationManager from: destination_shapefile with: [huffValue::read("huff") as float, surface::read("surface") as float];
+		create FinalDestinationManager from: destination_shapefile with: [huffValue::float(read("huff")), surface::float(read("surface"))];
+
 		/* 
 		 * The following code can be commented or not, depending if the user want to execute the simulation with every FDM 
 		 * It is mainly used for tests to avoid CPU overload.
@@ -98,7 +103,7 @@ global {
 			}
 		}
 		/**/
-		
+
 		// Init other parameters
 		do init_decreasingRateOfStocks;
 		do init_cost;
@@ -112,7 +117,7 @@ global {
 	 * A part of the initialization of the final destinations managers must be made here.
 	 * Indeed, we must schedule the FDM according to their surface (larger before). But the scheduling can't be made in the classic init.
 	 */
-	reflex second_init when: time = 0 {
+	reflex second_init when: time < 1 {
 		ask FinalDestinationManager sort_by (-1*each.surface){
 			do second_init;
 		}

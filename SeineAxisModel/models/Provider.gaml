@@ -16,6 +16,7 @@ import "./Order.gaml"
 species Provider parent: RestockingBuilding {
 	list<LogisticProvider> customers <- [];
 	string port;
+	float attractiveness <- 1;
 
 	init {
 		if(port = "ANTWERP"){
@@ -40,7 +41,21 @@ species Provider parent: RestockingBuilding {
 	action addCustomer(LogisticProvider lp){
 		customers <- customers + lp;
 	}
-	
+
+	action lostCustomer(LogisticProvider lp){
+		int k <- 0;
+		bool notfound <- true;
+		loop while: k < length(customers) and notfound {
+			if(lp = customers[k]){
+				remove index: k from: customers;
+				notfound <- false;
+			}
+			else{
+				k <- k + 1;
+			}
+		}
+	}
+
 	reflex receive_batch {
 		// override reflex from RestockingBuilding
 		// It is useless for providers since they are never restocked

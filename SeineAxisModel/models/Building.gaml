@@ -33,10 +33,10 @@ species Building {
 			ask entering_batch {
 				//If the batch is at the right adress
 				if(self.dest = myself){
-					loop stock over: self.stocks {
+					loop st over: self.stocks {
 						create AwaitingStock number: 1 returns: ast {
 							self.stepOrderMade <- myself.stepOrderMade;
-							self.stock <- stock;
+							self.stock <- st;
 							self.position <- myself.position;
 							self.location <- myself.location;
 						}
@@ -178,12 +178,12 @@ species RestockingBuilding parent: Building {
 		leavingBatches <- [];
 	}
 
-	action sendStock(Stock stockToSend, Building buildingTarget, int position, int stepOrderMade){
+	action sendStock(Stock stockToSend, Building buildingTarget, int pos, int stpOrderMade){
 		// Looking for a batch which go to the same building
 		bool foundBatch <- false;
 		int j <- 0;
 		loop while: j < length(leavingBatches) and !foundBatch {
-			if( (leavingBatches[j] as Batch).dest = buildingTarget and position = (leavingBatches[j] as Batch).position){
+			if( (leavingBatches[j] as Batch).dest = buildingTarget and pos = (leavingBatches[j] as Batch).position){
 				foundBatch <- true;
 			}
 			else {
@@ -200,9 +200,9 @@ species RestockingBuilding parent: Building {
 			create Batch number: 1 returns:rlb {
 				self.target <- buildingTarget.location;
 				self.location <- myself.location;
-				self.position <- position;
+				self.position <- pos;
 				self.dest <- buildingTarget;
-				self.stepOrderMade <- stepOrderMade;
+				self.stepOrderMade <- stpOrderMade;
 			}
 			lb <- first(rlb);
 			leavingBatches <- leavingBatches + lb;

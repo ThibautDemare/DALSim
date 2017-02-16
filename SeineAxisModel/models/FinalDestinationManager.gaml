@@ -39,7 +39,7 @@ species FinalDestinationManager {
 			occupiedSurface <- 0.0;
 			myself.building <- self;
 		}
-		
+		logisticProvider <- one_of(LogisticProvider);
 		//Connection to graphstream
 		if(use_gs){
 			// Add new node/edge events for corresponding sender
@@ -75,12 +75,10 @@ species FinalDestinationManager {
 		//do buildOneStock;
 		//do buildFourStock;
 		do buildTwoToSixStock;
-		
 		logisticProvider <- chooseLogisticProvider();
 		ask logisticProvider {
 			do getNewCustomer(myself, nil, nil);
 		}
-		
 		loop stock over: building.stocks {
 			stock.lp <- logisticProvider;
 		}
@@ -106,7 +104,7 @@ species FinalDestinationManager {
 	 * This reflex manages the contract with the logistic provider.
 	 * If the contract is old enough, and if the efficiency of the LP is too low, then the FDM change of collaborator.
 	 */
-	reflex manageContractWithLP {
+	reflex manageContractWithLP when: false {
 		numberOfHoursOfContract <- numberOfHoursOfContract + 1;
 		if(numberOfHoursOfContract > minimalNumberOfHoursOfContract){
 			if(localAverageLPEfficiency > averageLPEfficiency ){
@@ -152,10 +150,26 @@ species FinalDestinationManager {
 	 * The more the logistic provider is close, the more he has a chance to be selected.
 	 */
 	LogisticProvider chooseLogisticProvider {
-//		list<LogisticProvider> llp <- LogisticProvider sort_by (self distance_to each);
+		list<LogisticProvider> llp <- LogisticProvider sort_by (self distance_to each);
+		int i <- 0;
+		bool notfound <- true;
+		loop while: notfound {
+			if(flip(0.8) and llp[i] != logisticProvider){
+				notfound <- false;
+			}
+			else {
+				i <- i + 1;
+				if(i >= length(llp)){
+					i <- length(llp)-1;
+					notfound <- false;
+				}
+			}
+		}
+		return llp[i];
 //		int f <- ((rnd(10000)/10000)^6)*(length(llp)-1);
+//		write "Dist retourné : "+(self distance_to llp[f]) + " - Dist [0] : " + (self distance_to llp[0]) + " - Dist [fin] : "+(self distance_to llp[length(llp)-1]);
 //		return llp[f];
-		return one_of(LogisticProvider);
+//		return one_of(LogisticProvider);
 	}
 
 	action manageLostStock(AwaitingStock aws) {

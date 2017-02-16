@@ -19,12 +19,13 @@ species Batch skills:[MovingOnNetwork] {
 	Building dest;
 	int stepOrderMade;
 	bool marked <- false;// useful for the Observer in order to avoid to count the batch two times
+	float pathLength <- -1;
 
 	reflex move when: target != nil {
 		if(network = nil){
 			network <- road_network;
 		}
-		do goto target:target.location length_attribute:"length" speed_attribute:"speed" mark:overallQuantity;
+		do go_to target:target.location length_attribute:"length" speed_attribute:"speed" mark:overallQuantity;
 	}
 
 	aspect base {

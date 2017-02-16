@@ -454,7 +454,8 @@ global {
 
 	reflex saveObservations when: saveObservations {
 		if(date_simu_starts = nil) {
-			date_simu_starts <- machine_time as_system_date "%Y-%M-%D-%h-%m-%s";
+			// TODO : when gama dev will have republish  as_system_date "%Y-%M-%D-%h-%m-%s", use it instead
+			date_simu_starts <- ""+gama.machine_time;// as_system_date "%Y-%M-%D-%h-%m-%s"; 
 		}
 
 		string params <- "_LS" + localStrategy;

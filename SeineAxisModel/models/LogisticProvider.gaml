@@ -31,6 +31,7 @@ species LogisticProvider {
 	float cumulateCosts <- 0;
 	float averageCosts <- 0;
 	float threshold <- 0.3;
+	float probaAnt <- 0.5;
 
 	init {
 		if(localStrategy){
@@ -70,6 +71,66 @@ species LogisticProvider {
 		}
 	}
 
+	action updateSupplyChainProvider {
+		// Select (or not) a new provider
+		Provider LHP <- nil;
+		Provider AntP <- nil;
+		ask Provider {
+			if(self.port = "LE HAVRE"){
+				LHP <- self;
+			}
+			else{
+				AntP <- self;
+			}
+		}
+		bool update <- false;
+		if(flip(probaAnt)){
+			if(AntP != provider){
+				ask provider {
+					do lostCustomer(myself);
+				}
+				provider <- AntP;
+				update <- true;
+				ask provider {
+					do addCustomer(myself);
+				}
+			}
+		}
+		else {
+			if(LHP != provider){
+				ask provider {
+					do lostCustomer(myself);
+				}
+				provider <- LHP;
+				update <- true;
+				ask provider {
+					do addCustomer(myself);
+				}
+			}
+		}
+		// Do I need to update ?
+		if(update and supplyChain != nil){
+			// Update the supply chain according to this new provider
+			create SupplyChainElement number:1 returns:rt {
+				supplyChain <- myself.supplyChain;
+				building <- myself.provider;
+				sons <- [];
+				position <- 0;
+			}
+			SupplyChainElement newRoot <- rt[0];
+			ask supplyChain.root.sons {
+				int i <- 0;
+				loop while: i < length(fathers) {
+					if(fathers[i].building = myself.supplyChain.root.building){
+						fathers[i] <- newRoot;
+						newRoot.sons <- newRoot.sons + self;
+					}
+					i <- i + 1;
+				}
+			}
+			supplyChain.root <- newRoot;
+		}
+	}
 
 	/*
 	 * This method looks for the warehouse of his supply chain which need to be restocked
@@ -461,23 +522,22 @@ species LogisticProvider {
 		 * Connect the close warehouse to the large warehouse
 		 */
 		do connectLvl2Warehouse(fdm, sceCloseWarehouse, stocksLvl2);
-
 		customers <- customers + fdm;
 	}
 	
 	/**
 	 * We assume that the warehouse have already a stock when we initialize a new supply chain
 	 */
-	action initStock(Warehouse warehouse, FinalDestinationManager fdm, list<Stock> stocks, int sizeOfStock){
+	action initStock(Warehouse warehouse, FinalDestinationManager f, list<Stock> stocks, int sizeOfStock){
 		if(stocks = nil or length(stocks) = 0){
-			loop stockFdm over: (fdm.building as Building).stocks {
+			loop stockFdm over: (f.building as Building).stocks {
 				// We create the stock agent
 				create Stock number:1 returns:s {
 					self.product <- stockFdm.product;
 					self.quantity <- rnd(stockFdm.maxQuantity * sizeOfStock);
 					self.maxQuantity <- stockFdm.maxQuantity * sizeOfStock;
 					self.status <- 0;
-					self.fdm <- fdm;
+					self.fdm <- f;
 					self.lp <- myself;
 					self.building <- warehouse;
 				}
@@ -493,7 +553,7 @@ species LogisticProvider {
 			warehouse.stocks <- warehouse.stocks + stocks;
 			loop stock over: stocks {
 				warehouse.occupiedSurface <- warehouse.occupiedSurface + (stock as Stock).maxQuantity;
-				(stock as Stock).fdm <- fdm;
+				(stock as Stock).fdm <- f;
 				(stock as Stock).lp <- self;
 				(stock as Stock).building <- warehouse;
 				(stock as Stock).status <- 0;
@@ -542,6 +602,22 @@ species LogisticProvider {
 	}
 	
 	aspect base { 
-		draw square(1.5°km) color: rgb("green") ;
+		Provider LHP <- nil;
+		Provider AntP <- nil;
+		ask Provider {
+			if(self.port = "LE HAVRE"){
+				LHP <- self;
+			}
+			else{
+				AntP <- self;
+			}
+		}
+		if(AntP = provider){
+			draw shape+3°px  color: rgb(14, 234, 2) ; //vert
+		}
+		else {
+			draw shape+3°px color: rgb(12, 0, 236) ; // bleu
+		}
+
 	}
 }

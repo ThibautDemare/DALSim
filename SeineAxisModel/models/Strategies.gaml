@@ -92,8 +92,10 @@ global {
 		// We inform GAMA that each warehouse must be consider connected to the network in order to compute the Shimbel index
 		bool success <- connect_to(list(Warehouse), road_network, "length", "speed", 70°m/°s);
 		if(first(Warehouse).accessibility < 0){
+			int i <- 0;
 			ask Warehouse {
 				self.accessibility <- shimbel_index(self, road_network, "length", "speed", 70°m/°s);
+				i <- i + 1;
 			}
 		}
 

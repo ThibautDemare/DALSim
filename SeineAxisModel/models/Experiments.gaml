@@ -8,7 +8,6 @@ model Experiments
 
 
 import "./Observer.gaml"
-
 import "./Road.gaml"
 import "./Warehouse.gaml"
 import "./LogisticProvider.gaml"
@@ -25,10 +24,33 @@ experiment exp_save_results type: gui {
 	parameter "saver" var: saveObservations <- true;
 }
 
-experiment exp_all type: gui {
+experiment exp_attractiveness type: gui {
 	parameter "saver" var: saveObservations <- true;
+	parameter "Le Havre's attractiveness" var: LHAttractiveness <- 1.0;
+	parameter "Antwerp's attractiveness" var: AntAttractiveness <- 3.0;
+	
+	user_command Update_Ports_Attractiveness action:update_proba_to_choose_provider;
 
 	output {
+		display display_lp autosave: true refresh:every(1) {
+			species Road aspect: geom;
+			species LogisticProvider aspect: base;
+		}
+	}
+}
+
+experiment exp_all type: gui {
+	parameter "saver" var: saveObservations <- true;
+	parameter "Le Havre's attractiveness" var: LHAttractiveness <- 1.0;
+	parameter "Antwerp's attractiveness" var: AntAttractiveness <- 3.0;
+	user_command Update_Ports_Attractiveness action:update_proba_to_choose_provider;
+
+	output {
+		display display_lp autosave: true refresh:every(1) {
+			species Road aspect: geom;
+			species LogisticProvider aspect: base;
+		}
+
 		display display_grid_stock_shortage autosave: true refresh:every(1) {
 			species Road aspect: geom;
 			species Warehouse aspect: base_condition;
@@ -40,7 +62,7 @@ experiment exp_all type: gui {
 
 		display display_traffic autosave: true refresh:every(1) {
 			species Road aspect: geom;
-			event mouse_down action: block_roads;
+		//	event [mouse_down] action: block_roads;
 		}
 
 		display chart_number_of_batch refresh:every(1) {
