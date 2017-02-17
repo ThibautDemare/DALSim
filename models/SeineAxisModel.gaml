@@ -23,24 +23,26 @@ import "./Parameters.gaml"
  */
 global {
 
+	string pathBD <- "../../../BD_SIG/Used/";
+
 	//This data comes from "EuroGlobalMap" (EuroGeographics)
 	// Each road has an attribute giving the speed in km/h
 	//file roads_shapefile <- file("../../../BD_SIG/Used/Roads/Roads_one_component/roads_v2.shp");
-	file roads_shapefile <- file("../../../BD_SIG/Used/Roads/roads_two_provider/roads_speed_length_km.shp");
+	file roads_shapefile <- file(pathBD+"Roads/roads_two_provider/roads_speed_length_km.shp");
 	graph road_network;
 
 	// Logistic provider
 	// The list of logistics service provider. The data comes from the list of "commissionaire de transport" build by Devport
-	file logistic_provider_shapefile <- file("../../../BD_SIG/Used/LogisticProvider/LogisticProvider.shp");
+	file logistic_provider_shapefile <- file(pathBD+"LogisticProvider/LogisticProvider.shp");
 
 	// Warehouses classified by their size
 	// The list of warehouses with their storage surface
-	file warehouse_shapefile <- file("../../../BD_SIG/Used/Warehouses/warehouses_attractiveness_0.shp");
+	file warehouse_shapefile <- file(pathBD+"Warehouses/warehouses_attractiveness_0.shp");
 
 	// Final destination (for instance : shop)
 	// The list of wholesaler on the Seine axis territory. They have an attribute giving the number of customers according to the Huff model.
 	// The surface is in m^2. In the shapefile used, it is an estimation.
-	string destination_path <- "../../../BD_SIG/Used/FinalDestination/";
+	string destination_path <- pathBD+"FinalDestination/";
 	string destination_file_name <- "FinalDestinationManager";
 	//string destination_file_name <- "FinalDestinationManager_subset_Paris_1";
 	//string destination_file_name <- "FinalDestinationManager_subset_Paris_20";
@@ -51,7 +53,7 @@ global {
 
 	// The list of providers. They represent where the goods come in the territory.
 	// In this simulation there are only two providers: one for the port of Le Havre, and one for the port of Antwerp
-	file provider_shapefile <- file("../../../BD_SIG/Used/Provider/Provider.shp");
+	file provider_shapefile <- file(pathBD+"Provider/Provider.shp");
 
 	//Define the border of the environnement according to the road network
 	geometry shape <- envelope(roads_shapefile);
