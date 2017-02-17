@@ -29,40 +29,40 @@ species Batch skills:[MovingOnNetwork] {
 	}
 
 	aspect base {
-		string color <- "";
+		string c <- "";
 		if( position = 1){// The provider must send new stock
-			color <- "blue";
+			c <- "blue";
 		}
 		else if( position = 2 ){
-			color <- "green";
+			c <- "green";
 		}
 		else if( position = 3){
-			color <- "orange";
+			c <- "orange";
 		}
 		else {
-			color <- "grey";
+			c <- "grey";
 		}
 		if(position > 0){
-			draw triangle(3.0°km) color: rgb(color) ;
+			draw triangle(3.0°km) color: rgb(c) ;
 		}
 	}
 	
 	aspect little_base {
-		string color <- "";
+		string c <- "";
 		if( position = 1){// The provider must send new stock
-			color <- "blue";
+			c <- "blue";
 		}
 		else if( position = 2 ){
-			color <- "green";
+			c <- "green";
 		}
 		else if( position = 3){
-			color <- "orange";
+			c <- "orange";
 		}
 		else {
-			color <- "grey";
+			c <- "grey";
 		}
 		if(position > 0){
-			draw triangle(3.0°km) color: rgb(color) ;
+			draw triangle(3.0°km) color: rgb(c) ;
 		}
 	}
 }
