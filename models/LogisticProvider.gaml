@@ -118,15 +118,17 @@ species LogisticProvider {
 				position <- 0;
 			}
 			SupplyChainElement newRoot <- rt[0];
-			ask supplyChain.root.sons {
+			int j <- 0;
+			loop while: j<length(supplyChain.root.sons) {
 				int i <- 0;
-				loop while: i < length(fathers) {
-					if(fathers[i].building = myself.supplyChain.root.building){
-						fathers[i] <- newRoot;
-						newRoot.sons <- newRoot.sons + self;
+				loop while: i < length(supplyChain.root.sons[j].fathers) {
+					if(supplyChain.root.sons[j].fathers[i].building = supplyChain.root.building){
+						supplyChain.root.sons[j].fathers[i] <- newRoot;
+						newRoot.sons <- newRoot.sons + supplyChain.root.sons[j];
 					}
 					i <- i + 1;
 				}
+				j <- j + 1;
 			}
 			supplyChain.root <- newRoot;
 		}
@@ -571,6 +573,7 @@ species LogisticProvider {
 		}
 		else if(adoptedStrategy = 2){
 			w <- world.findWarehouseLvl1Strat2(fdm, sizeOfStock, lvl1Warehouses, lvl2Warehouses);
+			write "findWarehouseLvl1Strat2"+w;
 		}
 		else if(adoptedStrategy = 3){
 			w <- world.findWarehouseLvl1Strat3(fdm, sizeOfStock, lvl2Warehouses);
