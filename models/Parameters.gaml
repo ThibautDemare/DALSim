@@ -18,6 +18,8 @@ global {
 	int globalAdoptedStrategy <- 4;
 	int numberWarehouseSelected <- 5;
 
+	bool allowLSPSwitch <- true;
+
 	/*
 	 * Some variables and functions to call some reflex
 	 */

@@ -104,7 +104,7 @@ species FinalDestinationManager {
 	 * This reflex manages the contract with the logistic provider.
 	 * If the contract is old enough, and if the efficiency of the LP is too low, then the FDM change of collaborator.
 	 */
-	reflex manageContractWithLP when: false {
+	reflex manageContractWithLP when: allowLSPSwitch {
 		numberOfHoursOfContract <- numberOfHoursOfContract + 1;
 		if(numberOfHoursOfContract > minimalNumberOfHoursOfContract){
 			if(localAverageLPEfficiency > averageLPEfficiency ){
