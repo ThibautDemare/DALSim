@@ -573,7 +573,6 @@ species LogisticProvider {
 		}
 		else if(adoptedStrategy = 2){
 			w <- world.findWarehouseLvl1Strat2(fdm, sizeOfStock, lvl1Warehouses, lvl2Warehouses);
-			write "findWarehouseLvl1Strat2"+w;
 		}
 		else if(adoptedStrategy = 3){
 			w <- world.findWarehouseLvl1Strat3(fdm, sizeOfStock, lvl2Warehouses);
