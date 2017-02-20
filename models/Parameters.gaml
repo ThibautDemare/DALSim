@@ -14,9 +14,9 @@ import "./LogisticProvider.gaml"
 global {
 	float step <- 60 °mn;//60 minutes per step
 	
-	bool localStrategy <- false;
+	bool localStrategy <- true;
 	int globalAdoptedStrategy <- 4;
-	int numberWarehouseSelected <- 15;
+	int numberWarehouseSelected <- 5;
 
 	/*
 	 * Some variables and functions to call some reflex
