@@ -130,19 +130,28 @@ global {
 			if( i > numberWarehouseSelected) {
 				remove index: i from: lw;
 			}
-			i <- i + 1;
+			else {
+				i <- i + 1;
+			}
 		}
-
 		// Look at the list of warehouses of level 1
 		// if one of those warehouses is in the remaining list of close warehouses, then we return this warehouse (we already filtered the unfree warehouses)
 		i <- 0;
-		loop while: i < length(lw) {
+		bool notfound <- true;
+		Warehouse toreturn <- nil;
+		loop while: i < length(lw) and notfound {
 			if(lvl1Warehouses contains lw[i]){
-				return lw[i];
+				notfound <- false;
+				toreturn <- lw[i];
 			}
 			else{
 				i <- i + 1;
 			}
+		}
+
+		// It seems that since the new version of gama, I can't return the warehouse in the previous loop... It return nil even if lw[i] is not nil.
+		if(!notfound){
+			return toreturn;
 		}
 
 		// Return the most accessible (in the case of the Shimbel index, the most accessible has the lowest value of accessibility
