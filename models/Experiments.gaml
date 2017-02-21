@@ -24,6 +24,19 @@ experiment exp_save_results type: gui {
 	parameter "saver" var: saveObservations <- true;
 }
 
+experiment exp_blocked_road type: gui {
+
+	user_command print_blocked_road action:print_blocked_road;
+
+	output {
+		display display_warehouse autosave: true refresh:every(1) {
+			species Road aspect: geom;
+			species Warehouse aspect: base;
+			event [mouse_down] action: block_roads;
+		}
+	}
+}
+
 experiment exp_attractiveness type: gui {
 	parameter "saver" var: saveObservations <- true;
 	parameter "Le Havre's attractiveness" var: LHAttractiveness <- 1.0;

@@ -31,6 +31,14 @@ global {
 		}
 	}
 
+	action print_blocked_road {
+		ask Road {
+			if(blocked){
+				write name;
+			}
+		}
+	}
+
 	// This function uses an adaptation of the Huff model to compute the supposed attractivity of a port perceived by a logistic provider
 	// It is represented by a probability to choose a port instead of another one.
 	action update_proba_to_choose_provider {
