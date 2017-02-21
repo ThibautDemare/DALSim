@@ -21,6 +21,12 @@ global {
 	bool allowLSPSwitch <- true;
 
 	/*
+	 * Allow or disallow the execution of scenarios
+	 */
+	bool allowScenarioAttractiveness <- false;
+	bool allowScenarioBlockRoads <- true;
+
+	/*
 	 * Some variables and functions to call some reflex
 	 */
 	 

@@ -32,7 +32,7 @@ experiment exp_blocked_road type: gui {
 		display display_warehouse autosave: true refresh:every(1) {
 			species Road aspect: geom;
 			species Warehouse aspect: base;
-			event [mouse_down] action: block_roads;
+			event [mouse_down] action: block_one_road;
 		}
 	}
 }
@@ -75,7 +75,7 @@ experiment exp_all type: gui {
 
 		display display_traffic autosave: true refresh:every(1) {
 			species Road aspect: geom;
-			event [mouse_down] action: block_roads;
+			event [mouse_down] action: block_one_road;
 		}
 
 		display chart_number_of_batch refresh:every(1) {

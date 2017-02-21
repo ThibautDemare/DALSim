@@ -11,7 +11,7 @@ import "./Provider.gaml"
 
 global {
 
-	action block_roads {
+	action block_one_road {
 		Road selected_agent <- Road closest_to #user_location;
 		ask selected_agent {
 			if(blocked){
@@ -97,8 +97,12 @@ global {
 	/*
 	 * Scenarios
 	 */
-	
-	reflex scenario1 {
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// This scenario the attractiveness of the ports of Le Havre and Antwerp  at steps 500 and 1000 //
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	reflex scenario_attractiveness when: allowScenarioAttractiveness {
 		if(cycle = 500){
 			LHAttractiveness <- 1.0;
 			AntAttractiveness <- 3.0;
@@ -109,10 +113,40 @@ global {
 			AntAttractiveness <- 1.0;
 			do update_proba_to_choose_provider;
 		}
-//		else if(cycle = 2250){
-//			LHAttractiveness <- 3.0;
-//			AntAttractiveness <- 1.0;
-//			do update_proba_to_choose_provider;
-//		}
+	}
+
+	//////////////////////////////////////////////////////////////////////////////////////////////
+	// This scenario blocks some roads at steps 500 and 1000 on the Antwerp-Paris axis //
+	//////////////////////////////////////////////////////////////////////////////////////////////
+
+	action block_some_roads(list<string> roads){
+		int i <- 0;
+		loop while: i < length(roads){
+			int j <- 0;
+			loop while: j < length(Road) {
+				if(Road[j].name = roads[i]){
+					if(!Road[j].blocked){
+						// Need to block the road
+						Road[j].blocked <- true;
+						ask Batch[0] {
+							do block_road road:Road[j];
+						}
+					}
+				}
+				j <- j + 1;
+			}
+			i <- i + 1;
+		}
+	}
+
+	reflex scenario_block_roads when: allowScenarioBlockRoads {
+		if(cycle = 500){
+			list<string> roads <- ["Road3900", "Road4069", "Road4517", "Road4526", "Road5547", "Road5548", "Road5602", "Road5808", "Road8750", "Road8753", "Road8970", "Road8982", "Road8999", "Road9024", "Road9647"];
+			do block_some_roads(roads);
+		}
+		else if(cycle = 1000){
+			list<string> roads <- ["Road3900", "Road3905", "Road4018", "Road4069", "Road4080", "Road4081", "Road4517", "Road4526", "Road5491", "Road5492", "Road5547", "Road5548", "Road5602", "Road5604", "Road5632", "Road5723", "Road5742", "Road5808", "Road5897", "Road5902", "Road5904", "Road8750", "Road8753", "Road8950", "Road8958", "Road8970", "Road8982", "Road8999", "Road9024", "Road9055", "Road9075", "Road9647", "Road9657", "Road9696", "Road9697", "Road9707", "Road9716"];
+			do block_some_roads(roads);
+		}
 	}
 }
