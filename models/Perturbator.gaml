@@ -10,9 +10,10 @@ import "./Road.gaml"
 import "./Provider.gaml"
 
 global {
-	
-	action block_roads (point loc, list<Road> selected_agents) {
-		ask selected_agents {
+
+	action block_roads {
+		Road selected_agent <- Road closest_to #user_location;
+		ask selected_agent {
 			if(blocked){
 				// Need to unblock the road
 				blocked <- false;

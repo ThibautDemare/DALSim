@@ -62,7 +62,7 @@ experiment exp_all type: gui {
 
 		display display_traffic autosave: true refresh:every(1) {
 			species Road aspect: geom;
-		//	event [mouse_down] action: block_roads;
+			event [mouse_down] action: block_roads;
 		}
 
 		display chart_number_of_batch refresh:every(1) {
