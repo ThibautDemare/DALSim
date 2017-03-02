@@ -104,18 +104,19 @@ species Provider parent: RestockingBuilding {
 						self.dest <- order.building;
 						self.stepOrderMade <- order.stepOrderMade;
 					}
-					lb <- first(rlb);
+					lb <- rlb[0];
 					leavingBatches <- leavingBatches + lb;
 				}
 
 				lb.overallQuantity <- lb.overallQuantity + order.quantity;
 				lb.stocks <- lb.stocks + sendedStock;
 
-				outflow <- outflow + first(sendedStock).quantity;
+				outflow <- outflow + sendedStock[0].quantity;
 				outflow_updated <- true;
-			}
-			ask order {
-				do die;
+
+				ask order {
+					do die;
+				}
 			}
 			remove index: 0 from: currentOrders;
 			i <- i + 1;
