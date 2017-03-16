@@ -25,7 +25,7 @@ species Provider parent: RestockingBuilding {
 		else {
 			cost <- 400;
 		}
-		maxProcessOrdersCapacity <- 10;
+		maxProcessOrdersCapacity <- 100;
 		if(use_gs){
 			// Add a new node event for corresponding sender
 			if(use_r9){
