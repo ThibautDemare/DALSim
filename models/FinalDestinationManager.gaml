@@ -39,7 +39,7 @@ species FinalDestinationManager {
 			occupiedSurface <- 0.0;
 			myself.building <- self;
 		}
-		logisticProvider <- one_of(LogisticProvider);
+
 		//Connection to graphstream
 		if(use_gs){
 			// Add new node/edge events for corresponding sender
@@ -107,8 +107,8 @@ species FinalDestinationManager {
 	reflex manageContractWithLP when: allowLSPSwitch {
 		numberOfHoursOfContract <- numberOfHoursOfContract + 1;
 		if(numberOfHoursOfContract > minimalNumberOfHoursOfContract){
-			if(localAverageLPEfficiency > averageLPEfficiency ){
-			//if(localTimeToBeDelivered > averageTimeToBeDelivered ){
+			//if(localAverageLPEfficiency > averageLPEfficiency ){
+			if(localTimeToBeDelivered > averageTimeToBeDelivered ){
 			//if(logisticProvider.averageCosts < averageCosts){
 				// the logsitic provider is not efficient enough. He must be replaced by another one.
 				// Inform the current logistic provider that he losts a customer
@@ -151,24 +151,25 @@ species FinalDestinationManager {
 	 */
 	LogisticProvider chooseLogisticProvider {
 		list<LogisticProvider> llp <- LogisticProvider sort_by (self distance_to each);
-		int i <- 0;
-		bool notfound <- true;
-		loop while: notfound {
-			if(flip(0.8) and llp[i] != logisticProvider){
-				notfound <- false;
-			}
-			else {
-				i <- i + 1;
-				if(i >= length(llp)){
-					i <- length(llp)-1;
-					notfound <- false;
-				}
-			}
-		}
-		return llp[i];
-//		int f <- ((rnd(10000)/10000)^6)*(length(llp)-1);
-//		write "Dist retourné : "+(self distance_to llp[f]) + " - Dist [0] : " + (self distance_to llp[0]) + " - Dist [fin] : "+(self distance_to llp[length(llp)-1]);
-//		return llp[f];
+//		int i <- 0;
+//		bool notfound <- true;
+//		loop while: notfound {
+//			if(flip(0.5) and llp[i] != logisticProvider){
+//				notfound <- false;
+//			}
+//			else {
+//				i <- i + 1;
+//				if(i >= length(llp)){
+//					i <- length(llp)-1;
+//					notfound <- false;
+//				}
+//			}
+//		}
+//		return llp[i];
+
+		int f <- ((rnd(10000)/10000)^4)*(length(llp)-1);
+		return llp[f];
+
 //		return one_of(LogisticProvider);
 	}
 
@@ -267,20 +268,19 @@ species FinalDestinationManager {
 		int nbProduct <- rnd(2)+2;
 		float freeSurface <- building.totalSurface;// The free surface of the building according to the max quantity
 		float surfaceByProduct <- freeSurface / nbProduct;
-		float maxOccupiedSurface <- 0.0;// the occupied surface if the stock are maximum.
 		list<Stock> ls <- [];
 		loop while: i < nbProduct {
 			create Stock number: 1 returns: s;
 			ask s {
 				// The id of the product
 				product <- i;
-				i <- i + 1;
 				maxQuantity <- surfaceByProduct;
 				quantity <- rnd(maxQuantity as int) as float;
 				myself.building.occupiedSurface <- myself.building.occupiedSurface + maxQuantity;
 				fdm <- myself;
 				self.building <- myself.building;
 			}
+			i <- i + 1;
 			ls <- ls + s;
 		}
 		building.stocks <- ls;
