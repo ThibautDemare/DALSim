@@ -20,7 +20,6 @@ experiment 'No ouput' type: gui {
 	
 }
 
-
 experiment 'No output but save results' type: gui {
 	parameter "saver" var: saveObservations <- true;
 }
