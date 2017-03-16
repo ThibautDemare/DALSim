@@ -93,7 +93,7 @@ global {
 			i <- i + 1;
 		}
 	}
-	
+
 	/*
 	 * Scenarios
 	 */
