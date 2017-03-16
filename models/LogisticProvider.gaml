@@ -34,13 +34,7 @@ species LogisticProvider {
 	float probaAnt <- 0.5;
 
 	init {
-		if(localStrategy){
-			adoptedStrategy <- rnd(3) + 1;
-		}
-		else {
-			adoptedStrategy <- globalAdoptedStrategy;
-		}
-
+		adoptedStrategy <- one_of(possibleStrategies);
 		provider <- one_of(Provider);
 		ask provider {
 			do addCustomer(myself);

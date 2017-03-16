@@ -14,9 +14,8 @@ import "./LogisticProvider.gaml"
 global {
 	float step <- 60 °mn;//60 minutes per step
 	
-	bool localStrategy <- true;
-	int globalAdoptedStrategy <- 4;
-	int numberWarehouseSelected <- 5;
+	list<int> possibleStrategies <- [1, 4];// [1, 2, 3, 4]
+	int numberWarehouseSelected <- 50;
 
 	bool allowLSPSwitch <- true;
 
