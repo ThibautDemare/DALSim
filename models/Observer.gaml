@@ -89,7 +89,7 @@ global {
 			float nbStockShortages <- 0.0;
 			ask self.building.stocks {
 				stockInFinalDest <- stockInFinalDest + self.quantity;
-				if(self.quantity = 0){
+				if(self.quantity <= 0){
 					nbStockShortages <- nbStockShortages + 1.0;
 				}
 				tempStock <- tempStock + self.quantity;
@@ -284,6 +284,15 @@ global {
 		}
 	}
 
+	// Average number of LSP for each strategy
+	list<int> listNbLPStrat1 <- [];
+	list<int> listNbLPStrat2 <- [];
+	list<int> listNbLPStrat3 <- [];
+	list<int> listNbLPStrat4 <- [];
+	float averageStrat1 <- 0;
+	float averageStrat2 <- 0;
+	float averageStrat3 <- 0;
+	float averageStrat4 <- 0;
 	// Strat 1
 	float nbLPStrat1LowThreshold;
 	float nbLPStrat1LowMediumThreshold;
@@ -393,6 +402,39 @@ global {
 				}
 			}
 		}
+
+		listNbLPStrat1 <- listNbLPStrat1 + nbLPStrat1;
+		if(length(listNbLPStrat1) > 100 ){
+			remove index: 0 from: listNbLPStrat1;
+		}
+		listNbLPStrat2 <- listNbLPStrat2 + nbLPStrat2;
+		if(length(listNbLPStrat2) > 100 ){
+			remove index: 0 from: listNbLPStrat2;
+		}
+		listNbLPStrat3 <- listNbLPStrat3 + nbLPStrat3;
+		if(length(listNbLPStrat3) > 100 ){
+			remove index: 0 from: listNbLPStrat3;
+		}
+		listNbLPStrat4 <- listNbLPStrat4 + nbLPStrat4;
+		if(length(listNbLPStrat4) > 100 ){
+			remove index: 0 from: listNbLPStrat4;
+		}
+		averageStrat1 <- 0.0;
+		averageStrat2 <- 0.0;
+		averageStrat3 <- 0.0;
+		averageStrat4 <- 0.0;
+		int i <- 0;
+		loop while: i < length(listNbLPStrat4) {
+			averageStrat1 <- averageStrat1 + listNbLPStrat1[i];
+			averageStrat2 <- averageStrat2 + listNbLPStrat2[i];
+			averageStrat3 <- averageStrat3 + listNbLPStrat3[i];
+			averageStrat4 <- averageStrat4 + listNbLPStrat4[i];
+			i <- i + 1;
+		}
+		averageStrat1 <- averageStrat1/length(listNbLPStrat1);
+		averageStrat2 <- averageStrat2/length(listNbLPStrat2);
+		averageStrat3 <- averageStrat3/length(listNbLPStrat3);
+		averageStrat4 <- averageStrat4/length(listNbLPStrat4);
 	}
 
 	reflex computeLPCost{
@@ -460,7 +502,7 @@ global {
 
 		string params <- "_LS" + localStrategy;
 		if(!localStrategy){
-			params <- params +"_GAS" + globalAdoptedStrategy;
+			params <- params +"_GAS" + possibleStrategies;
 		}
 		string filePath <- "../results/CSV/";
 		save "" + ((time/3600.0) as int) + ";" +stockInWarehouse + ";" + freeSurfaceInWarehouse + ";"
