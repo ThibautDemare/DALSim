@@ -127,13 +127,14 @@ global {
 		lw <- lw sort_by (fdm distance_to each);
 		i <- 0;
 		loop while: i < length(lw) {
-			if( i > numberWarehouseSelected) {
+			if( i >= numberWarehouseSelected) {
 				remove index: i from: lw;
 			}
 			else {
 				i <- i + 1;
 			}
 		}
+
 		// Look at the list of warehouses of level 1
 		// if one of those warehouses is in the remaining list of close warehouses, then we return this warehouse (we already filtered the unfree warehouses)
 		i <- 0;
@@ -217,16 +218,24 @@ global {
 			i <- i + 1;
 		}
 
-		// Look at the list of warehouses of level 1
+		// Look at the list of warehouses of level 2
 		// if one of those warehouses is in the remaining list of close warehouses, then we return this warehouse (we already filtered the unfree warehouses)
 		i <- 0;
-		loop while: i < length(lw) {
+		bool notfound <- true;
+		Warehouse toreturn <- nil;
+		loop while: i < length(lw) and notfound {
 			if(lvl2Warehouses contains lw[i]){
-				return lw[i];
+				notfound <- false;
+				toreturn <- lw[i];
 			}
 			else{
 				i <- i + 1;
 			}
+		}
+
+		// It seems that since the new version of gama, I can't return the warehouse in the previous loop... It return nil even if lw[i] is not nil.
+		if(!notfound){
+			return toreturn;
 		}
 
 		// Return the most accessible (in the case of the Shimbel index, the most accessible has the lowest value of accessibility
@@ -260,7 +269,7 @@ global {
 		}
 
 		// Remove the ones which cannot welcome the stocks of the customer because they are already a warehouse of level 2
-		int i <- 0;
+		i <- 0;
 		loop while: i < length(lw) {
 			if(lvl2Warehouses contains lw[i]){
 				remove index: i from: lw;
@@ -296,7 +305,7 @@ global {
 		}
 
 		// Remove the ones that cannot welcome the stocks of the customer
-		int i <- 0;
+		i <- 0;
 		loop while: i < length(lw) {
 			if(( lw[i] as Building).totalSurface - (lw[i] as Building).occupiedSurface - ((fdm.building as Building).occupiedSurface * sizeOfStock ) < 0) {
 				remove index: i from: lw;	
