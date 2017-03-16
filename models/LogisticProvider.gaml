@@ -313,6 +313,7 @@ species LogisticProvider {
 		// Build the root of this almost-tree
 		create SupplyChainElement number:1 returns:rt {
 			building <- myself.provider;
+			(building as RestockingBuilding).maxProcessOrdersCapacity <- (building as RestockingBuilding).maxProcessOrdersCapacity + 5;
 			sons <- [];
 			position <- 0;
 		}
@@ -362,7 +363,6 @@ species LogisticProvider {
 				building <- closeWarehouse;
 				sons <- [] + fdmLeaf;
 				fathers <- [];
-				fdmLeaf.fathers <- [] + self;
 			}
 			sceCloseWarehouse <- sceBuild[0];
 
@@ -389,8 +389,10 @@ species LogisticProvider {
 
 			// We must update the fathers of the leaf and the sons of the close warehouse
 			sceCloseWarehouse.sons <- sceCloseWarehouse.sons + fdmLeaf;
-			fdmLeaf.fathers <- [] + sceCloseWarehouse;
+
 		}
+
+		fdmLeaf.fathers <- [] + sceCloseWarehouse;
 
 		ask sceCloseWarehouse {
 			(building as RestockingBuilding).maxProcessOrdersCapacity <- (building as RestockingBuilding).maxProcessOrdersCapacity + 5;
@@ -552,14 +554,14 @@ species LogisticProvider {
 			}
 		}
 		else {
-			warehouse.stocks <- warehouse.stocks + stocks;
 			loop stock over: stocks {
-				warehouse.occupiedSurface <- warehouse.occupiedSurface + (stock as Stock).maxQuantity;
-				(stock as Stock).fdm <- f;
-				(stock as Stock).lp <- self;
-				(stock as Stock).building <- warehouse;
-				(stock as Stock).status <- 0;
+				warehouse.occupiedSurface <- warehouse.occupiedSurface + stock.maxQuantity;
+				stock.fdm <- f;
+				stock.lp <- self;
+				stock.building <- warehouse;
+				stock.status <- 0;
 			}
+			warehouse.stocks <- warehouse.stocks + stocks;
 		}
 	}
 	
