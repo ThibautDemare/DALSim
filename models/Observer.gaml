@@ -500,10 +500,8 @@ global {
 			date_simu_starts <- ""+gama.machine_time;// as_system_date "%Y-%M-%D-%h-%m-%s"; 
 		}
 
-		string params <- "_LS" + localStrategy;
-		if(!localStrategy){
-			params <- params +"_GAS" + possibleStrategies;
-		}
+		string params <- "_Strats" + possibleStrategies;
+
 		string filePath <- "../results/CSV/";
 		save "" + ((time/3600.0) as int) + ";" +stockInWarehouse + ";" + freeSurfaceInWarehouse + ";"
 			to: filePath + date_simu_starts + "_stocks_warehouses" + params + ".csv" type: text rewrite: false;
