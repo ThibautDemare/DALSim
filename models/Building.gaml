@@ -16,7 +16,7 @@ import "./LogisticProvider.gaml"
 		
 species Building {
 	list<Stock> stocks;
-	list<AwaitingStock> entering_stocks;
+	list<AwaitingStock> entering_stocks <- [];
 	float totalSurface;
 	float occupiedSurface;
 	float outflow <- 0.0;// This data is sended to Graphstream for the supplying network
@@ -27,24 +27,15 @@ species Building {
 	/*
 	 * Receive a batch
 	 */
-	reflex receive_batch {
-		list<Batch> entering_batch <- (Batch inside self);
-		if( !(empty (entering_batch))) {
-			ask entering_batch {
-				//If the batch is at the right adress
-				if(self.dest = myself){
-					loop st over: self.stocks {
-						create AwaitingStock number: 1 returns: ast {
-							self.stepOrderMade <- myself.stepOrderMade;
-							self.stock <- st;
-							self.position <- myself.position;
-							self.location <- myself.location;
-						}
-						myself.entering_stocks <- myself.entering_stocks + ast;
-					}
-					do die;
-				}
+	action receive_stocks(Batch batch){
+		loop st over: batch.stocks {
+			create AwaitingStock number: 1 returns: ast {
+				self.stepOrderMade <- batch.stepOrderMade;
+				self.stock <- st;
+				self.position <- batch.position;
+				self.location <- batch.location;
 			}
+			entering_stocks <- entering_stocks + ast[0];
 		}
 	}
 
@@ -60,7 +51,6 @@ species Building {
 					notfound <- false;
 					stockBuilding.status <- 0;
 					stockBuilding.quantity <- stockBuilding.quantity + entering_stock.stock.quantity;
-
 					if(entering_stock.stepOrderMade >= 0){
 						// Update lists containing the time to deliver some goods in order to measure the efficiency of the actors
 						(entering_stock.stock.lp as LogisticProvider).timeToDeliver <- (entering_stock.stock.lp as LogisticProvider).timeToDeliver + ((int(time/3600)) - entering_stock.stepOrderMade);
@@ -128,7 +118,7 @@ species RestockingBuilding parent: Building {
 				int i <- 0;
 				loop while: i < length(stocks) and !foundStock {
 					Stock stock <- stocks[i];
-					// If we find the right stock, we had the corresponding quantity within a batch
+					// If we find the right stock, we add the corresponding quantity within a batch
 					if stock.fdm = order.fdm and stock.product = order.product {
 						foundStock <- true;
 						order.reference.status <- 3;
@@ -153,7 +143,6 @@ species RestockingBuilding parent: Building {
 								self.fdm <- order.fdm;
 								self.lp <- order.logisticProvider;
 							}
-
 							do sendStock(sendedStock[0], order.building, order.position, order.stepOrderMade);
 						}
 					}

@@ -21,11 +21,28 @@ species Batch skills:[MovingOnNetwork] {
 	bool marked <- false;// useful for the Observer in order to avoid to count the batch two times
 	float pathLength <- -1;
 
+	action init_network{
+		network <- road_network;
+	}
+
+	reflex delete when: target = nil and dest != nil {
+		do die;
+	}
+
 	reflex move when: target != nil {
 		if(network = nil){
 			network <- road_network;
 		}
 		do go_to target:target.location length_attribute:"length" speed_attribute:"speed" mark:overallQuantity;
+
+		if(location = dest.location){
+			// The agent is at destination
+			// We have to transfer its stocks to the building
+			ask dest {
+				do receive_stocks(myself);
+			}
+			target <- nil;
+		}
 	}
 
 	aspect base {
@@ -43,7 +60,7 @@ species Batch skills:[MovingOnNetwork] {
 			c <- "grey";
 		}
 		if(position > 0){
-			draw triangle(3.0°km) color: rgb(c) ;
+			draw shape color: rgb(c) ;
 		}
 	}
 	
@@ -62,7 +79,7 @@ species Batch skills:[MovingOnNetwork] {
 			c <- "grey";
 		}
 		if(position > 0){
-			draw triangle(3.0°km) color: rgb(c) ;
+			draw shape color: rgb(c) ;
 		}
 	}
 }
