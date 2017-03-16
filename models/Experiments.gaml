@@ -16,28 +16,28 @@ import "./FinalDestinationManager.gaml"
 import "./Batch.gaml"
 import "Perturbator.gaml"
 
-experiment exp_no_output type: gui {
+experiment 'No ouput' type: gui {
 	
 }
 
-experiment exp_save_results type: gui {
+
+experiment 'No output but save results' type: gui {
 	parameter "saver" var: saveObservations <- true;
 }
 
-experiment exp_blocked_road type: gui {
+experiment 'Scenario: block roads' type: gui {
 
 	user_command print_blocked_road action:print_blocked_road;
 
 	output {
 		display display_warehouse autosave: true refresh:every(1) {
 			species Road aspect: geom;
-			species Warehouse aspect: base;
 			event [mouse_down] action: block_one_road;
 		}
 	}
 }
 
-experiment exp_attractiveness type: gui {
+experiment 'Scenario: update attractiveness' type: gui {
 	parameter "saver" var: saveObservations <- true;
 	parameter "Le Havre's attractiveness" var: LHAttractiveness <- 1.0;
 	parameter "Antwerp's attractiveness" var: AntAttractiveness <- 3.0;
@@ -52,19 +52,19 @@ experiment exp_attractiveness type: gui {
 	}
 }
 
-experiment exp_all type: gui {
+experiment 'Every output' type: gui {
 	parameter "saver" var: saveObservations <- true;
 	parameter "Le Havre's attractiveness" var: LHAttractiveness <- 1.0;
 	parameter "Antwerp's attractiveness" var: AntAttractiveness <- 3.0;
 	user_command Update_Ports_Attractiveness action:update_proba_to_choose_provider;
 
 	output {
-		display display_lp autosave: true refresh:every(1) {
+		display 'Ports attractiveness and LSP' autosave: false refresh:every(1) {
 			species Road aspect: geom;
 			species LogisticProvider aspect: base;
-		}
+		}/**/
 
-		display display_grid_stock_shortage autosave: true refresh:every(1) {
+		display 'Grid with stock shortages' autosave: false refresh:every(1) {
 			species Road aspect: geom;
 			species Warehouse aspect: base_condition;
 			species FinalDestinationManager aspect: base;
@@ -73,12 +73,12 @@ experiment exp_all type: gui {
 			species Batch aspect: little_base;
 		}
 
-		display display_traffic autosave: true refresh:every(1) {
+		display 'Traffic' autosave: true refresh:every(1) {
 			species Road aspect: geom;
 			event [mouse_down] action: block_one_road;
 		}
 
-		display chart_number_of_batch refresh:every(1) {
+		display 'Number of Vehicles' refresh:every(1) {
 			chart  "Number of batches" type: series {
 				data "Total number of batch" value: totalNumberOfBatch color: rgb('purple') ;
 				data "Number of batch going from the provider to a large warehouse" value: numberOfBatchProviderToLarge color: rgb('blue') ;
@@ -87,7 +87,7 @@ experiment exp_all type: gui {
 			}
 		}/**/
 
-		display chart_cumulative_number_of_batch refresh:every(1) {
+		display 'Cumulative number of Vehicles' refresh:every(1) {
 			chart  "Cumulative number of batches" type: series {
 				data "Cumulative number of batch" value: cumulativeNumberOfBatch color: rgb('blue') ;
 				data "Cumulative number of batch going from the provider to a large warehouse" value: cumulativeNumberOfBatchProviderToLarge color: rgb('blue') ;
@@ -96,7 +96,7 @@ experiment exp_all type: gui {
 			}
 		}/**/
 
-		display chart_stock_on_roads refresh:every(1) {
+		display 'Stocks in transportation' refresh:every(1) {
 			chart  "Stock quantity within batches" type: series {
 				data "Total quantity of goods within batches" value: stockOnRoads color: rgb('purple') ;
 				data "Quantity of goods within batches going from the provider to a large warehouse" value: stockOnRoadsProviderToLarge color: rgb('blue') ;
@@ -105,7 +105,7 @@ experiment exp_all type: gui {
 			}
 		}/**/
 
-		display chart_cumulative_stock_on_roads refresh:every(1) {
+		display 'Cumulative stocks in transportation' refresh:every(1) {
 			chart  "Cumulative stock quantity within batches" type: series {
 				data "Cumulative quantity of goods within batches" value: cumulativeStockOnRoads color: rgb('blue') ;
 				data "Cumulative quantity of goods within batches going from the provider to a large warehouse" value: cumulativeStockOnRoadsProviderToLarge color: rgb('blue') ;
@@ -114,45 +114,45 @@ experiment exp_all type: gui {
 			}
 		}/**/
 
-		display chart_total_stock_in_final_dest refresh:every(1) {
+		display 'Stocks in final destination' refresh:every(1) {
 			chart  "Stock quantity in final destinations" type: series {
 				data "Total stock quantity in final destinations" value: stockInFinalDest color: rgb('green') ;
 				data "Total free surface in final destinations" value: freeSurfaceInFinalDest color: rgb('blue') ;
 			}
 		}/**/
 
-		display chart_total_stock_in_warehouse refresh:every(1) {
+		display 'Stocks in warehouses' refresh:every(1) {
 			chart  "Stock quantity in warehouses" type: series {
 				data "Total stock quantity in warehouses" value: stockInWarehouse color: rgb('green') ;
 				data "Total free surface in warehouses" value: freeSurfaceInWarehouse color: rgb('blue') ;
 			}
 		}/**/
 
-		display chart_number_empty_stock_final_dest refresh:every(1) {
+		display 'Empty stocks in final destination' refresh:every(1) {
 			chart  "Number of empty stock in final destinations" type: series {
 				data "Number of empty stock in final destinations" value: numberofEmptyStockInFinalDests color: rgb('green') ;
 			}
 		}/**/
 
-		display chart_number_empty_stock_warehouses refresh:every(1) {
+		display 'Empty stocks in warehouses' refresh:every(1) {
 			chart  "Number of empty stock in warehouses" type: series {
 				data "Number of empty stock in warehouses" value: numberOfEmptyStockInWarehouses color: rgb('green') ;
 			}
 		}/**/
 
-		display chart_averageTimeToDeliver refresh:every(1) {
+		display 'Average time to deliver goods somewhere' refresh:every(1) {
 			chart  "Average time that the LPs took to deliver goods somewhere" type: series {
 				data "Average time that the LPs took to deliver goods somewhere" value: averageTimeToDeliver color: rgb('green') ;
 			}
 		}/**/
 
-		display chart_averageTimeToBeDelivered refresh:every(1) {
+		display 'Average time to deliver goods to final destinations' refresh:every(1) {
 			chart  "Average time that the LPs took to deliver goods to FDMs" type: series {
 				data "Average time that the LPs took to deliver goods to FDMs" value: averageTimeToBeDelivered color: rgb('green') ;
 			}
 		}/**/
 
-		display chart_strategyShare refresh:every(1) {
+		display 'Share of the different strategies adopted' refresh:every(1) {
 			chart  "Share of the different strategies adopted" type: series {
 				data "Strategy 1 (closest/largest warehouse according to a probability)" value: nbLPStrat1 color: rgb('green') ;
 				data "Strategy 2 (closest/largest warehouse according to its accessibility)" value: nbLPStrat2 color: rgb('red') ;
@@ -161,7 +161,16 @@ experiment exp_all type: gui {
 			}
 		}/**/
 
-		display chart_strategySharePlusThreshold refresh:every(1) {
+		display 'Share of the different strategies adopted (smoothed)' refresh:every(1) {
+			chart  "Share of the different strategies adopted" type: series {
+				data "Strategy 1 (closest/largest warehouse according to a probability)" value: averageStrat1 color: rgb('green') ;
+				data "Strategy 2 (closest/largest warehouse according to its accessibility)" value: averageStrat2 color: rgb('red') ;
+				data "Strategy 3 (closest/largest warehouse)" value: averageStrat3 color: rgb('blue') ;
+				data "Strategy 4 (pure random)" value: averageStrat4 color: rgb('orange') ;
+			}
+		}/**/
+
+		display 'Share of the different strategies adopted per threshold' refresh:every(1) {
 			chart  "Share of the different strategies adopted" type: series {
 				data "Strategy 1 (closest/largest warehouse according to a probability) - Low threshold" value: nbLPStrat1LowThreshold color: rgb(7,127,47) ;
 				data "Strategy 1 (closest/largest warehouse according to a probability) - Low medium threshold" value: nbLPStrat1LowMediumThreshold color: rgb(41,204,95) ;
@@ -186,33 +195,33 @@ experiment exp_all type: gui {
 			}
 		}/**/
 
-		display chart_averageThreshold refresh:every(1) {
+		display 'Average threshold' refresh:every(1) {
 			chart  "Average threshold" type: series {
 				data "Average threshold (in percentage)" value: averageThreshold*100 color: rgb('blue') ;
 			}
 		}/**/
 
-		display chart_stockAwaitingToLeave refresh:every(1) {
-			chart "Blocking level to make goods enter or leave buildings" type: series {
+		display 'Stocks awating to leave providers and warehouses' refresh:every(1) {
+			chart "Blocking level to make goods leave buildings" type: series {
 				data "Number of stocks awaiting to leave warehouses" value: nbStocksAwaitingToLeaveWarehouse color: rgb('blue') ;
 				data "Number of stocks awaiting to leave providers" value: nbStocksAwaitingToLeaveProvider color: rgb('violet') ;
 			}
 		}/**/
 
-		display chart_stockAwaitingToEnter refresh:every(1) {
-			chart "Blocking level to make goods enter or leave buildings" type: series {
+		display "Stocks awating to enter warehouses or final destination's building" refresh:every(1) {
+			chart "Blocking level to make goods enter buildings" type: series {
 				data "Number of stocks awaiting to enter buildings" value: nbStocksAwaitingToEnterBuilding color: rgb('green') ;
 				data "Number of stocks awaiting to enter warehouses" value: nbStocksAwaitingToEnterWarehouse color: rgb('red') ;
 			}
 		}/**/
 
-		display chart_AverageCosts refresh:every(1) {
+		display 'Average costs' refresh:every(1) {
 			chart "Average Costs" type: series {
 				data "average costs" value: averageCosts color: rgb('green') ;
 			}
 		}/**/
 
-		display chart_PortsShare refresh:every(1) {
+		display 'Competition between Le Havre and Antwerp' refresh:every(1) {
 			chart "Competition between the ports of Le Havre and Antwerp" type: series {
 				data "Number of LP using Le Havre" value: nbHavre color: rgb('green') ;
 				data "Number of LP using Antwerp" value: nbAntwerp color: rgb('red') ;
