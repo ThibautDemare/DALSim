@@ -79,6 +79,12 @@ global {
 			}
 		}
 
+		// I create one batch who will do nothing, because, if there is no batch at all, it slows down the simulation... Weird...
+		create Batch number:1 returns:b;
+		ask b {
+			do init_network;
+		}
+
 		// Creation of a SuperProvider
 		create Provider from: provider_shapefile with: [port::read("Port") as string];
 
@@ -87,6 +93,23 @@ global {
 
 		//  Logistic providers
 		create LogisticProvider from: logistic_provider_shapefile;
+		/*
+		 * The following code can be commented or not, depending if the user want to execute the simulation with every FDM 
+		 * It is mainly used for tests to avoid CPU overload.
+		 */
+		/*int i <- 100;
+		list<LogisticProvider> llsp <- shuffle(LogisticProvider);
+		loop while: i < length(llsp) {
+			LogisticProvider s <- llsp[i];
+			remove index: i from: llsp;
+			ask s {
+				do die;
+			}
+		}
+		/**/
+		LHAttractiveness <- 1.0;
+		AntAttractiveness <- 3.0;
+		do update_proba_to_choose_provider;
 
 		// Final destinations
 		create FinalDestinationManager from: destination_shapefile with: [huffValue::float(read("huff")), surface::float(read("surface"))];
@@ -111,8 +134,6 @@ global {
 		do init_cost;
 		do init_threshold;
 
-		// I create one batch who will do nothing, because, if there is no batch at all, it slows down the simulation... Weird...
-		create Batch number:1;
 	}
 	
 	/*
