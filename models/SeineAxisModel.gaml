@@ -6,9 +6,11 @@
 model SeineAxisModel
 
 import "./Road.gaml"
+import "./MaritimeLine.gaml"
 import "./Warehouse.gaml"
 import "./LogisticProvider.gaml"
 import "./Provider.gaml"
+import "./ForwardingAgent.gaml"
 import "./FinalDestinationManager.gaml"
 import "./Batch.gaml"
 import "./Stock.gaml"
@@ -30,6 +32,10 @@ global {
 	//file roads_shapefile <- file("../../../BD_SIG/Used/Roads/Roads_one_component/roads_v2.shp");
 	file roads_shapefile <- file(pathBD+"Roads/roads_two_provider/roads_speed_length_km.shp");
 	graph road_network;
+
+	// The maritime network
+	file maritime_shapefile <- file(pathBD+"Roads/Maritime/maritime.shp");
+	graph maritime_network;
 
 	// Logistic provider
 	// The list of logistics service provider. The data comes from the list of "commissionaire de transport" build by Devport
@@ -55,6 +61,10 @@ global {
 	// In this simulation there are only two providers: one for the port of Le Havre, and one for the port of Antwerp
 	file provider_shapefile <- file(pathBD+"Provider/Provider.shp");
 
+	// The maritime terminals near LH and Antwerp
+	file terminal_LH_shapefile <- file(pathBD+"Terminals/maritime_terminals_LH.shp");
+	file terminal_A_shapefile <- file(pathBD+"Terminals/maritime_terminals_A.shp");
+
 	//Define the border of the environnement according to the road network
 	geometry shape <- envelope(roads_shapefile);
 
@@ -79,17 +89,28 @@ global {
 			}
 		}
 
+		// Maritime  network creation
+		create MaritimeLine from: maritime_shapefile with: [speed::read("speed") as float];
+		maritime_network <- as_edge_graph(MaritimeLine);
+
 		// I create one batch who will do nothing, because, if there is no batch at all, it slows down the simulation... Weird...
 		create Batch number:1 returns:b;
 		ask b {
 			do init_network;
 		}
 
-		// Creation of a SuperProvider
+		// Creation of Providers
 		create Provider from: provider_shapefile with: [port::read("Port") as string];
 
 		// Warehouses
 		create Warehouse from: warehouse_shapefile returns: lw with: [totalSurface::read("surface") as float];
+
+		// Maritime Terminals
+		create MaritimeLine from: terminal_LH_shapefile;
+		create MaritimeLine from: terminal_A_shapefile;
+
+		// Forwarding agent
+		create ForwardingAgent number:1;
 
 		//  Logistic providers
 		create LogisticProvider from: logistic_provider_shapefile;
