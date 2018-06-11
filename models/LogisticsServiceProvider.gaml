@@ -1,25 +1,11 @@
-/**
- *  LogisticProvider
- *  Author: Thibaut Démare
- *  Description: This agent manage the stock of its warehouses and the orders of his final destinations. His behavior is still simple but can be improve
- */
+model LogisticsServiceProvider
 
-model LogisticProvider
+import "Provider.gaml"
+import "SupplyChain.gaml"
+import "TransferredStocks.gaml"
+import "Strategies.gaml"
 
-import "./Provider.gaml"
-import "./Warehouse.gaml"
-import "./Batch.gaml"
-import "./Building.gaml"
-import "./SupplyChain.gaml"
-import "./Order.gaml"
-import "./Stock.gaml"
-import "./TransferredStocks.gaml"
-import "./SeineAxisModel.gaml"
-import "./GraphStreamConnection.gaml"
-import "./Parameters.gaml"
-import "./Strategies.gaml"
-
-species LogisticProvider {
+species LogisticsServiceProvider {
 	int timeShifting <- rnd(23);
 	int adoptedStrategy;
 	SupplyChain supplyChain <- nil;
@@ -32,7 +18,8 @@ species LogisticProvider {
 	float averageCosts <- 0;
 	float threshold <- 0.3;
 	float probaAnt <- 0.5;
-
+	string costsPathStrategy <- 'financial_costs';//one_of(['financial_costs','travel_time']);
+	
 	init {
 		adoptedStrategy <- one_of(possibleStrategies);
 		provider <- one_of(Provider);
@@ -145,13 +132,16 @@ species LogisticProvider {
 			Warehouse w <- lw[i];
 			int j <- 0;
 			loop while: j < length(w.stocks) and notfound {
-				if(aws.stock.product = w.stocks[j].product and w.stocks[j].lp = self and aws.stock.fdm = w.stocks[j].fdm){
-					create Batch number: 1 {
-						self.target <- w.location;
-						self.location <- aws.location;
-						self.position <- aws.position;
-						self.dest <- w;
-						self.stepOrderMade <- int(time/3600);// We update the stepOrderMade because, if the stock is lost, it means that the order has been made by a previous LSP, therefore, we should not depreciate the current LSP
+				if(aws.stock.product = w.stocks[j].product and w.stocks[j].lp = self and aws.stock.fdm = w.stocks[j].fdm){	
+					create Commodity number:1 returns:returnedAgent;
+					Commodity commodity <- returnedAgent[0];
+					commodity.stock <- aws.stock;
+					commodity.volume <- aws.stock.quantity;
+					commodity.finalDestination <- w;
+					commodity.stepOrderMade <- aws.stepOrderMade;
+					aws.building.leavingCommodities <- aws.building.leavingCommodities + commodity;
+					ask forwardingAgent {
+						commodity.paths <- compute_shortest_path(aws.building, w, myself.costsPathStrategy, commodity);//'financial_costs'//travel_time
 					}
 					notfound <- false;
 				}
@@ -313,7 +303,7 @@ species LogisticProvider {
 		}
 		// and build the supply chain with this root
 		create SupplyChain number:1 returns:sc {
-			logisticProvider <- myself;
+			logisticsServiceProvider <- myself;
 			root <- rt[0];
 		}
 		supplyChain <- first(sc);
@@ -617,5 +607,9 @@ species LogisticProvider {
 			draw shape+3°px color: rgb(12, 0, 236) ; // bleu
 		}
 
+	}
+	
+	aspect simple_base { 
+		draw shape+3°px  color: rgb(66, 219, 108) ; //vert
 	}
 }

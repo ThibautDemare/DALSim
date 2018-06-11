@@ -1,13 +1,7 @@
-/**
- *  Warehouse
- *  Author: Thibaut Démare
- *  Description: A warehouse contains some stock of goods. It is managed by one or many LSP. It can create Batch agent to satisfy orders.
- */
-
 model Warehouse
 
-import "./Building.gaml"
-import "./GraphStreamConnection.gaml"
+import "GraphStreamConnection.gaml"
+import "Building.gaml"
 
 species Warehouse parent: RestockingBuilding {
 	string color;
@@ -36,7 +30,7 @@ species Warehouse parent: RestockingBuilding {
 	}
 	
 	aspect base {
-		draw shape+3°px color: rgb("RoyalBlue");
+		draw shape+3°px color: rgb(0,128,0);
 	}
 
 	aspect base_condition {

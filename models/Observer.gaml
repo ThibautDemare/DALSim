@@ -1,18 +1,6 @@
-/**
- *  Observer
- *  Author: Thibaut
- *  Description: 
- */
-
 model Observer
 
-import "./FinalDestinationManager.gaml"
-import "./LogisticProvider.gaml"
-import "./Batch.gaml"
-import "./Warehouse.gaml"
-import "./Building.gaml"
-import "./Parameters.gaml"
-import "./Stock.gaml"
+import "FinalDestinationManager.gaml"
 
 global {
 	string date_simu_starts <- nil;
@@ -40,26 +28,26 @@ global {
 	float stockInWarehouse <- 0.0;
 	float freeSurfaceInWarehouse <- 0.0;
 	
-	int totalNumberOfBatch <- 0;
-	int cumulativeNumberOfBatch <- 0;
-	int numberOfBatchProviderToLarge <- 0;
-	int cumulativeNumberOfBatchProviderToLarge <- 0;
-	int numberOfBatchLargeToClose <- 0;
-	int cumulativeNumberOfBatchLargeToClose <- 0;
-	int numberOfBatchCloseToFinal <- 0;
-	int cumulativeNumberOfBatchCloseToFinal <- 0;
-	
-	float stockOnRoads <- 0.0;
-	float cumulativeStockOnRoads <- 0.0;
-	float stockOnRoadsProviderToLarge <- 0.0;
-	float cumulativeStockOnRoadsProviderToLarge <- 0.0;
-	float stockOnRoadsLargeToClose <- 0.0;
-	float cumulativeStockOnRoadsLargeToClose <- 0.0;
-	float stockOnRoadsCloseToFinal <- 0.0;
-	float cumulativeStockOnRoadsCloseToFinal <- 0.0;
-
-	float averageGoodsQuantityPerBatch <- 0.0;
-	float sumGoods <- 0.0;
+//	int totalNumberOfBatch <- 0;
+//	int cumulativeNumberOfBatch <- 0;
+//	int numberOfBatchProviderToLarge <- 0;
+//	int cumulativeNumberOfBatchProviderToLarge <- 0;
+//	int numberOfBatchLargeToClose <- 0;
+//	int cumulativeNumberOfBatchLargeToClose <- 0;
+//	int numberOfBatchCloseToFinal <- 0;
+//	int cumulativeNumberOfBatchCloseToFinal <- 0;
+//	
+//	float stockOnRoads <- 0.0;
+//	float cumulativeStockOnRoads <- 0.0;
+//	float stockOnRoadsProviderToLarge <- 0.0;
+//	float cumulativeStockOnRoadsProviderToLarge <- 0.0;
+//	float stockOnRoadsLargeToClose <- 0.0;
+//	float cumulativeStockOnRoadsLargeToClose <- 0.0;
+//	float stockOnRoadsCloseToFinal <- 0.0;
+//	float cumulativeStockOnRoadsCloseToFinal <- 0.0;
+//
+//	float averageGoodsQuantityPerBatch <- 0.0;
+//	float sumGoods <- 0.0;
 
 	// These variables are used to measure the efficiency of the logistic provider to deliver quickly the goods
 	float averageTimeToDeliver <- 0.0;
@@ -174,72 +162,72 @@ global {
 	/**
 	 * 
 	 */
-	reflex updateBatch  {
-		// Init to zero
-		totalNumberOfBatch <- 0;
-		numberOfBatchProviderToLarge <- 0;
-		numberOfBatchLargeToClose <- 0;
-		numberOfBatchCloseToFinal <- 0;
-		stockOnRoadsProviderToLarge <- 0.0;
-		stockOnRoadsLargeToClose <- 0.0;
-		stockOnRoadsCloseToFinal <- 0.0;
-		
-		averageGoodsQuantityPerBatch <- 0.0;
-		sumGoods <- 0.0;
-		int nbBatchNotMarked <- 0;
-		// Filter the right agents
-		ask Batch {
-			if(!marked){
-				marked <- true;
-				if(self.position = 1){
-					cumulativeNumberOfBatchProviderToLarge <- cumulativeNumberOfBatchProviderToLarge + 1;
-					cumulativeStockOnRoadsProviderToLarge <- cumulativeStockOnRoadsProviderToLarge + self.overallQuantity;
-				}
-				else if(self.position = 2){
-					cumulativeNumberOfBatchLargeToClose <- cumulativeNumberOfBatchLargeToClose + 1;
-					cumulativeStockOnRoadsLargeToClose <- cumulativeStockOnRoadsLargeToClose + self.overallQuantity;
-				}
-				else if(self.position = 3){
-					cumulativeNumberOfBatchCloseToFinal <- cumulativeNumberOfBatchCloseToFinal + 1;
-					cumulativeStockOnRoadsCloseToFinal <- cumulativeStockOnRoadsCloseToFinal + self.overallQuantity;
-				}
-				if(self.position > 0){
-					cumulativeNumberOfBatch <- cumulativeNumberOfBatch + 1;
-					cumulativeStockOnRoads <- cumulativeStockOnRoads + self.overallQuantity;
-				}
-				sumGoods <- sumGoods + self.overallQuantity;
-				nbBatchNotMarked <- nbBatchNotMarked + 1;
-			}
-			if(self.position = 1){
-				numberOfBatchProviderToLarge <- numberOfBatchProviderToLarge + 1;
-				stockOnRoadsProviderToLarge <- stockOnRoadsProviderToLarge + self.overallQuantity;
-			}
-			else if(self.position = 2){
-				numberOfBatchLargeToClose <- numberOfBatchLargeToClose + 1;
-				stockOnRoadsLargeToClose <- stockOnRoadsLargeToClose + self.overallQuantity;
-			}
-			else if(self.position = 3){
-				numberOfBatchCloseToFinal <- numberOfBatchCloseToFinal + 1;
-				stockOnRoadsCloseToFinal <- stockOnRoadsCloseToFinal + self.overallQuantity;
-			}
-			if(self.position > 0){
-				totalNumberOfBatch <- totalNumberOfBatch + 1;
-			}
-		}
-		stockOnRoads <- stockOnRoadsProviderToLarge + stockOnRoadsLargeToClose + stockOnRoadsCloseToFinal;
-		if(nbBatchNotMarked > 0){
-			averageGoodsQuantityPerBatch <- sumGoods / nbBatchNotMarked;
-		}
-		else {
-			averageGoodsQuantityPerBatch <- 0.0;
-		}
-	}
+//	reflex updateBatch  {
+//		// Init to zero
+//		totalNumberOfBatch <- 0;
+//		numberOfBatchProviderToLarge <- 0;
+//		numberOfBatchLargeToClose <- 0;
+//		numberOfBatchCloseToFinal <- 0;
+//		stockOnRoadsProviderToLarge <- 0.0;
+//		stockOnRoadsLargeToClose <- 0.0;
+//		stockOnRoadsCloseToFinal <- 0.0;
+//		
+//		averageGoodsQuantityPerBatch <- 0.0;
+//		sumGoods <- 0.0;
+//		int nbBatchNotMarked <- 0;
+//		// Filter the right agents
+//		ask Vehicle {
+//			if(!marked){
+//				marked <- true;
+//				if(self.position = 1){
+//					cumulativeNumberOfBatchProviderToLarge <- cumulativeNumberOfBatchProviderToLarge + 1;
+//					cumulativeStockOnRoadsProviderToLarge <- cumulativeStockOnRoadsProviderToLarge + self.overallQuantity;
+//				}
+//				else if(self.position = 2){
+//					cumulativeNumberOfBatchLargeToClose <- cumulativeNumberOfBatchLargeToClose + 1;
+//					cumulativeStockOnRoadsLargeToClose <- cumulativeStockOnRoadsLargeToClose + self.overallQuantity;
+//				}
+//				else if(self.position = 3){
+//					cumulativeNumberOfBatchCloseToFinal <- cumulativeNumberOfBatchCloseToFinal + 1;
+//					cumulativeStockOnRoadsCloseToFinal <- cumulativeStockOnRoadsCloseToFinal + self.overallQuantity;
+//				}
+//				if(self.position > 0){
+//					cumulativeNumberOfBatch <- cumulativeNumberOfBatch + 1;
+//					cumulativeStockOnRoads <- cumulativeStockOnRoads + self.overallQuantity;
+//				}
+//				sumGoods <- sumGoods + self.overallQuantity;
+//				nbBatchNotMarked <- nbBatchNotMarked + 1;
+//			}
+//			if(self.position = 1){
+//				numberOfBatchProviderToLarge <- numberOfBatchProviderToLarge + 1;
+//				stockOnRoadsProviderToLarge <- stockOnRoadsProviderToLarge + self.overallQuantity;
+//			}
+//			else if(self.position = 2){
+//				numberOfBatchLargeToClose <- numberOfBatchLargeToClose + 1;
+//				stockOnRoadsLargeToClose <- stockOnRoadsLargeToClose + self.overallQuantity;
+//			}
+//			else if(self.position = 3){
+//				numberOfBatchCloseToFinal <- numberOfBatchCloseToFinal + 1;
+//				stockOnRoadsCloseToFinal <- stockOnRoadsCloseToFinal + self.overallQuantity;
+//			}
+//			if(self.position > 0){
+//				totalNumberOfBatch <- totalNumberOfBatch + 1;
+//			}
+//		}
+//		stockOnRoads <- stockOnRoadsProviderToLarge + stockOnRoadsLargeToClose + stockOnRoadsCloseToFinal;
+//		if(nbBatchNotMarked > 0){
+//			averageGoodsQuantityPerBatch <- sumGoods / nbBatchNotMarked;
+//		}
+//		else {
+//			averageGoodsQuantityPerBatch <- 0.0;
+//		}
+//	}
 
 	reflex update_average_time_to_deliver {
 		// Update the average time to deliver (at the LPs level)
 		int i <- 0;
 		int sum <- 0;
-		ask LogisticProvider {
+		ask LogisticsServiceProvider {
 			if(length(customers) > 0){
 				int j <- 0;
 
@@ -341,60 +329,60 @@ global {
 
 		float inter <- (maxlocalThreshold - minlocalThreshold)/4.0;
 		ask FinalDestinationManager {
-			if(logisticProvider.adoptedStrategy = 1){
+			if(logisticsServiceProvider.adoptedStrategy = 1){
 				nbLPStrat1 <- nbLPStrat1 + 1;
-				if(logisticProvider.threshold < (minlocalThreshold + inter)){
+				if(logisticsServiceProvider.threshold < (minlocalThreshold + inter)){
 					nbLPStrat1LowThreshold <- nbLPStrat1LowThreshold + 1;
 				}
-				else if(logisticProvider.threshold < (minlocalThreshold + 2*inter)){
+				else if(logisticsServiceProvider.threshold < (minlocalThreshold + 2*inter)){
 					nbLPStrat1LowMediumThreshold <- nbLPStrat1LowMediumThreshold + 1;
 				}
-				else if(logisticProvider.threshold < (minlocalThreshold + 3*inter)){
+				else if(logisticsServiceProvider.threshold < (minlocalThreshold + 3*inter)){
 					nbLPStrat1HighMediumThreshold <- nbLPStrat1HighMediumThreshold + 1;
 				}
 				else {
 					nbLPStrat1HighThreshold <- nbLPStrat1HighThreshold + 1;
 				}
 			}
-			else if(logisticProvider.adoptedStrategy = 2){
+			else if(logisticsServiceProvider.adoptedStrategy = 2){
 				nbLPStrat2 <- nbLPStrat2 + 1;
-				if(logisticProvider.threshold < (minlocalThreshold + inter)){
+				if(logisticsServiceProvider.threshold < (minlocalThreshold + inter)){
 					nbLPStrat2LowThreshold <- nbLPStrat2LowThreshold + 1;
 				}
-				else if(logisticProvider.threshold < (minlocalThreshold + 2*inter)){
+				else if(logisticsServiceProvider.threshold < (minlocalThreshold + 2*inter)){
 					nbLPStrat2LowMediumThreshold <- nbLPStrat2LowMediumThreshold + 1;
 				}
-				else if(logisticProvider.threshold < (minlocalThreshold + 3*inter)){
+				else if(logisticsServiceProvider.threshold < (minlocalThreshold + 3*inter)){
 					nbLPStrat2HighMediumThreshold <- nbLPStrat2HighMediumThreshold + 1;
 				}
 				else {
 					nbLPStrat2HighThreshold <- nbLPStrat2HighThreshold + 1;
 				}
 			}
-			else if(logisticProvider.adoptedStrategy = 3){
+			else if(logisticsServiceProvider.adoptedStrategy = 3){
 				nbLPStrat3 <- nbLPStrat3 + 1;
-				if(logisticProvider.threshold < (minlocalThreshold + inter)){
+				if(logisticsServiceProvider.threshold < (minlocalThreshold + inter)){
 					nbLPStrat3LowThreshold <- nbLPStrat3LowThreshold + 1;
 				}
-				else if(logisticProvider.threshold < (minlocalThreshold + 2*inter)){
+				else if(logisticsServiceProvider.threshold < (minlocalThreshold + 2*inter)){
 					nbLPStrat3LowMediumThreshold <- nbLPStrat3LowMediumThreshold + 1;
 				}
-				else if(logisticProvider.threshold < (minlocalThreshold + 3*inter)){
+				else if(logisticsServiceProvider.threshold < (minlocalThreshold + 3*inter)){
 					nbLPStrat3HighMediumThreshold <- nbLPStrat3HighMediumThreshold + 1;
 				}
 				else {
 					nbLPStrat3HighThreshold <- nbLPStrat3HighThreshold + 1;
 				}
 			}
-			else if(logisticProvider.adoptedStrategy = 4){
+			else if(logisticsServiceProvider.adoptedStrategy = 4){
 				nbLPStrat4 <- nbLPStrat4 + 1;
-				if(logisticProvider.threshold < (minlocalThreshold + inter)){
+				if(logisticsServiceProvider.threshold < (minlocalThreshold + inter)){
 					nbLPStrat4LowThreshold <- nbLPStrat4LowThreshold + 1;
 				}
-				else if(logisticProvider.threshold < (minlocalThreshold + 2.0*inter)){
+				else if(logisticsServiceProvider.threshold < (minlocalThreshold + 2.0*inter)){
 					nbLPStrat4LowMediumThreshold <- nbLPStrat4LowMediumThreshold + 1;
 				}
-				else if(logisticProvider.threshold < (minlocalThreshold + 3.0*inter)){
+				else if(logisticsServiceProvider.threshold < (minlocalThreshold + 3.0*inter)){
 					nbLPStrat4HighMediumThreshold <- nbLPStrat4HighMediumThreshold + 1;
 				}
 				else {
@@ -440,7 +428,7 @@ global {
 	reflex computeLPCost{
 		averageCosts <- 0;
 		int nbLP <- 0;
-		ask LogisticProvider {
+		ask LogisticsServiceProvider {
 			if(length(customers) > 0){
 				nbLP <- nbLP + 1;
 				cumulateCosts <- 0;
@@ -467,7 +455,7 @@ global {
 	reflex portsShare {
 		nbAntwerp <- 0;
 		nbHavre <- 0;
-		ask LogisticProvider {
+		ask LogisticsServiceProvider {
 			if(length(customers) > 0){
 				if(provider.port = "ANTWERP"){
 					nbAntwerp <- nbAntwerp + 1;
@@ -483,7 +471,7 @@ global {
 	reflex computeAverageThreshold {
 		float sum <- 0.0;
 		float nbLP <- 0.0;
-		ask LogisticProvider {
+		ask LogisticsServiceProvider {
 			if(length(customers) > 0){
 				nbLP <- nbLP + length(customers);
 				sum <- sum + threshold*length(customers);
@@ -507,16 +495,16 @@ global {
 			to: filePath + date_simu_starts + "_stocks_warehouses" + params + ".csv" type: text rewrite: false;
 		save "" + ((time/3600.0) as int) + ";" +stockInFinalDest + ";" + freeSurfaceInFinalDest + ";"
 			to: filePath + date_simu_starts + "_stocks_final_dests" + params  + ".csv" type: text rewrite: false;
-		save "" + ((time/3600.0) as int) + ";" + averageGoodsQuantityPerBatch
-			to: filePath + date_simu_starts + "averageGoodsQuantityPerBatch" + params  + ".csv" type: text rewrite: false;
-		save "" + ((time/3600.0) as int) + ";" + cumulativeNumberOfBatch + ";" + cumulativeNumberOfBatchProviderToLarge + ";" + cumulativeNumberOfBatchLargeToClose + ";" + cumulativeNumberOfBatchCloseToFinal + ";" 
-			to: filePath + date_simu_starts + "_cumulative_number_batches" + params  + ".csv" type: text rewrite: false;
-		save "" + ((time/3600.0) as int) + ";" + cumulativeStockOnRoads + ";" + cumulativeStockOnRoadsProviderToLarge + ";" + cumulativeStockOnRoadsLargeToClose + ";" + cumulativeStockOnRoadsCloseToFinal + ";"
-			to: filePath + date_simu_starts + "_cumulative_stock_on_roads" + params  + ".csv" type: text rewrite: false;
-		save "" + ((time/3600.0) as int) + ";" + totalNumberOfBatch + ";" + numberOfBatchProviderToLarge + ";" + numberOfBatchLargeToClose + ";" + numberOfBatchCloseToFinal + ";"
-			to: filePath + date_simu_starts + "_number_batches" + params  + ".csv" type: text rewrite: false;
-		save "" + ((time/3600.0) as int) + ";" + stockOnRoads + ";" + stockOnRoadsProviderToLarge + ";" + stockOnRoadsLargeToClose + ";" + stockOnRoadsCloseToFinal + ";"
-			to: filePath + date_simu_starts + "_stock_on_roads" + params  + ".csv" type: text rewrite: false;
+//		save "" + ((time/3600.0) as int) + ";" + averageGoodsQuantityPerBatch
+//			to: filePath + date_simu_starts + "averageGoodsQuantityPerBatch" + params  + ".csv" type: text rewrite: false;
+//		save "" + ((time/3600.0) as int) + ";" + cumulativeNumberOfBatch + ";" + cumulativeNumberOfBatchProviderToLarge + ";" + cumulativeNumberOfBatchLargeToClose + ";" + cumulativeNumberOfBatchCloseToFinal + ";" 
+//			to: filePath + date_simu_starts + "_cumulative_number_batches" + params  + ".csv" type: text rewrite: false;
+//		save "" + ((time/3600.0) as int) + ";" + cumulativeStockOnRoads + ";" + cumulativeStockOnRoadsProviderToLarge + ";" + cumulativeStockOnRoadsLargeToClose + ";" + cumulativeStockOnRoadsCloseToFinal + ";"
+//			to: filePath + date_simu_starts + "_cumulative_stock_on_roads" + params  + ".csv" type: text rewrite: false;
+//		save "" + ((time/3600.0) as int) + ";" + totalNumberOfBatch + ";" + numberOfBatchProviderToLarge + ";" + numberOfBatchLargeToClose + ";" + numberOfBatchCloseToFinal + ";"
+//			to: filePath + date_simu_starts + "_number_batches" + params  + ".csv" type: text rewrite: false;
+//		save "" + ((time/3600.0) as int) + ";" + stockOnRoads + ";" + stockOnRoadsProviderToLarge + ";" + stockOnRoadsLargeToClose + ";" + stockOnRoadsCloseToFinal + ";"
+//			to: filePath + date_simu_starts + "_stock_on_roads" + params  + ".csv" type: text rewrite: false;
 		save "" + ((time/3600.0) as int) + ";" + numberofEmptyStockInFinalDests + ";"
 			to: filePath + date_simu_starts + "_number_empty_stock_final_dest" + params  + ".csv" type: text rewrite: false;
 		save "" + ((time/3600.0) as int) + ";" + numberOfEmptyStockInWarehouses + ";"

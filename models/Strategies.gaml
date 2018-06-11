@@ -1,17 +1,8 @@
-/**
- *  Strategies
- *  Author: Thibaut
- *  Description: List the different strategies that the agents can adopt
- */
-
 model Strategies
 
-import "./Warehouse.gaml"
-import "./Building.gaml"
-import "./FinalDestinationManager.gaml"
-import "./LogisticProvider.gaml"
-import "./Parameters.gaml"
-import "./SeineAxisModel.gaml"
+import "Warehouse.gaml"
+import "Building.gaml"
+import "Networks.gaml"
 
 global {
 	/*

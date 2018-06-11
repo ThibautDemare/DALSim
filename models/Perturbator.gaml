@@ -1,13 +1,10 @@
-/**
- *  Perturbator
- *  Author: Thibaut
- *  Description: 
- */
-
 model Perturbator
 
-import "./Road.gaml"
-import "./Provider.gaml"
+import "Networks.gaml"
+import "Vehicle.gaml"
+import "Provider.gaml"
+import "LogisticsServiceProvider.gaml"
+import "Parameters.gaml"
 
 global {
 
@@ -17,14 +14,14 @@ global {
 			if(blocked){
 				// Need to unblock the road
 				blocked <- false;
-				ask Batch[0] {
+				ask Vehicle[0] {
 					do unblock_road road:myself;
 				}
 			}
 			else {
 				// Need to block the road
 				blocked <- true;
-				ask Batch[0] {
+				ask Vehicle[0] {
 					do block_road road:myself;
 				}
 			}
@@ -42,12 +39,12 @@ global {
 	// This function uses an adaptation of the Huff model to compute the supposed attractivity of a port perceived by a logistic provider
 	// It is represented by a probability to choose a port instead of another one.
 	action update_proba_to_choose_provider {
-		matrix<float> p <- 0.0 as_matrix( {length(Provider), length(LogisticProvider)} );
-		matrix<float> sum <- 0.0 as_matrix( {length(LogisticProvider), 1} );
+		matrix<float> p <- 0.0 as_matrix( {length(Provider), length(LogisticsServiceProvider)} );
+		matrix<float> sum <- 0.0 as_matrix( {length(LogisticsServiceProvider), 1} );
 
 		// Firstly : We start initiating the probability of a customer at i to go at the shop at j, and we compute the sum
 		int ld <- length(Provider);
-		int lw <- length(LogisticProvider);
+		int lw <- length(LogisticsServiceProvider);
 		int i <- 0;
 		int j <- 0;
 
@@ -65,8 +62,11 @@ global {
 			j <- 0;
 			loop while: j < lw {
 				float dist;
-				ask Batch[0] {
-					dist <- compute_path_length2(Provider[i], LogisticProvider[j]);
+				ask forwardingAgent {
+					create Commodity number:1 returns:returnedAgent;
+					Commodity commodity <- returnedAgent[0];
+					commodity.volume <- 1;
+					dist <- get_path_time_length(Provider[i], LogisticsServiceProvider[j], LogisticsServiceProvider[j].costsPathStrategy, commodity);
 				}
 				p[i, j] <- (  (Provider[i] as Provider).attractiveness ) / (dist*dist) ;
 				sum[j, 0] <- sum[j, 0] + p[i, j];
@@ -83,8 +83,8 @@ global {
 			loop while: j < lw {
 				p[i, j] <- (p[i, j] / sum[j, 0]) ;//The attractiveness is used in order to add a virtual weigth to the provider.
 				if( (Provider[i] as Provider).port = "ANTWERP" ){
-					(LogisticProvider[j]).probaAnt <-   p[i, j]; //(w[j]).huffValue
-					ask (LogisticProvider[j]) {
+					(LogisticsServiceProvider[j]).probaAnt <-   p[i, j]; //(w[j]).huffValue
+					ask (LogisticsServiceProvider[j]) {
 						do updateSupplyChainProvider;
 					}
 				}
@@ -128,7 +128,7 @@ global {
 					if(!Road[j].blocked){
 						// Need to block the road
 						Road[j].blocked <- true;
-						ask Batch[0] {
+						ask Vehicle[0] {
 							do block_road road:Road[j];
 						}
 					}

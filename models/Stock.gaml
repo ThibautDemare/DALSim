@@ -1,12 +1,8 @@
-/**
- *  Stock
- *  Author: Thibaut Démare
- *  Description: Total or partial stock of a given product
- */
-
 model Stock
 
-import "./Building.gaml"
+import "Building.gaml"
+import "FinalDestinationManager.gaml"
+import "LogisticsServiceProvider.gaml"
 
 species Stock schedules: [] {
 	int product;
@@ -14,7 +10,7 @@ species Stock schedules: [] {
 	float maxQuantity;
 	int status <- 0; // = 0 : a restock has not been asked; = 1 the restock has been asked; = 2 : ?? no idea - was it used before? ?? ; = 3 : a building is processing the order to restock
 	FinalDestinationManager fdm;
-	LogisticProvider lp;
+	LogisticsServiceProvider lp;
 	Building building;
 	int stepWithNoStock <- 0; // Used to detect bug in the simulation : if a stock never has a restock, then there is a bug somewhere. Bugs in ABM can be hard to detect...
 	int stepWithStock <- 0;

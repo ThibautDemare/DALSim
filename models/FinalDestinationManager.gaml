@@ -1,25 +1,11 @@
-/**
- *  FinalDestinationManager
- *  Author: Thibaut Démare
- *  Description: This agent sells his stock and then must order a restock to his logistic provider.
- */
-
 model FinalDestinationManager
 
-import "./LogisticProvider.gaml"
-import "./SeineAxisModel.gaml"
-import "./Warehouse.gaml"
-import "./Batch.gaml"
-import "./Building.gaml"
-import "./Order.gaml"
-import "./Stock.gaml"
-import "./TransferredStocks.gaml"
-import "./GraphStreamConnection.gaml"
-import "./Parameters.gaml"
+import "Building.gaml"
+import "Observer.gaml"
 
 species FinalDestinationManager {
 	int timeShifting <- rnd(23);
-	LogisticProvider logisticProvider;
+	LogisticsServiceProvider logisticsServiceProvider;
 	list<float> localLPEfficiencies <- [];
 	float localAverageLPEfficiency <- 0.0;
 	int numberOfHoursOfContract <- rnd(336) - 100;
@@ -45,7 +31,7 @@ species FinalDestinationManager {
 			// Add new node/edge events for corresponding sender
 			if(use_r1){
 				gs_add_node gs_sender_id:"actor" gs_node_id:name;
-				gs_add_edge gs_sender_id:"actor" gs_edge_id:(name + logisticProvider.name) gs_node_id_from:name gs_node_id_to:logisticProvider.name gs_is_directed:false;
+				gs_add_edge gs_sender_id:"actor" gs_edge_id:(name + logisticsServiceProvider.name) gs_node_id_from:name gs_node_id_to:logisticsServiceProvider.name gs_is_directed:false;
 			}
 			if(use_r2){
 				gs_add_node gs_sender_id:"neighborhood_all" gs_node_id:name;
@@ -75,12 +61,12 @@ species FinalDestinationManager {
 		//do buildOneStock;
 		//do buildFourStock;
 		do buildTwoToSixStock;
-		logisticProvider <- chooseLogisticProvider();
-		ask logisticProvider {
+		logisticsServiceProvider <- chooseLogisticProvider();
+		ask logisticsServiceProvider {
 			do getNewCustomer(myself, nil, nil);
 		}
 		loop stock over: building.stocks {
-			stock.lp <- logisticProvider;
+			stock.lp <- logisticsServiceProvider;
 		}
 	}
 	
@@ -113,14 +99,14 @@ species FinalDestinationManager {
 				// the logsitic provider is not efficient enough. He must be replaced by another one.
 				// Inform the current logistic provider that he losts a customer
 				TransferredStocks stocksRemoved;
-				ask logisticProvider {
+				ask logisticsServiceProvider {
 					stocksRemoved <- lostCustomer(myself);
 				}
 
 				// Choose a new one
-				logisticProvider <- chooseLogisticProvider();
+				logisticsServiceProvider <- chooseLogisticProvider();
 				// Inform him that he gets a new customer
-				ask logisticProvider {
+				ask logisticsServiceProvider {
 					do getNewCustomer(myself, stocksRemoved.stocksLvl1, stocksRemoved.stocksLvl2);
 				}
 
@@ -132,7 +118,7 @@ species FinalDestinationManager {
 				int i <- 0;
 				loop while: i < length(building.stocks) {
 					building.stocks[i].status <- 0;
-					building.stocks[i].lp <- logisticProvider;
+					building.stocks[i].lp <- logisticsServiceProvider;
 					i <- i + 1;
 				}
 
@@ -149,8 +135,8 @@ species FinalDestinationManager {
 	/**
 	 * The more the logistic provider is close, the more he has a chance to be selected.
 	 */
-	LogisticProvider chooseLogisticProvider {
-		list<LogisticProvider> llp <- LogisticProvider sort_by (self distance_to each);
+	LogisticsServiceProvider chooseLogisticProvider {
+		list<LogisticsServiceProvider> llp <- LogisticsServiceProvider sort_by (self distance_to each);
 //		int i <- 0;
 //		bool notfound <- true;
 //		loop while: notfound {
@@ -174,7 +160,7 @@ species FinalDestinationManager {
 	}
 
 	action manageLostStock(AwaitingStock aws) {
-		ask logisticProvider {
+		ask logisticsServiceProvider {
 			do manageLostStock(aws);
 		}
 	}

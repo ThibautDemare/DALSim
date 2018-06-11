@@ -1,19 +1,7 @@
-/**
- *  Building
- *  Author: Thibaut Démare
- *  Description: It is a physical structure that contains a stock and which has a surface. It can receive some batch and simulate a break bulk mechanism.
- */
-
 model Building
 
-import "./Batch.gaml"
-import "./AwaitingStock.gaml"
-import "./Stock.gaml"
-import "./Order.gaml"
-import "./Parameters.gaml"
-import "./GraphStreamConnection.gaml"
-import "./LogisticProvider.gaml"
-		
+import "AwaitingStock.gaml"
+
 species Building {
 	list<Stock> stocks;
 	list<AwaitingStock> entering_stocks <- [];
@@ -24,18 +12,42 @@ species Building {
 	int maxProcessEnteringGoodsCapacity <- 5;
 	int timeShifting <- rnd(23);
 
-	/*
-	 * Receive a batch
-	 */
-	action receive_stocks(Batch batch){
-		loop st over: batch.stocks {
+	list<Vehicle> leavingVehicles <- []; // Liste des véhicules au départ
+	list<Commodity> leavingCommodities <- [];
+	list<Commodity> comingCommodities <- [];
+
+	float handling_time_to_road <- 1;
+	float handling_time_from_road <- 1;
+	
+	float colorValue <- -1;
+	
+	reflex manageRoadComingCommodities {
+		int i <- 0;
+		loop while:i<length(comingCommodities) {
+			if(comingCommodities[i].currentNetwork = 'road' and
+				comingCommodities[i].incomingDate + handling_time_from_road#hour >= current_date
+			){
+				leavingCommodities <+ comingCommodities[i];
+				remove index:i from:comingCommodities;
+			}
+			else{
+				i <- i + 1;
+			}
+		} 
+	}
+	
+	action receiveCommodity(Commodity c){
+		if(c.finalDestination = self){
 			create AwaitingStock number: 1 returns: ast {
-				self.stepOrderMade <- batch.stepOrderMade;
-				self.stock <- st;
-				self.position <- batch.position;
-				self.location <- batch.location;
+				self.stepOrderMade <- c.stepOrderMade;
+				self.stock <- c.stock;
+				self.location <- myself.location;
+				self.building <- myself;
 			}
 			entering_stocks <- entering_stocks + ast[0];
+		}
+		else {
+			comingCommodities <+ c;
 		}
 	}
 
@@ -53,7 +65,7 @@ species Building {
 					stockBuilding.quantity <- stockBuilding.quantity + entering_stock.stock.quantity;
 					if(entering_stock.stepOrderMade >= 0){
 						// Update lists containing the time to deliver some goods in order to measure the efficiency of the actors
-						(entering_stock.stock.lp as LogisticProvider).timeToDeliver <- (entering_stock.stock.lp as LogisticProvider).timeToDeliver + ((int(time/3600)) - entering_stock.stepOrderMade);
+						(entering_stock.stock.lp as LogisticsServiceProvider).timeToDeliver <- (entering_stock.stock.lp as LogisticsServiceProvider).timeToDeliver + ((int(time/3600)) - entering_stock.stepOrderMade);
 						if(stockBuilding.fdm.building = self){ // The average time to be delivered is only useful with the building of the FDM and not for every building of the supply chain
 							stockBuilding.fdm.timeToBeDelivered <- stockBuilding.fdm.timeToBeDelivered + ((int(time/3600)) - entering_stock.stepOrderMade);
 						}
@@ -83,7 +95,7 @@ species Building {
 
 species RestockingBuilding parent: Building {
 	list<Order> currentOrders <- [];
-	list<Batch> leavingBatches <- [];
+	list<Vehicle> leavingVehicles <- [];
 	int maxProcessOrdersCapacity;
 	float cost;
 
@@ -118,7 +130,7 @@ species RestockingBuilding parent: Building {
 				int i <- 0;
 				loop while: i < length(stocks) and !foundStock {
 					Stock stock <- stocks[i];
-					// If we find the right stock, we add the corresponding quantity within a batch
+					// If we find the right stock, we add the corresponding quantity within a vehicle
 					if stock.fdm = order.fdm and stock.product = order.product {
 						foundStock <- true;
 						order.reference.status <- 3;
@@ -136,14 +148,14 @@ species RestockingBuilding parent: Building {
 							outflow <- outflow + sendedQuantity;
 							outflow_updated <- true;
 
-							// And create a Stock agent which will move within a Batch
+							// And create a Stock agent which will move within a Vehicle
 							create Stock number:1 returns:sendedStock {
 								self.product <- order.product;
 								self.quantity <- sendedQuantity;
 								self.fdm <- order.fdm;
-								self.lp <- order.logisticProvider;
+								self.lp <- order.logisticsServiceProvider;
 							}
-							do sendStock(sendedStock[0], order.building, order.position, order.stepOrderMade);
+							do sendStock(sendedStock[0], order);
 						}
 					}
 					i <- i + 1;
@@ -164,40 +176,18 @@ species RestockingBuilding parent: Building {
 			remove index: 0 from: currentOrders;
 		}
 		currentOrders <- awaitingOrder + currentOrders;
-		leavingBatches <- [];
 	}
 
-	action sendStock(Stock stockToSend, Building buildingTarget, int pos, int stpOrderMade){
-		// Looking for a batch which go to the same building
-		bool foundBatch <- false;
-		int j <- 0;
-		loop while: j < length(leavingBatches) and !foundBatch {
-			if( (leavingBatches[j] as Batch).dest = buildingTarget and pos = (leavingBatches[j] as Batch).position){
-				foundBatch <- true;
-			}
-			else {
-				j <- j + 1;
-			}
+	action sendStock(Stock stockToSend, Order order){
+		create Commodity number:1 returns:returnedAgent;
+		Commodity commodity <- returnedAgent[0];
+		commodity.stock <- stockToSend;
+		commodity.volume <- stockToSend.quantity;
+		commodity.finalDestination <- order.building;
+		commodity.stepOrderMade <- order.stepOrderMade;
+		ask forwardingAgent {
+			commodity.paths <- compute_shortest_path(myself, order.building, order.strategy, commodity);//'financial_costs'//travel_time
 		}
-		Batch lb <- nil;
-		// There is such a Batch, we update it
-		if(foundBatch){
-			lb <- leavingBatches[j];
-		}
-		else {
-			// else, we create one
-			create Batch number: 1 returns:rlb {
-				self.target <- buildingTarget.location;
-				self.location <- myself.location;
-				self.position <- pos;
-				self.dest <- buildingTarget;
-				self.stepOrderMade <- stpOrderMade;
-			}
-			lb <- first(rlb);
-			leavingBatches <- leavingBatches + lb;
-		}
-
-		lb.overallQuantity <- lb.overallQuantity + stockToSend.quantity;
-		lb.stocks <- lb.stocks + stockToSend;
+		leavingCommodities <- leavingCommodities + commodity;
 	}
 }

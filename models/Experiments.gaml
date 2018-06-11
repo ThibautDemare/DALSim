@@ -1,23 +1,23 @@
-/**
- *  Experiments
- *  Author: Thibaut
- *  Description: 
- */
-
 model Experiments
 
-
-import "./Observer.gaml"
-import "./Road.gaml"
-import "./Warehouse.gaml"
-import "./LogisticProvider.gaml"
-import "./Provider.gaml"
-import "./FinalDestinationManager.gaml"
-import "./Batch.gaml"
+import "Parameters.gaml"
+import "Networks.gaml"
 import "Perturbator.gaml"
+import "CellsStockShortage.gaml"
 
 experiment 'No ouput' type: gui {
 	
+}
+
+experiment 'traffic' type: gui {
+	output {
+		display 'traffic' autosave: false refresh:every(1) {
+			species Road aspect: geom;
+			species MaritimeLine aspect: geom;
+			species RiverLine aspect: geom;
+			species Vehicle aspect: base;
+		}
+	}
 }
 
 experiment 'No output but save results' type: gui {
@@ -31,6 +31,8 @@ experiment 'Scenario: block roads' type: gui {
 	output {
 		display display_warehouse autosave: true refresh:every(1) {
 			species Road aspect: geom;
+			species MaritimeLine aspect: geom;
+			species RiverLine aspect: geom;
 			event [mouse_down] action: block_one_road;
 		}
 	}
@@ -46,7 +48,9 @@ experiment 'Scenario: update attractiveness' type: gui {
 	output {
 		display display_lp autosave: true refresh:every(1) {
 			species Road aspect: geom;
-			species LogisticProvider aspect: base;
+			species MaritimeLine aspect: geom;
+			species RiverLine aspect: geom;
+			species LogisticsServiceProvider aspect: base;
 		}
 	}
 }
@@ -58,26 +62,52 @@ experiment 'Every output' type: gui {
 	user_command Update_Ports_Attractiveness action:update_proba_to_choose_provider;
 
 	output {
+		display 'All agents' autosave: false refresh:every(1) {
+			species Road aspect: geom;
+			species MaritimeLine aspect: geom;
+			species RiverLine aspect: geom;
+			species Warehouse aspect: base;
+			species FinalDestinationManager aspect: base;
+			species Provider aspect: base;
+			species LogisticsServiceProvider aspect: simple_base;
+			species Vehicle aspect: base;
+		}
+
+		display 'FC and LSP' autosave: false refresh:every(1) {
+			species Road aspect: geom;
+			species MaritimeLine aspect: geom;
+			species RiverLine aspect: geom;
+			species Warehouse aspect: base;
+			species FinalDestinationManager aspect: base;
+			species Provider aspect: base;
+		}
+		
 		display 'Ports attractiveness and LSP' autosave: false refresh:every(1) {
 			species Road aspect: geom;
-			species LogisticProvider aspect: base;
+			species MaritimeLine aspect: geom;
+			species RiverLine aspect: geom;
+			species LogisticsServiceProvider aspect: base;
 		}/**/
 
 		display 'Grid with stock shortages' autosave: false refresh:every(1) {
 			species Road aspect: geom;
+			species MaritimeLine aspect: geom;
+			species RiverLine aspect: geom;
 			species Warehouse aspect: base_condition;
 			species FinalDestinationManager aspect: base;
 			species Provider aspect: base;
 			grid cell_stock_shortage;
-			species Batch aspect: little_base;
+			species Vehicle aspect: base;
 		}
 
 		display 'Traffic' autosave: true refresh:every(1) {
 			species Road aspect: geom;
+			species MaritimeLine aspect: geom;
+			species RiverLine aspect: geom;
 			event [mouse_down] action: block_one_road;
 		}
 
-		display 'Number of Vehicles' refresh:every(1) {
+		/*display 'Number of Vehicles' refresh:every(1) {
 			chart  "Number of batches" type: series {
 				data "Total number of batch" value: totalNumberOfBatch color: rgb('purple') ;
 				data "Number of batch going from the provider to a large warehouse" value: numberOfBatchProviderToLarge color: rgb('blue') ;
@@ -86,7 +116,7 @@ experiment 'Every output' type: gui {
 			}
 		}/**/
 
-		display 'Cumulative number of Vehicles' refresh:every(1) {
+		/*display 'Cumulative number of Vehicles' refresh:every(1) {
 			chart  "Cumulative number of batches" type: series {
 				data "Cumulative number of batch" value: cumulativeNumberOfBatch color: rgb('blue') ;
 				data "Cumulative number of batch going from the provider to a large warehouse" value: cumulativeNumberOfBatchProviderToLarge color: rgb('blue') ;
@@ -95,7 +125,7 @@ experiment 'Every output' type: gui {
 			}
 		}/**/
 
-		display 'Stocks in transportation' refresh:every(1) {
+		/*display 'Stocks in transportation' refresh:every(1) {
 			chart  "Stock quantity within batches" type: series {
 				data "Total quantity of goods within batches" value: stockOnRoads color: rgb('purple') ;
 				data "Quantity of goods within batches going from the provider to a large warehouse" value: stockOnRoadsProviderToLarge color: rgb('blue') ;
@@ -104,7 +134,7 @@ experiment 'Every output' type: gui {
 			}
 		}/**/
 
-		display 'Cumulative stocks in transportation' refresh:every(1) {
+		/*display 'Cumulative stocks in transportation' refresh:every(1) {
 			chart  "Cumulative stock quantity within batches" type: series {
 				data "Cumulative quantity of goods within batches" value: cumulativeStockOnRoads color: rgb('blue') ;
 				data "Cumulative quantity of goods within batches going from the provider to a large warehouse" value: cumulativeStockOnRoadsProviderToLarge color: rgb('blue') ;

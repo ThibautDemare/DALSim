@@ -1,17 +1,9 @@
-/**
- *  GraphStreamConnection
- *  Author: Thibaut
- *  Description: 
- */
-
 model GraphStreamConnection
 
-import "./SeineAxisModel.gaml"
-import "./Building.gaml"
-import "./Warehouse.gaml"
-import "./Provider.gaml"
-import "./LogisticProvider.gaml"
-import "./FinalDestinationManager.gaml"
+import "Provider.gaml"
+import "Warehouse.gaml"
+import "Main.gaml"
+import "Networks.gaml"
 
 global {
 	
@@ -144,7 +136,7 @@ global {
 					gs_add_edge gs_sender_id:"neighborhood_all" gs_edge_id:(myself.name + self.name) gs_node_id_from:myself.name gs_node_id_to:self.name gs_is_directed:false;
 				}		
 			}
-			ask LogisticProvider at_distance(neighborhood_dist) {
+			ask LogisticsServiceProvider at_distance(neighborhood_dist) {
 				if(self != myself){
 					gs_add_edge gs_sender_id:"neighborhood_all" gs_edge_id:(myself.name + self.name) gs_node_id_from:myself.name gs_node_id_to:self.name gs_is_directed:false;
 				}		
@@ -152,7 +144,7 @@ global {
 		}
 		
 		ask FinalDestinationManager {
-			ask LogisticProvider at_distance(neighborhood_dist) {
+			ask LogisticsServiceProvider at_distance(neighborhood_dist) {
 				if(self != myself){
 					gs_add_edge gs_sender_id:"neighborhood_all" gs_edge_id:(myself.name + self.name) gs_node_id_from:myself.name gs_node_id_to:self.name gs_is_directed:false;
 				}		
@@ -165,8 +157,8 @@ global {
 			}
 		}
 		
-		ask LogisticProvider {
-			ask LogisticProvider at_distance(neighborhood_dist) {
+		ask LogisticsServiceProvider {
+			ask LogisticsServiceProvider at_distance(neighborhood_dist) {
 				if(self != myself){
 					gs_add_edge gs_sender_id:"neighborhood_all" gs_edge_id:(myself.name + self.name) gs_node_id_from:myself.name gs_node_id_to:self.name gs_is_directed:false;
 				}		
@@ -201,8 +193,8 @@ global {
 	}
 	
 	action init_neighborhood_logistic_provider {
-		ask LogisticProvider {
-			ask LogisticProvider at_distance(neighborhood_dist) {
+		ask LogisticsServiceProvider {
+			ask LogisticsServiceProvider at_distance(neighborhood_dist) {
 				if(self != myself){
 					gs_add_edge gs_sender_id:"neighborhood_logistic_provider" gs_edge_id:(myself.name + self.name) gs_node_id_from:myself.name gs_node_id_to:self.name gs_is_directed:false;
 				}		
@@ -243,14 +235,14 @@ global {
 					gs_add_edge gs_sender_id:"neighborhood_logistic_final" gs_edge_id:(myself.name + self.name) gs_node_id_from:myself.name gs_node_id_to:self.name gs_is_directed:false;
 				}
 			}
-			ask LogisticProvider at_distance(neighborhood_dist) {
+			ask LogisticsServiceProvider at_distance(neighborhood_dist) {
 				if(self != myself){
 					gs_add_edge gs_sender_id:"neighborhood_logistic_final" gs_edge_id:(myself.name + self.name) gs_node_id_from:myself.name gs_node_id_to:self.name gs_is_directed:false;
 				}
 			}
 		}
-		ask LogisticProvider {
-			ask LogisticProvider at_distance(neighborhood_dist) {
+		ask LogisticsServiceProvider {
+			ask LogisticsServiceProvider at_distance(neighborhood_dist) {
 				if(self != myself){
 					gs_add_edge gs_sender_id:"neighborhood_logistic_final" gs_edge_id:(myself.name + self.name) gs_node_id_from:myself.name gs_node_id_to:self.name gs_is_directed:false;
 				}

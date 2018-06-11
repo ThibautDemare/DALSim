@@ -1,29 +1,27 @@
-/**
- *  Parameters
- *  Author: Thibaut
- *  Description: 
- */
-
 model Parameters
 
-
-import "./SeineAxisModel.gaml"
-import "./FinalDestinationManager.gaml"
-import "./LogisticProvider.gaml"
+import "FinalDestinationManager.gaml"
+import "Warehouse.gaml" 
+import "LogisticsServiceProvider.gaml"
 
 global {
-	float step <- 60 °mn;//60 minutes per step
-	
+	float step <- 60 #mn;//60 minutes per step
+	date starting_date <- date([2018,6,5,11,0,0]);// 6 Juin 2018 à 11h00
+
 	list<int> possibleStrategies <- [1, 4];// [1, 2, 3, 4]
 	int numberWarehouseSelected <- 50;
 
 	bool allowLSPSwitch <- true;
 
+	// Attractiveness parameters
+	float LHAttractiveness;
+	float AntAttractiveness;
+
 	/*
 	 * Allow or disallow the execution of scenarios
 	 */
 	bool allowScenarioAttractiveness <- false;
-	bool allowScenarioBlockRoads <- true;
+	bool allowScenarioBlockRoads <- false;
 
 	/*
 	 * Some variables and functions to call some reflex
@@ -53,7 +51,7 @@ global {
 	float globalThreshold <- 0.3;
 
 	action init_threshold {
-		ask LogisticProvider {
+		ask LogisticsServiceProvider {
 			if(localThreshold) {
 				threshold <- rnd(minlocalThreshold, maxlocalThreshold);//truncated_gauss({minlocalThreshold, maxlocalThreshold});
 			}

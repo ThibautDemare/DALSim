@@ -1,19 +1,10 @@
-/**
- *  SupplyChain
- *  Author: Thibaut
- *  Description: 
- */
-
 model SupplyChain
 
-
-import "./Building.gaml"
-import "./Order.gaml"
-import "./Stock.gaml"
-import "./Parameters.gaml"
+import "Building.gaml"
+import "Transporters.gaml"
 
 species SupplyChain schedules: [] {
-	LogisticProvider logisticProvider;
+	LogisticsServiceProvider logisticsServiceProvider;
 	SupplyChainElement root;
 	list<SupplyChainElement> leafs <- [];
 }
@@ -45,19 +36,8 @@ species SupplyChainElement schedules: [] {
 		// Now, we can build an order with each product which needs to be restocked
 		list<Order> orders <- [];
 		loop stock over: b.stocks {
-			if stock.lp = supplyChain.logisticProvider and stock.quantity < (supplyChain.logisticProvider.threshold)*stock.maxQuantity and stock.status = 0 {
-				stock.status <- 1;
-				create Order number: 1 returns: o {
-					self.product <- stock.product;
-					self.quantity <- stock.maxQuantity-stock.quantity;
-					self.building <- b;
-					self.fdm <- stock.fdm;
-					self.position <- myself.position;
-					self.reference <- stock;
-					self.logisticProvider <- myself.supplyChain.logisticProvider;
-					self.stepOrderMade <- int(time/3600);
-				}
-				orders <- orders + o;
+			if stock.lp = supplyChain.logisticsServiceProvider and stock.quantity < (supplyChain.logisticsServiceProvider.threshold)*stock.maxQuantity and stock.status = 0 {
+				orders <- orders + makeOrders(stock, b);
 			}
 		}
 		
@@ -66,5 +46,34 @@ species SupplyChainElement schedules: [] {
 				do recursiveTests(orders);
 			}
 		}
+	}
+	
+	list<Order> makeOrders(Stock stock, Building b){
+		list<Order> orders <- [];
+		stock.status <- 1;
+		float quantityToOrder <- stock.maxQuantity-stock.quantity;
+		float maxQuantityPerOrder <- RoadTransporter[0].maximalTransportedVolume;
+		loop while: (quantityToOrder > maxQuantityPerOrder){
+			orders <+ createOneOrder(stock, b, maxQuantityPerOrder);
+			quantityToOrder <- quantityToOrder - maxQuantityPerOrder;
+		}
+		
+		orders <+ createOneOrder(stock, b, quantityToOrder);
+		return orders;
+	}
+	
+	Order createOneOrder(Stock stock, Building b, float q){
+		create Order number: 1 returns: o {
+			self.product <- stock.product;
+			self.quantity <- q;
+			self.building <- b;
+			self.fdm <- stock.fdm;
+			self.position <- myself.position;
+			self.reference <- stock;
+			self.logisticsServiceProvider <- myself.supplyChain.logisticsServiceProvider;
+			self.stepOrderMade <- int(time/3600);
+			self.strategy <- myself.supplyChain.logisticsServiceProvider.costsPathStrategy;
+		}
+		return o[0];
 	}
 }
