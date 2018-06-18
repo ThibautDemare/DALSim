@@ -83,34 +83,36 @@ global {
 	bool second_init_bool <- true;
 	
 	init {
+		// Graphstream connections
 		if(use_gs){
 			// Init senders in order to create nodes/edges when we create agent
 			do init_senders;
 		}
 
-		// Road network creation
+		// Transportation networks
+			// Road
 		create Road from: roads_shapefile with: [speed::read("speed") as float, length::read("length") as float];
 		road_network <- as_edge_graph(Road);
-		
-		// Maritime  network creation
+			// Maritime
 		create MaritimeLine from: maritime_shapefile with: [speed::read("speed") as float, length::read("length") as float];
 		maritime_network <- as_edge_graph(MaritimeLine);
-		
-		// Maritime  network creation
+			// River
 		create RiverLine from: river_shapefile with: [speed::read("speed") as float, length::read("length") as float];
 		river_network <- as_edge_graph(RiverLine);
 		
-		// Creation of Providers
+		// Providers
 		create Provider from: provider_shapefile with: [port::read("Port") as string];
 		
 		// Warehouses
 		create Warehouse from: warehouse_shapefile returns: lw with: [totalSurface::read("surface") as float];
-		
+
+		// Transporters
 		create RoadTransporter number:1;
 		create RiverTransporter number:1;
 		create MaritimeTransporter number:1;
 		
-		// Maritime Terminals
+		// Terminals
+			// Maritime and river
 		create MaritimeRiverTerminal from: terminal_LH_shapefile with: [handling_time_to_road::read("TO_ROAD") as float,
 			handling_time_to_river::read("TO_RIVER") as float,
 			handling_time_to_maritime::read("TO_MARITIM") as float,
@@ -118,27 +120,30 @@ global {
 			handling_time_from_river::read("FROM_RIVER") as float,
 			handling_time_from_maritime::read("FROM_MARIT") as float
 		];
+			// River
 		create RiverTerminal from: river_terminals with: [handling_time_to_road::read("TO_ROAD") as float,
 			handling_time_to_river::read("TO_RIVER") as float,
 			handling_time_from_road::read("FROM_ROAD") as float,
 			handling_time_from_river::read("FROM_RIVER") as float
 		];
+			// Maritime
 		create MaritimeTerminal from: terminal_A_shapefile with: [handling_time_to_road::read("TO_ROAD") as float,
 			handling_time_to_maritime::read("TO_MARITIM") as float,
 			handling_time_from_road::read("FROM_ROAD") as float,
 			handling_time_from_maritime::read("FROM_MARIT") as float
 		];
+
 		// Forwarding agent
 		create ForwardingAgent number:1 returns:fas;
 		forwardingAgent <- fas[0];
 
-		// Create a vehicle to init_networks
+		// Create a vehicle to call "init_networks"
 		create Vehicle number:1;
 
 		// Warehouses
 		create Warehouse from: warehouse_shapefile returns: lw with: [totalSurface::read("surface") as float];
 
-		//  Logistic providers
+		//  Logistic Service providers
 		create LogisticsServiceProvider from: logistic_provider_shapefile;
 
 		/*
@@ -155,7 +160,6 @@ global {
 			}
 		}
 		/**/
-
 
 		// Final destinations
 		create FinalDestinationManager from: destination_shapefile with: [huffValue::float(read("huff")), surface::float(read("surface"))];
@@ -179,12 +183,10 @@ global {
 		do init_cost;
 		do init_threshold;
 
-	
 	}
 	
 	/*
-	 * A part of the initialization of the final destinations managers must be made here.
-	 * Indeed, we must schedule the FDM according to their surface (larger before). But the scheduling can't be made in the classic init.
+	 * A part of the initialization of some agents must be made here once every agent have been fully initilized.
 	 */
 	reflex second_init when: second_init_bool {
 		second_init_bool <- false;
@@ -209,8 +211,7 @@ global {
 				AntP <- self;
 			}
 		}
-		
-		
+
 		ask ForwardingAgent {
 			do add_network network:road_network mode:'road' nodes:
 				buildingOfFDM + (Warehouse as list) + (MaritimeTerminal as list) + (RiverTerminal as list) + (MaritimeRiverTerminal as list);
@@ -219,7 +220,7 @@ global {
 			do add_network network:river_network mode:'river' nodes:
 				(RiverTerminal as list) + (MaritimeRiverTerminal as list);
 		}
-		
+
 		LHAttractiveness <- 1.0;
 		AntAttractiveness <- 3.0;
 		do update_proba_to_choose_provider;
