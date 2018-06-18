@@ -18,7 +18,7 @@ species LogisticsServiceProvider {
 	float averageCosts <- 0;
 	float threshold <- 0.3;
 	float probaAnt <- 0.5;
-	string costsPathStrategy <- 'financial_costs';//one_of(['financial_costs','travel_time']);
+	string costsPathStrategy <- one_of(['financial_costs','travel_time']);//'financial_costs';//
 	
 	init {
 		adoptedStrategy <- one_of(possibleStrategies);
