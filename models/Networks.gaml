@@ -53,6 +53,7 @@ species MaritimeLine {
 species RiverLine {
 	float speed;
 	float length;
+	int is_new;// This attribute is used to distinguish parts of this network which belong to the Canal Seine Nord, and should be unblock at a different time
 	int colorValue <- -1; // This value is filled by the custom GAMA Plugin : MovingOnNetwork. It allows to colour the road according to the quantity of goods on the road.
 	bool blocked <- false;
 	aspect geom {
