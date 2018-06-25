@@ -44,7 +44,12 @@ global {
 	file maritime_shapefile <- file(pathBD+"Maritime/maritime_lambert93_filtered_attributes.shp");
 
 	// The river  network
-	file river_shapefile <- file(pathBD+"River/river_network_length_in_km.shp");
+	// This Shapefile comes from the database made by the ETIS Project. However, we updated it according to this website :
+	// - http://maps.grade.de/index.htm
+	// in order to have correct CEMT values
+	// And also we updated it in order to have the Canal Seine Nord navigable.
+	//file river_shapefile <- file(pathBD+"River/river_network_length_in_km.shp"); Only the Seine and Oise => not the part to Antwerp with Canal Seine Nord
+	file river_shapefile <- file(pathBD+"River/IWW_Axe_Seine_Antwerp_CLASS-40-50-60_lambert93.shp");
 
 	// Logistic provider
 	// The list of logistics service provider. The data comes from the list of "commissionaire de transport" build by Devport
@@ -97,7 +102,7 @@ global {
 		create MaritimeLine from: maritime_shapefile with: [speed::read("speed") as float, length::read("length") as float];
 		maritime_network <- as_edge_graph(MaritimeLine);
 			// River
-		create RiverLine from: river_shapefile with: [speed::read("speed") as float, length::read("length") as float];
+		create RiverLine from: river_shapefile with: [speed::read("speed") as float, length::read("length") as float, is_new::read("is_new") as int];
 		river_network <- as_edge_graph(RiverLine);
 		
 		// Providers
@@ -112,7 +117,7 @@ global {
 		create MaritimeTransporter number:1;
 		
 		// Terminals
-			// Maritime and river
+			// Terminals of LH (they are maritime and river terminals)
 		create MaritimeRiverTerminal from: terminal_LH_shapefile with: [handling_time_to_road::read("TO_ROAD") as float,
 			handling_time_to_river::read("TO_RIVER") as float,
 			handling_time_to_maritime::read("TO_MARITIM") as float,
@@ -120,14 +125,14 @@ global {
 			handling_time_from_river::read("FROM_RIVER") as float,
 			handling_time_from_maritime::read("FROM_MARIT") as float
 		];
-			// River
+			// Terminals inside  the Seine axis (they are river terminals)
 		create RiverTerminal from: river_terminals with: [handling_time_to_road::read("TO_ROAD") as float,
 			handling_time_to_river::read("TO_RIVER") as float,
 			handling_time_from_road::read("FROM_ROAD") as float,
 			handling_time_from_river::read("FROM_RIVER") as float
 		];
-			// Maritime
-		create MaritimeTerminal from: terminal_A_shapefile with: [handling_time_to_road::read("TO_ROAD") as float,
+			// Terminals of Antwerp (they are maritime and river terminals if we have the Canal Seine Nord, otherwise, they are MaritimeTerminal agents)
+		create MaritimeRiverTerminal from: terminal_A_shapefile with: [handling_time_to_road::read("TO_ROAD") as float,
 			handling_time_to_maritime::read("TO_MARITIM") as float,
 			handling_time_from_road::read("FROM_ROAD") as float,
 			handling_time_from_maritime::read("FROM_MARIT") as float
@@ -191,27 +196,31 @@ global {
 	reflex second_init when: second_init_bool {
 		second_init_bool <- false;
 
+		// We initialyse stocks and associate the buildings  to their FDM
 		list<Building> buildingOfFDM <- [];
 		ask FinalDestinationManager sort_by (-1*each.surface){
 			do second_init;
 			buildingOfFDM <+ self.building;
 		}
 
+		// We initialyse the networks so the vehicles can move on these
 		ask Vehicle[0] {
 			do init_networks;
 		}
 
-		Provider LHP <- nil;
-		Provider AntP <- nil;
-		ask Provider {
-			if(self.port = "LE HAVRE"){
-				LHP <- self;
-			}
-			else{
-				AntP <- self;
-			}
-		}
+// This is useless right ?
+//		Provider LHP <- nil;
+//		Provider AntP <- nil;
+//		ask Provider {
+//			if(self.port = "LE HAVRE"){
+//				LHP <- self;
+//			}
+//			else{
+//				AntP <- self;
+//			}
+//		}
 
+		// We initialyse the networks but this time for the forwarding agent so he can compute multi-modal shortest paths
 		ask ForwardingAgent {
 			do add_network network:road_network mode:'road' nodes:
 				buildingOfFDM + (Warehouse as list) + (MaritimeTerminal as list) + (RiverTerminal as list) + (MaritimeRiverTerminal as list);
@@ -221,6 +230,16 @@ global {
 				(RiverTerminal as list) + (MaritimeRiverTerminal as list);
 		}
 
+		// We block the canal Seine Nord at the beginning of the simulation
+		ask RiverLine {
+			if(is_new = 1){
+				ask forwardingAgent {
+					do block_edge edge:myself;
+				}
+			}
+		}
+
+		// We associate a provider to each LSPs according to the distance and the attractiveness
 		LHAttractiveness <- 1.0;
 		AntAttractiveness <- 3.0;
 		do update_proba_to_choose_provider;
