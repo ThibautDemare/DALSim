@@ -14,15 +14,15 @@ global {
 			if(blocked){
 				// Need to unblock the road
 				blocked <- false;
-				ask Vehicle[0] {
-					do unblock_road road:myself;
+				ask forwardingAgent {
+					do unblock_edge edge:myself;
 				}
 			}
 			else {
 				// Need to block the road
 				blocked <- true;
-				ask Vehicle[0] {
-					do block_road road:myself;
+				ask forwardingAgent {
+					do block_edge edge:myself;
 				}
 			}
 		}
@@ -128,8 +128,8 @@ global {
 					if(!Road[j].blocked){
 						// Need to block the road
 						Road[j].blocked <- true;
-						ask Vehicle[0] {
-							do block_road road:Road[j];
+						ask forwardingAgent {
+							do block_edge edge:myself;
 						}
 					}
 				}
@@ -147,6 +147,18 @@ global {
 		else if(cycle = 1000){
 			list<string> roads <- ["Road3900", "Road3905", "Road4018", "Road4069", "Road4080", "Road4081", "Road4517", "Road4526", "Road5491", "Road5492", "Road5547", "Road5548", "Road5602", "Road5604", "Road5632", "Road5723", "Road5742", "Road5808", "Road5897", "Road5902", "Road5904", "Road8750", "Road8753", "Road8950", "Road8958", "Road8970", "Road8982", "Road8999", "Road9024", "Road9055", "Road9075", "Road9647", "Road9657", "Road9696", "Road9697", "Road9707", "Road9716"];
 			do block_some_roads(roads);
+		}
+	}
+
+	reflex scenario_canal_seine_nord when: allowScenarionCanalSeineNord {
+		if(cycle = 1000){
+			ask RiverLine {
+				if(is_new = 1){
+					ask forwardingAgent {
+						do unblock_edge edge:myself;
+					}
+				}
+			}
 		}
 	}
 }

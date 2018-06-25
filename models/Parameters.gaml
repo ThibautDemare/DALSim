@@ -22,6 +22,7 @@ global {
 	 */
 	bool allowScenarioAttractiveness <- false;
 	bool allowScenarioBlockRoads <- false;
+	bool allowScenarionCanalSeineNord <- false;
 
 	/*
 	 * Some variables and functions to call some reflex
