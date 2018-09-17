@@ -13,6 +13,7 @@ Ensuite, il vous faudra rapatrier les différents plugins ci-dessous en les impo
 - https://github.com/graphstream/gs-gama
 - https://git.litislab.fr/tdemare/TransportOrganizerPlugin
 - https://git.litislab.fr/tdemare/MovingOnNetworkPlugin
+- https://git.litislab.fr/tdemare/AnalyseNetworkPlugin
 
 Ces trois plugins sont configurés pour fonctionner avec la librairie Graphstream (version 1.3). Vous devrez donc ajouter cette librairie. Pour cela, télécharger "gs-core" et "gs-algo" à ces deux adresses :
 - https://data.graphstream-project.org/pub/1.x/nightly-build/last/gs-algo-1.3-SNAPSHOT-last.jar
