@@ -1,5 +1,29 @@
 Source code of the DALSim (Dynamic Graphs and Agents for Logistics Simulations)
 
+INSTALL
+-------
+
+To use this model, you first nedd to install the GAMA platform and the plugins developped as part of this project.
+
+The first step consists to instal the "Git" version of GAMA following this tutorial:
+- https://github.com/gama-platform/gama/wiki/InstallingGitVersion
+
+Then, you need to download the following repositories and to import them into Eclipse as projects:
+- https://github.com/graphstream/gs-gama
+- https://git.litislab.fr/tdemare/TransportOrganizerPlugin
+- https://git.litislab.fr/tdemare/MovingOnNetworkPlugin
+- https://git.litislab.fr/tdemare/AnalyseNetworkPlugin
+
+These four plugins are configured to work with the Graphstream library (version 1.3). So you need to add the library to these plugins. To do so, download "gs-core" and gs-algo" here: 
+- https://data.graphstream-project.org/pub/1.x/nightly-build/last/gs-algo-1.3-SNAPSHOT-last.jar
+- https://data.graphstream-project.org/pub/1.x/nightly-build/last/gs-core-1.3-SNAPSHOT-last.jar
+
+Then, in Eclipse, for each plugin, do a right click on a project (the project containing the source code and not the feature), then go in properties > Java Build Path > Libraries > Add External Jars > select both gs-core and gs-algo  > Apply and Close.
+
+After that, you need to include the plugins to GAMA following the section Addition of a feature to the product" of this tutorial:
+- https://github.com/gama-platform/gama/wiki/DevelopingPlugins
+
+At this point, you are able to start GAMA (according to the method described here: https://github.com/gama-platform/gama/wiki/InstallingGitVersion) which will ask you to choose a workspace. Once started, you can import to your workspace the GAMA model of this current repository.
 
 INSTALLATION
 ------------
@@ -15,7 +39,7 @@ Ensuite, il vous faudra rapatrier les différents plugins ci-dessous en les impo
 - https://git.litislab.fr/tdemare/MovingOnNetworkPlugin
 - https://git.litislab.fr/tdemare/AnalyseNetworkPlugin
 
-Ces trois plugins sont configurés pour fonctionner avec la librairie Graphstream (version 1.3). Vous devrez donc ajouter cette librairie. Pour cela, télécharger "gs-core" et "gs-algo" à ces deux adresses :
+Ces quatre plugins sont configurés pour fonctionner avec la librairie Graphstream (version 1.3). Vous devrez donc ajouter cette librairie. Pour cela, télécharger "gs-core" et "gs-algo" à ces deux adresses :
 - https://data.graphstream-project.org/pub/1.x/nightly-build/last/gs-algo-1.3-SNAPSHOT-last.jar
 - https://data.graphstream-project.org/pub/1.x/nightly-build/last/gs-core-1.3-SNAPSHOT-last.jar
 
