@@ -1,4 +1,4 @@
-Source code of the DALSim (Dynamic Graph and Agents for Logistics Simulation)
+Source code of the DALSim (Dynamic Graphs and Agents for Logistics Simulations)
 
 
 INSTALLATION
