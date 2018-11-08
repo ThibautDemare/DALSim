@@ -107,6 +107,19 @@ experiment 'Every output' type: gui {
 			event [mouse_down] action: block_one_road;
 		}
 
+		display 'Road traffic' autosave: true refresh:every(1) {
+			species Road aspect: geom;
+			event [mouse_down] action: block_one_road;
+		}
+
+		display 'Maritime and River traffic' autosave: true refresh:every(1) {
+			species MaritimeLine aspect: geom;
+			species RiverLine aspect: geom;
+			species MaritimeTerminal aspect:geom;
+			species RiverTerminal aspect:geom;
+			species MaritimeRiverTerminal aspect:geom;
+			event [mouse_down] action: block_one_road;
+		}
 		/*display 'Number of Vehicles' refresh:every(1) {
 			chart  "Number of batches" type: series {
 				data "Total number of batch" value: totalNumberOfBatch color: rgb('purple') ;
