@@ -48,6 +48,7 @@ species Vehicle skills:[MovingOnNetwork] {
 			write "\tDeparture date : "+departureDate;
 			write "\tcurrent_date : "+current_date;
 			write "\tscheduledCommodities[0] : "+scheduledCommodities[0];
+			write "\tnetworkType : "+networkType;
 			do die;// There are no commodities to transport. No need to move, the scheduled commodities will have to register another vehicle 
 		}
 		readyToMove <- true;
