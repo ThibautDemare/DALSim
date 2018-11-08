@@ -9,7 +9,7 @@ import "Parameters.gaml"
 global {
 
 	action block_one_road {
-		Road selected_agent <- Road closest_to #user_location;
+		Road selected_agent <- Network closest_to #user_location;
 		ask selected_agent {
 			if(blocked){
 				// Need to unblock the road
@@ -66,7 +66,7 @@ global {
 					create Commodity number:1 returns:returnedAgent;
 					Commodity commodity <- returnedAgent[0];
 					commodity.volume <- 1;
-					dist <- get_path_time_length(Provider[i], LogisticsServiceProvider[j], LogisticsServiceProvider[j].costsPathStrategy, commodity);
+					dist <- Provider[i] distance_to LogisticsServiceProvider[j];
 				}
 				p[i, j] <- (  (Provider[i] as Provider).attractiveness ) / (dist*dist) ;
 				sum[j, 0] <- sum[j, 0] + p[i, j];
@@ -115,9 +115,9 @@ global {
 		}
 	}
 
-	//////////////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////
 	// This scenario blocks some roads at steps 500 and 1000 on the Antwerp-Paris axis //
-	//////////////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////
 
 	action block_some_roads(list<string> roads){
 		int i <- 0;
@@ -150,8 +150,12 @@ global {
 		}
 	}
 
+	////////////////////////////////////////////////////////////////////////////////////////////
+	// This scenario blocks the Canal Seine-Nord at the beginning and unblocks it at step 500 //
+	////////////////////////////////////////////////////////////////////////////////////////////
+
 	reflex scenario_canal_seine_nord when: allowScenarionCanalSeineNord {
-		if(cycle = 1000){
+		if(cycle = 500){
 			ask RiverLine {
 				if(is_new = 1){
 					ask forwardingAgent {
