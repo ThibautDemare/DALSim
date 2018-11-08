@@ -7,26 +7,6 @@ import "ForwardingAgent.gaml"
 import "Vehicle.gaml"
 import "Perturbator.gaml"
 import "Experiments.gaml"
-/*
-import "AwaitingStock.gaml"
-import "LogisticsServiceProvider.gaml"
-import "Building.gaml"
-import "Commodity.gaml"
-import "FinalDestinationManager.gaml"
-
-import "Networks.gaml"
-import "Observer.gaml"
-import "Order.gaml"
-import "Parameters.gaml"
-import "Provider.gaml"
-import "Stock.gaml"
-import "Strategies.gaml"
-import "SupplyChain.gaml"
-import "Terminals.gaml"
-import "TransferredStocks.gaml"
-import "Transporters.gaml"
-import "Warehouse.gaml"
-*/
 
 /*
  * Init global variables and agents
@@ -172,7 +152,7 @@ global {
 		 * The following code can be commented or not, depending if the user want to execute the simulation with every FDM 
 		 * It is mainly used for tests to avoid CPU overload.
 		 */
-		int i <- 100;
+		int i <- 400;
 		list<FinalDestinationManager> lfdm <- shuffle(FinalDestinationManager);
 		loop while: i < length(lfdm) {
 			FinalDestinationManager s <- lfdm[i];
@@ -208,25 +188,13 @@ global {
 			do init_networks;
 		}
 
-// This is useless right ?
-//		Provider LHP <- nil;
-//		Provider AntP <- nil;
-//		ask Provider {
-//			if(self.port = "LE HAVRE"){
-//				LHP <- self;
-//			}
-//			else{
-//				AntP <- self;
-//			}
-//		}
-
 		// We initialyse the networks but this time for the forwarding agent so he can compute multi-modal shortest paths
 		ask ForwardingAgent {
-			do add_network network:road_network mode:'road' nodes:
+			do add_mode network:road_network mode:'road' nodes:
 				buildingOfFDM + (Warehouse as list) + (MaritimeTerminal as list) + (RiverTerminal as list) + (MaritimeRiverTerminal as list);
-			do add_network network:maritime_network mode:'maritime' nodes:
+			do add_mode network:maritime_network mode:'maritime' nodes:
 				(Provider as list) + (MaritimeTerminal as list) + (MaritimeRiverTerminal as list);
-			do add_network network:river_network mode:'river' nodes:
+			do add_mode network:river_network mode:'river' nodes:
 				(RiverTerminal as list) + (MaritimeRiverTerminal as list);
 		}
 
