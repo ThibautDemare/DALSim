@@ -79,6 +79,7 @@ species Provider parent: RestockingBuilding {
 				commodity.stock <- sendedStock[0];
 				commodity.volume <- sendedStock[0].quantity;
 				commodity.finalDestination <- order.building;
+				commodity.stepOrderMade <- order.stepOrderMade;
 				ask forwardingAgent {
 					commodity.paths <- compute_shortest_path(myself, order.building, order.strategy, commodity);//'financial_costs'//travel_time
 				}
