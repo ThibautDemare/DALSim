@@ -4,17 +4,27 @@ import "Building.gaml"
 import "Observer.gaml"
 
 species FinalDestinationManager {
-	int timeShifting <- rnd(23);
-	LogisticsServiceProvider logisticsServiceProvider;
-	list<float> localLPEfficiencies <- [];
-	float localAverageLPEfficiency <- 0.0;
-	int numberOfHoursOfContract <- rnd(336) - 100;
-	Building building;
-	float huffValue;// number of customer according to huff model => this value cant be used like this because the Huff model does not take care of time.
-	int decreasingRateOfStocks;
+	// Basic characteristics
 	float surface;
-	list<int> timeToBeDelivered <- []; // This variable is used to have an idea of the efficicency of the LP to deliver quickly the goods
+	int decreasingRateOfStocks;
+	float huffValue;// number of customer according to huff model => this value cant be used like this because the Huff model does not take care of time.
+	Building building;
+
+	// Relative to contract with LSP
+	LogisticsServiceProvider logisticsServiceProvider;
+	int timeShifting <- rnd(23);
+	int numberOfHoursOfContract <- rnd(336) - 100;
+
+	// Measures of efficiency
+	int stratMeasureLSPEfficiency <- 0;
+		// based on number of stock shortages
+	list<float> localNbStockShortagesLastSteps <- [];
+	float localAverageNbStockShortagesLastSteps <- 0.0;
+		// based on time to deliver some goods to the final consignee
+	list<int> localTimeToBeDeliveredLastDeliveries <- []; // This variable is used to have an idea of the efficicency of the LP to deliver quickly the goods
 	float localTimeToBeDelivered <- 0.0;
+		// based on costs of deliveries and warehousing
+	float localCosts <- 0.0;
 
 	init {
 
@@ -24,6 +34,13 @@ species FinalDestinationManager {
 			totalSurface <- myself.surface;
 			occupiedSurface <- 0.0;
 			myself.building <- self;
+		}
+
+		if(isLocalLSPSwitcStrat){
+			stratMeasureLSPEfficiency <- one_of(possibleLSPSwitcStrats);
+		}
+		else {
+			stratMeasureLSPEfficiency <- globalLSPSwitchStrat;
 		}
 
 		//Connection to graphstream
@@ -93,9 +110,7 @@ species FinalDestinationManager {
 	reflex manageContractWithLP when: allowLSPSwitch {
 		numberOfHoursOfContract <- numberOfHoursOfContract + 1;
 		if(numberOfHoursOfContract > minimalNumberOfHoursOfContract){
-			//if(localAverageLPEfficiency > averageLPEfficiency ){
-			if(localTimeToBeDelivered > averageTimeToBeDelivered ){
-			//if(logisticProvider.averageCosts < averageCosts){
+			if(shouldISwitchMyLSP){
 				// the logsitic provider is not efficient enough. He must be replaced by another one.
 				// Inform the current logistic provider that he losts a customer
 				TransferredStocks stocksRemoved;
@@ -124,12 +139,32 @@ species FinalDestinationManager {
 
 				// Re-initialise some variables : contract is new, and efficiency values are set to zero.
 				numberOfHoursOfContract <- 0;
-				localLPEfficiencies <- [];
-				localAverageLPEfficiency <- 0.0;
-				timeToBeDelivered <- [];
+				localNbStockShortagesLastSteps <- [];
+				localAverageNbStockShortagesLastSteps <- 0.0;
+				localTimeToBeDeliveredLastDeliveries <- [];
 				localTimeToBeDelivered <- 0.0;
+				localCosts <- 0.0;
 			}
 		}
+	}
+
+	bool shouldISwitchMyLSP {
+		if(stratMeasureLSPEfficiency = 1){
+			if(localAverageNbStockShortagesLastSteps > averageNbStockShortages ){
+				return true;
+			}
+		}
+		else if(stratMeasureLSPEfficiency = 2){
+			if(localTimeToBeDelivered > averageTimeToBeDelivered ){
+				return true;
+			}
+		}
+		else if(stratMeasureLSPEfficiency = 3){
+			if(logisticsServiceProvider.averageCosts < averageCosts){
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**

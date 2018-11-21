@@ -6,11 +6,21 @@ import "LogisticsServiceProvider.gaml"
 
 global {
 	float step <- 60 #mn;//60 minutes per step
-	date starting_date <- date([2018,6,5,11,0,0]);// 6 Juin 2018 à 11h00
+	date starting_date <- date([2018,6,5,11,0,0]);// 5 Juin 2018 11h00
 
-	list<int> possibleStrategies <- [1, 4];// [1, 2, 3, 4]
+	list<int> possibleSelectingWarehouseStrategies <- [1, 2, 3, 4]; //[1];//[1, 4];// [1, 2, 3, 4] // 1 : biased random selection - 2 : accessibility - 3 : closest/largest - 4 : pure random selection
 	int numberWarehouseSelected <- 50;
 
+	// Parameters relative to the threshold used by LSPs to decide when to restock
+	bool localThreshold <- true;
+	float minlocalThreshold <- 0.05;
+	float maxlocalThreshold <- 0.2;
+	float globalThreshold <- 0.3;
+
+	// Parameters relative to the ability of the final consignee to switch of LSP
+	bool isLocalLSPSwitcStrat <- false;
+	list<int> possibleLSPSwitcStrats <- [1, 2, 3]; // 1 : NbStockShortages - 2 : TimeToBeDelivered - 3 : Costs
+	int globalLSPSwitchStrat <- 1;
 	bool allowLSPSwitch <- true;
 
 	// Attractiveness parameters
@@ -22,7 +32,7 @@ global {
 	 */
 	bool allowScenarioAttractiveness <- false;
 	bool allowScenarioBlockRoads <- false;
-	bool allowScenarionCanalSeineNord <- false;
+	bool allowScenarionCanalSeineNord <- true;
 
 	/*
 	 * Some variables and functions to call some reflex
@@ -45,22 +55,6 @@ global {
 	
 	int sizeOfStockLocalWarehouse <- 2;
 	int sizeOfStockLargeWarehouse <- 3;
-
-	bool localThreshold <- false;
-	float minlocalThreshold <- 0.15;
-	float maxlocalThreshold <- 0.35;
-	float globalThreshold <- 0.3;
-
-	action init_threshold {
-		ask LogisticsServiceProvider {
-			if(localThreshold) {
-				threshold <- rnd(minlocalThreshold, maxlocalThreshold);//truncated_gauss({minlocalThreshold, maxlocalThreshold});
-			}
-			else {
-				threshold <- globalThreshold;
-			}
-		}
-	}
 
 	/**
 	 * Each final destination manager is associated to a rate of decreasing of his stocks.

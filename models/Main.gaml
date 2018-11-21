@@ -166,8 +166,6 @@ global {
 		// Init other parameters
 		do init_decreasingRateOfStocks;
 		do init_cost;
-		do init_threshold;
-
 	}
 	
 	/*
@@ -189,7 +187,7 @@ global {
 		}
 
 		// We initialyse the networks but this time for the forwarding agent so he can compute multi-modal shortest paths
-		ask ForwardingAgent {
+		ask forwardingAgent {
 			do add_mode network:road_network mode:'road' nodes:
 				buildingOfFDM + (Warehouse as list) + (MaritimeTerminal as list) + (RiverTerminal as list) + (MaritimeRiverTerminal as list);
 			do add_mode network:maritime_network mode:'maritime' nodes:
@@ -208,8 +206,8 @@ global {
 		}
 
 		// We associate a provider to each LSPs according to the distance and the attractiveness
-		LHAttractiveness <- 1.0;
-		AntAttractiveness <- 3.0;
-		do update_proba_to_choose_provider;
+//		LHAttractiveness <- 1.0;
+//		AntAttractiveness <- 3.0;
+//		do update_proba_to_choose_provider;
 	}
 }

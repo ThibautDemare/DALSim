@@ -7,7 +7,7 @@ import "Strategies.gaml"
 
 species LogisticsServiceProvider {
 	int timeShifting <- rnd(23);
-	int adoptedStrategy;
+	int adoptedSelectingWarehouseStrategy;
 	SupplyChain supplyChain <- nil;
 	list<int> timeToDeliver <- [];
 	list<Warehouse> lvl1Warehouses <- []; // close warehouse
@@ -16,15 +16,22 @@ species LogisticsServiceProvider {
 	Provider provider;
 	float cumulateCosts <- 0;
 	float averageCosts <- 0;
-	float threshold <- 0.3;
+	float threshold;
 	float probaAnt <- 0.5;
-	string costsPathStrategy <- one_of(['financial_costs','travel_time']);//'financial_costs';//
+	string costsPathStrategy <- one_of(['financial_costs']);//'financial_costs';//'travel_time'//'financial_costs','travel_time'
 	
 	init {
-		adoptedStrategy <- one_of(possibleStrategies);
+		adoptedSelectingWarehouseStrategy <- one_of(possibleSelectingWarehouseStrategies);
 		provider <- one_of(Provider);
 		ask provider {
 			do addCustomer(myself);
+		}
+
+		if(localThreshold) {
+			threshold <- rnd(minlocalThreshold, maxlocalThreshold);//truncated_gauss({minlocalThreshold, maxlocalThreshold});
+		}
+		else {
+			threshold <- globalThreshold;
 		}
 
 		timeToDeliver <- [];
@@ -554,16 +561,16 @@ species LogisticsServiceProvider {
 	 */
 	Warehouse findWarehouseLvl1(FinalDestinationManager fdm, int sizeOfStock){
 		Warehouse w <- nil;
-		if(adoptedStrategy = 1){
+		if(adoptedSelectingWarehouseStrategy = 1){
 			w <- world.findWarehouseLvl1Strat1(fdm, sizeOfStock, lvl2Warehouses);
 		}
-		else if(adoptedStrategy = 2){
+		else if(adoptedSelectingWarehouseStrategy = 2){
 			w <- world.findWarehouseLvl1Strat2(fdm, sizeOfStock, lvl1Warehouses, lvl2Warehouses);
 		}
-		else if(adoptedStrategy = 3){
+		else if(adoptedSelectingWarehouseStrategy = 3){
 			w <- world.findWarehouseLvl1Strat3(fdm, sizeOfStock, lvl2Warehouses);
 		}
-		else if(adoptedStrategy = 4){
+		else if(adoptedSelectingWarehouseStrategy = 4){
 			w <- world.findWarehouseLvl1Strat4(fdm, sizeOfStock, lvl2Warehouses);
 		}
 		return w;
@@ -574,16 +581,16 @@ species LogisticsServiceProvider {
 	 */
 	Warehouse findWarehouseLvl2(FinalDestinationManager fdm, int sizeOfStock){
 		Warehouse w <- nil;
-		if(adoptedStrategy = 1){
+		if(adoptedSelectingWarehouseStrategy = 1){
 			w <- world.findWarehouseLvl2Strat1(fdm, sizeOfStock, lvl1Warehouses);
 		}
-		else if(adoptedStrategy = 2){
+		else if(adoptedSelectingWarehouseStrategy = 2){
 			w <- world.findWarehouseLvl2Strat2(fdm, sizeOfStock, lvl1Warehouses, lvl2Warehouses);
 		}
-		else if(adoptedStrategy = 3){
+		else if(adoptedSelectingWarehouseStrategy = 3){
 			w <- world.findWarehouseLvl2Strat3(fdm, sizeOfStock, lvl1Warehouses);
 		}
-		else if(adoptedStrategy = 4){
+		else if(adoptedSelectingWarehouseStrategy = 4){
 			w <- world.findWarehouseLvl2Strat4(fdm, sizeOfStock, lvl1Warehouses);
 		}
 		return w;

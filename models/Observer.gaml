@@ -5,7 +5,7 @@ import "FinalDestinationManager.gaml"
 global {
 	string date_simu_starts <- nil;
 
-	bool saveObservations <- false;
+	bool saveObservations <- true;
 
 	int nbLPStrat1 <- 0;
 	int nbLPStrat2 <- 0;
@@ -17,8 +17,8 @@ global {
 	int nbStocksAwaitingToLeaveWarehouse;
 	int nbStocksAwaitingToLeaveProvider;
 
-	list<float> averagesLPEfficiency <- [];
-	float averageLPEfficiency <- 0.0;
+	list<float> averagesNbStockShortages <- [];
+	float averageNbStockShortages <- 0.0;
 
 	int numberofEmptyStockInFinalDests <- 0;
 	int numberOfEmptyStockInWarehouses <- 0;
@@ -86,7 +86,7 @@ global {
 					numberofEmptyStockInFinalDests <- numberofEmptyStockInFinalDests + 1;
 				}
 			}
-			self.localLPEfficiencies <- localLPEfficiencies + nbStockShortages;
+			self.localNbStockShortagesLastSteps <- localNbStockShortagesLastSteps + nbStockShortages;
 			freeSurfaceInFinalDest <- freeSurfaceInFinalDest + (surface - tempStock);
 		}
 	}
@@ -114,30 +114,30 @@ global {
 	 * This reflex updates every step the average efficiency of every logistic provider, but also the estimated efficiency at the FDM level.
 	 */
 	reflex updateAverageLPEfficiency {
-		float currentLPEfficiency <- 0;
+		float currentNbStockShortages <- 0;
 		ask FinalDestinationManager {
 			int i <- 0;
-			self.localAverageLPEfficiency <- 0;
-			loop while: i < length(localLPEfficiencies) {
-				self.localAverageLPEfficiency <- self.localAverageLPEfficiency + localLPEfficiencies[i];
+			self.localAverageNbStockShortagesLastSteps <- 0;
+			loop while: i < length(localNbStockShortagesLastSteps) {
+				self.localAverageNbStockShortagesLastSteps <- self.localAverageNbStockShortagesLastSteps + localNbStockShortagesLastSteps[i];
 				i <- i + 1;
 			}
-			self.localAverageLPEfficiency <- self.localAverageLPEfficiency / length(localLPEfficiencies);
-			currentLPEfficiency <- currentLPEfficiency + self.localAverageLPEfficiency;
+			self.localAverageNbStockShortagesLastSteps <- self.localAverageNbStockShortagesLastSteps / length(localNbStockShortagesLastSteps);
+			currentNbStockShortages <- currentNbStockShortages + self.localAverageNbStockShortagesLastSteps;
 		}
-		currentLPEfficiency <- currentLPEfficiency / length(FinalDestinationManager);
-		averagesLPEfficiency <- averagesLPEfficiency + 0.0;
-		if(length(averagesLPEfficiency) > nbStepsConsideredForLPEfficiency){
-			remove index: 0 from: averagesLPEfficiency;
+		currentNbStockShortages <- currentNbStockShortages / length(FinalDestinationManager);
+		averagesNbStockShortages <- averagesNbStockShortages + 0.0;
+		if(length(averagesNbStockShortages) > nbStepsConsideredForLPEfficiency){
+			remove index: 0 from: averagesNbStockShortages;
 		}
-		averagesLPEfficiency[length(averagesLPEfficiency)-1] <- averagesLPEfficiency[length(averagesLPEfficiency)-1] + currentLPEfficiency;
+		averagesNbStockShortages[length(averagesNbStockShortages)-1] <- averagesNbStockShortages[length(averagesNbStockShortages)-1] + currentNbStockShortages;
 		int i <- 0;
-		averageLPEfficiency <- 0.0;
-		loop while: i < length(averagesLPEfficiency) {
-			averageLPEfficiency <- averageLPEfficiency + averagesLPEfficiency[i];
+		averageNbStockShortages <- 0.0;
+		loop while: i < length(averagesNbStockShortages) {
+			averageNbStockShortages <- averagesNbStockShortages + averagesNbStockShortages[i];
 			i <- i + 1;
 		}
-		averageLPEfficiency <- averageLPEfficiency / length(averagesLPEfficiency);
+		averageNbStockShortages <- averageNbStockShortages / length(averagesNbStockShortages);
 	}
 
 	action computeStockInWarehouses {
@@ -240,8 +240,10 @@ global {
 					j <- j + 1;
 					i <- i + 1;
 				}
+
 			}
 		}
+
 		if(i > 0){
 			averageTimeToDeliver <- (sum/i);
 		}
@@ -253,18 +255,18 @@ global {
 			int j <- 0;
 			int localSum <- 0;
 
-			loop while: 50 < length(timeToBeDelivered) {
-				remove index: 0 from: timeToBeDelivered;
+			loop while: 50 < length(localTimeToBeDeliveredLastDeliveries) {
+				remove index: 0 from: localTimeToBeDeliveredLastDeliveries;
 			}
 
-			loop while: j<length(timeToBeDelivered) {
-				sum <- sum + timeToBeDelivered[j];
-				localSum <- localSum + timeToBeDelivered[j];
+			loop while: j<length(localTimeToBeDeliveredLastDeliveries) {
+				sum <- sum + localTimeToBeDeliveredLastDeliveries[j];
+				localSum <- localSum + localTimeToBeDeliveredLastDeliveries[j];
 				j <- j + 1;
 				i <- i + 1;
 			}
-			if( length(timeToBeDelivered) > 0){
-				localTimeToBeDelivered <- localSum / length(timeToBeDelivered);
+			if( length(localTimeToBeDeliveredLastDeliveries) > 0){
+				localTimeToBeDelivered <- localSum / length(localTimeToBeDeliveredLastDeliveries);
 			}
 		}
 		if(i > 0){
@@ -329,7 +331,7 @@ global {
 
 		float inter <- (maxlocalThreshold - minlocalThreshold)/4.0;
 		ask FinalDestinationManager {
-			if(logisticsServiceProvider.adoptedStrategy = 1){
+			if(logisticsServiceProvider.adoptedSelectingWarehouseStrategy = 1){
 				nbLPStrat1 <- nbLPStrat1 + 1;
 				if(logisticsServiceProvider.threshold < (minlocalThreshold + inter)){
 					nbLPStrat1LowThreshold <- nbLPStrat1LowThreshold + 1;
@@ -344,7 +346,7 @@ global {
 					nbLPStrat1HighThreshold <- nbLPStrat1HighThreshold + 1;
 				}
 			}
-			else if(logisticsServiceProvider.adoptedStrategy = 2){
+			else if(logisticsServiceProvider.adoptedSelectingWarehouseStrategy = 2){
 				nbLPStrat2 <- nbLPStrat2 + 1;
 				if(logisticsServiceProvider.threshold < (minlocalThreshold + inter)){
 					nbLPStrat2LowThreshold <- nbLPStrat2LowThreshold + 1;
@@ -359,7 +361,7 @@ global {
 					nbLPStrat2HighThreshold <- nbLPStrat2HighThreshold + 1;
 				}
 			}
-			else if(logisticsServiceProvider.adoptedStrategy = 3){
+			else if(logisticsServiceProvider.adoptedSelectingWarehouseStrategy = 3){
 				nbLPStrat3 <- nbLPStrat3 + 1;
 				if(logisticsServiceProvider.threshold < (minlocalThreshold + inter)){
 					nbLPStrat3LowThreshold <- nbLPStrat3LowThreshold + 1;
@@ -374,7 +376,7 @@ global {
 					nbLPStrat3HighThreshold <- nbLPStrat3HighThreshold + 1;
 				}
 			}
-			else if(logisticsServiceProvider.adoptedStrategy = 4){
+			else if(logisticsServiceProvider.adoptedSelectingWarehouseStrategy = 4){
 				nbLPStrat4 <- nbLPStrat4 + 1;
 				if(logisticsServiceProvider.threshold < (minlocalThreshold + inter)){
 					nbLPStrat4LowThreshold <- nbLPStrat4LowThreshold + 1;
@@ -488,7 +490,7 @@ global {
 			date_simu_starts <- ""+gama.machine_time;// as_system_date "%Y-%M-%D-%h-%m-%s"; 
 		}
 
-		string params <- "_Strats" + possibleStrategies;
+		string params <- "_Strats" + possibleSelectingWarehouseStrategies;
 
 		string filePath <- "../results/CSV/";
 		save "" + ((time/3600.0) as int) + ";" +stockInWarehouse + ";" + freeSurfaceInWarehouse + ";"
@@ -527,5 +529,11 @@ global {
 			to: filePath + date_simu_starts + "_strat3_threshold_adoption_share" + params  + ".csv" type: text rewrite: false;
 		save "" + ((time/3600.0) as int) + ";" + nbLPStrat4LowThreshold + ";" + nbLPStrat4LowMediumThreshold + ";" + nbLPStrat4HighMediumThreshold + ";" + nbLPStrat4HighThreshold + ";"
 			to: filePath + date_simu_starts + "_strat4_threshold_adoption_share" + params  + ".csv" type: text rewrite: false;
+
+		save "" + ((time/3600.0) as int) + ";" + averageCosts
+			to: filePath + date_simu_starts + "_average_costs" + params  + ".csv" type: text rewrite: false;
+		save "" + ((time/3600.0) as int) + ";" + nbHavre + ";" +  nbAntwerp
+			to: filePath + date_simu_starts + "_competition_between_LH_Antwerp" + params  + ".csv" type: text rewrite: false;
+
 	}
 }

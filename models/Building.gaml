@@ -67,7 +67,7 @@ species Building {
 						// Update lists containing the time to deliver some goods in order to measure the efficiency of the actors
 						(entering_stock.stock.lp as LogisticsServiceProvider).timeToDeliver <- (entering_stock.stock.lp as LogisticsServiceProvider).timeToDeliver + ((int(time/3600)) - entering_stock.stepOrderMade);
 						if(stockBuilding.fdm.building = self){ // The average time to be delivered is only useful with the building of the FDM and not for every building of the supply chain
-							stockBuilding.fdm.timeToBeDelivered <- stockBuilding.fdm.timeToBeDelivered + ((int(time/3600)) - entering_stock.stepOrderMade);
+							stockBuilding.fdm.localTimeToBeDeliveredLastDeliveries <- stockBuilding.fdm.localTimeToBeDeliveredLastDeliveries + ((int(time/3600)) - entering_stock.stepOrderMade);
 						}
 					}
 				}
