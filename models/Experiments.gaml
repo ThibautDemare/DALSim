@@ -194,6 +194,12 @@ experiment 'Every output' type: gui {
 			}
 		}/**/
 
+		display 'Average transportation and warehousing costs' refresh:every(1) {
+			chart  "Average transportation and warehousing costs" type: series {
+				data "Average transportation and warehousing costs" value: averageCosts color: rgb('green') ;
+			}
+		}/**/
+
 		display 'Share of the different strategies adopted' refresh:every(1) {
 			chart  "Share of the different strategies adopted" type: series {
 				data "Strategy 1 (closest/largest warehouse according to a probability)" value: nbLPStrat1 color: rgb('green') ;

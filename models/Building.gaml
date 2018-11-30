@@ -18,9 +18,11 @@ species Building {
 
 	float handling_time_to_road <- 1;
 	float handling_time_from_road <- 1;
-	
+
 	float colorValue <- -1;
-	
+
+	float cost;
+
 	reflex manageRoadComingCommodities {
 		int i <- 0;
 		loop while:i<length(comingCommodities) {
@@ -35,7 +37,7 @@ species Building {
 			}
 		} 
 	}
-	
+
 	action receiveCommodity(Commodity c){
 		if(c.finalDestination = self){
 			create AwaitingStock number: 1 returns: ast {
@@ -45,6 +47,9 @@ species Building {
 				self.building <- myself;
 			}
 			entering_stocks <- entering_stocks + ast[0];
+			ask c {
+				do die;
+			}
 		}
 		else {
 			comingCommodities <+ c;
@@ -97,7 +102,6 @@ species RestockingBuilding parent: Building {
 	list<Order> currentOrders <- [];
 	list<Vehicle> leavingVehicles <- [];
 	int maxProcessOrdersCapacity;
-	float cost;
 
 	action addOrder(Order order){
 		currentOrders <- currentOrders + order;
@@ -188,6 +192,7 @@ species RestockingBuilding parent: Building {
 		ask forwardingAgent {
 			commodity.paths <- compute_shortest_path(myself, order.building, order.strategy, commodity);//'financial_costs'//travel_time
 		}
+		order.fdm.localTransportationCosts <- order.fdm.localTransportationCosts + commodity.costs;
 		leavingCommodities <- leavingCommodities + commodity;
 	}
 }

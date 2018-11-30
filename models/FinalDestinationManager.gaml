@@ -24,7 +24,9 @@ species FinalDestinationManager {
 	list<int> localTimeToBeDeliveredLastDeliveries <- []; // This variable is used to have an idea of the efficicency of the LP to deliver quickly the goods
 	float localTimeToBeDelivered <- 0.0;
 		// based on costs of deliveries and warehousing
-	float localCosts <- 0.0;
+	list<float> localTransportationCosts <- [];
+	float localWarehousingCosts <- 0.0;
+	float localAverageCosts <- 0.0;
 
 	init {
 
@@ -110,7 +112,7 @@ species FinalDestinationManager {
 	reflex manageContractWithLP when: allowLSPSwitch {
 		numberOfHoursOfContract <- numberOfHoursOfContract + 1;
 		if(numberOfHoursOfContract > minimalNumberOfHoursOfContract){
-			if(shouldISwitchMyLSP){
+			if(shouldISwitchMyLSP()){
 				// the logsitic provider is not efficient enough. He must be replaced by another one.
 				// Inform the current logistic provider that he losts a customer
 				TransferredStocks stocksRemoved;
@@ -143,7 +145,9 @@ species FinalDestinationManager {
 				localAverageNbStockShortagesLastSteps <- 0.0;
 				localTimeToBeDeliveredLastDeliveries <- [];
 				localTimeToBeDelivered <- 0.0;
-				localCosts <- 0.0;
+				localTransportationCosts <- [];
+				localWarehousingCosts <- 0.0;
+				localAverageCosts <- 0.0;
 			}
 		}
 	}
@@ -160,7 +164,7 @@ species FinalDestinationManager {
 			}
 		}
 		else if(stratMeasureLSPEfficiency = 3){
-			if(logisticsServiceProvider.averageCosts < averageCosts){
+			if(localAverageCosts > averageCosts){
 				return true;
 			}
 		}

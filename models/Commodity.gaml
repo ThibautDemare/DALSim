@@ -10,4 +10,5 @@ species Commodity {
 	string currentNetwork;
 	Stock stock;
 	int stepOrderMade;
+	float costs;
 }

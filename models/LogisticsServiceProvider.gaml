@@ -18,10 +18,23 @@ species LogisticsServiceProvider {
 	float averageCosts <- 0;
 	float threshold;
 	float probaAnt <- 0.5;
-	string costsPathStrategy <- one_of(['financial_costs']);//'financial_costs';//'travel_time'//'financial_costs','travel_time'
+	string costsPathStrategy;
 	
 	init {
-		adoptedSelectingWarehouseStrategy <- one_of(possibleSelectingWarehouseStrategies);
+		if(isLocalSelectingWarehouseStrategies){
+			adoptedSelectingWarehouseStrategy <- one_of(possibleSelectingWarehouseStrategies);
+		}
+		else {
+			adoptedSelectingWarehouseStrategy <- globalSelectingWarehouseStrategies;
+		}
+
+		if(isLocalCostPathStrategy){
+			costsPathStrategy <- one_of(possibleCostPathStrategies);
+		}
+		else {
+			costsPathStrategy <- globalCostPathStrategy;
+		}
+
 		provider <- one_of(Provider);
 		ask provider {
 			do addCustomer(myself);
@@ -489,6 +502,8 @@ species LogisticsServiceProvider {
 				gs_add_edge_attribute gs_sender_id:"supply_chain" gs_edge_id:(sceCloseWarehouse.building.name + sceLarge.building.name) gs_attribute_name:"length" gs_attribute_value:p;
 			}
 		}
+
+		return sceLarge;
 	}
 
 	/**
@@ -512,11 +527,12 @@ species LogisticsServiceProvider {
 		 * connect this leaf to a close warehouse
 		 */
 		SupplyChainElement sceCloseWarehouse <- connectLvl1Warehouse(fdm, fdmLeaf, stocksLvl1);
-
+		fdm.localWarehousingCosts <- fdm.localWarehousingCosts + sceCloseWarehouse.building.cost;
 		/*
 		 * Connect the close warehouse to the large warehouse
 		 */
-		do connectLvl2Warehouse(fdm, sceCloseWarehouse, stocksLvl2);
+		SupplyChainElement sceLarge <- connectLvl2Warehouse(fdm, sceCloseWarehouse, stocksLvl2);
+		fdm.localWarehousingCosts <- fdm.localWarehousingCosts + sceLarge.building.cost;
 		customers <- customers + fdm;
 	}
 	

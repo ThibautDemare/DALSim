@@ -274,6 +274,33 @@ global {
 		}
 	}
 
+	reflex update_average_costs {
+		// Update the average costs
+		int i <- 0;
+		float sum <- 0;
+		ask FinalDestinationManager {
+			if(length(localTransportationCosts) > 0){
+				int j <- 0;
+				float localSum <- 0;
+
+				loop while: 50 < length(localTransportationCosts) {
+					remove index: 0 from: localTransportationCosts;
+				}
+
+				loop while: j<length(localTransportationCosts) {
+					localSum <- localSum + localTransportationCosts[j];
+					j <- j + 1;
+				}
+				localAverageCosts <- localWarehousingCosts + localSum / length(localTransportationCosts);
+				sum <- sum + localAverageCosts;
+				i <- i + 1;
+			}
+		}
+		if(i > 0){
+			averageCosts <- (sum/i);
+		}
+	}
+
 	// Average number of LSP for each strategy
 	list<int> listNbLPStrat1 <- [];
 	list<int> listNbLPStrat2 <- [];
@@ -425,33 +452,6 @@ global {
 		averageStrat2 <- averageStrat2/length(listNbLPStrat2);
 		averageStrat3 <- averageStrat3/length(listNbLPStrat3);
 		averageStrat4 <- averageStrat4/length(listNbLPStrat4);
-	}
-
-	reflex computeLPCost{
-		averageCosts <- 0;
-		int nbLP <- 0;
-		ask LogisticsServiceProvider {
-			if(length(customers) > 0){
-				nbLP <- nbLP + 1;
-				cumulateCosts <- 0;
-				int i <- 0;
-				loop while: i<length(lvl1Warehouses) {
-					cumulateCosts <- cumulateCosts + lvl1Warehouses[i].cost;
-					i <- i + 1;
-				}
-				i <- 0;
-				loop while: i<length(lvl2Warehouses) {
-					cumulateCosts <- cumulateCosts + lvl2Warehouses[i].cost;
-					i <- i + 1;
-				}
-				cumulateCosts <- cumulateCosts + provider.cost;
-				self.averageCosts <- cumulateCosts/length(customers);
-				myself.averageCosts <- myself.averageCosts + self.averageCosts;
-			}
-		}
-		if(nbLP > 0){
-			averageCosts <- averageCosts / nbLP;
-		}
 	}
 
 	reflex portsShare {
