@@ -73,18 +73,9 @@ species Provider parent: RestockingBuilding {
 					self.fdm <- order.fdm;
 					self.lp <- order.logisticsServiceProvider;
 				}
-	
-				create Commodity number:1 returns:returnedAgent;
-				Commodity commodity <- returnedAgent[0];
-				commodity.stock <- sendedStock[0];
-				commodity.volume <- sendedStock[0].quantity;
-				commodity.finalDestination <- order.building;
-				commodity.stepOrderMade <- order.stepOrderMade;
-				ask forwardingAgent {
-					commodity.paths <- compute_shortest_path(myself, order.building, order.strategy, commodity);//'financial_costs'//travel_time
-				}
-				leavingCommodities <- leavingCommodities + commodity;
-				
+
+				do sendStock(sendedStock[0], order);
+
 				i <- i + 1;
 				
 				outflow <- outflow + sendedStock[0].quantity;
