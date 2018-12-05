@@ -63,7 +63,7 @@ species Vehicle skills:[MovingOnNetwork] {
 				transportedCommodities[j].location <- location;
 				transportedCommodities[j].incomingDate <- current_date;
 				ask destination {
-					do receiveCommodity(myself.transportedCommodities[j]);
+					do receiveCommodity(myself.transportedCommodities[j], myself.networkType);
 				}
 				j <- j + 1;
 			}

@@ -63,6 +63,7 @@ experiment 'Every output' type: gui {
 
 	output {
 		display 'All agents' autosave: false refresh:every(1) {
+			species RegionObserver aspect: geom;
 			species Road aspect: geom;
 			species MaritimeLine aspect: geom;
 			species RiverLine aspect: geom;
@@ -197,6 +198,232 @@ experiment 'Every output' type: gui {
 		display 'Average transportation and warehousing costs' refresh:every(1) {
 			chart  "Average transportation and warehousing costs" type: series {
 				data "Average transportation and warehousing costs" value: averageCosts color: rgb('green') ;
+			}
+		}/**/
+
+		display 'Share of mode of transport (number of vehicles)' refresh:every(1) {
+			chart  "Share of mode of transport (number of vehicles)" type: series {
+				data "Share of road" value: shareRoadVehicle color: rgb('green') ;
+				data "Share of river" value: shareRiverVehicle color: rgb('red') ;
+				data "Share of maritime" value: shareMaritimeVehicle color: rgb('blue') ;
+			}
+		}/**/
+
+		display 'Share of mode of transport (number of vehicles) - Region Basse-Normandie' refresh:every(1) {
+			chart  "Share of mode of transport (number of vehicles) - Region Basse-Normandie" type: series {
+				RegionObserver sr <- nil;
+				ask RegionObserver {
+					if(self.name = "Basse-Normandie"){
+						sr <- self;
+					}
+				}
+				if(sr!=nil){
+					data "Share of road" value: sr.shareRoadVehicleRO color: rgb('green') ;
+					data "Share of river" value: sr.shareRiverVehicleRO color: rgb('red') ;
+					data "Share of maritime" value: sr.shareMaritimeVehicleRO color: rgb('blue') ;
+				}
+				else { // At step 0, RegionObserver are not initialized, so, sr = nil
+					data "Share of road" value: 0 color: rgb('green') ;
+					data "Share of river" value: 0 color: rgb('red') ;
+					data "Share of maritime" value: 0 color: rgb('blue') ;
+				}
+			}
+		}/**/
+
+		display 'Share of mode of transport (number of vehicles) - Region Centre' refresh:every(1) {
+			chart  "Share of mode of transport (number of vehicles) - Region Centre" type: series {
+				RegionObserver sr <- nil;
+				ask RegionObserver {
+					if(self.name = "Centre"){
+						sr <- self;
+					}
+				}
+				if(sr!=nil){
+					data "Share of road" value: sr.shareRoadVehicleRO color: rgb('green') ;
+					data "Share of river" value: sr.shareRiverVehicleRO color: rgb('red') ;
+					data "Share of maritime" value: sr.shareMaritimeVehicleRO color: rgb('blue') ;
+				}
+				else { // At step 0, RegionObserver are not initialized, so, sr = nil
+					data "Share of road" value: 0 color: rgb('green') ;
+					data "Share of river" value: 0 color: rgb('red') ;
+					data "Share of maritime" value: 0 color: rgb('blue') ;
+				}
+			}
+		}/**/
+
+		display 'Share of mode of transport (number of vehicles) - Region Haute-Normandie' refresh:every(1) {
+			chart  "Share of mode of transport (number of vehicles) - Region Haute-Normandie" type: series {
+				RegionObserver sr <- nil;
+				ask RegionObserver {
+					if(self.name = "Haute-Normandie"){
+						sr <- self;
+					}
+				}
+				if(sr!=nil){
+					data "Share of road" value: sr.shareRoadVehicleRO color: rgb('green') ;
+					data "Share of river" value: sr.shareRiverVehicleRO color: rgb('red') ;
+					data "Share of maritime" value: sr.shareMaritimeVehicleRO color: rgb('blue') ;
+				}
+				else { // At step 0, RegionObserver are not initialized, so, sr = nil
+					data "Share of road" value: 0 color: rgb('green') ;
+					data "Share of river" value: 0 color: rgb('red') ;
+					data "Share of maritime" value: 0 color: rgb('blue') ;
+				}
+			}
+		}/**/
+
+		display 'Share of mode of transport (number of vehicles) - Region Île-de-France' refresh:every(1) {
+			chart  "Share of mode of transport (number of vehicles) - Region Île-de-France" type: series {
+				RegionObserver sr <- nil;
+				ask RegionObserver {
+					if(self.name = "Île-de-France"){
+						sr <- self;
+					}
+				}
+				if(sr!=nil){
+					data "Share of road" value: sr.shareRoadVehicleRO color: rgb('green') ;
+					data "Share of river" value: sr.shareRiverVehicleRO color: rgb('red') ;
+					data "Share of maritime" value: sr.shareMaritimeVehicleRO color: rgb('blue') ;
+				}
+				else { // At step 0, RegionObserver are not initialized, so, sr = nil
+					data "Share of road" value: 0 color: rgb('green') ;
+					data "Share of river" value: 0 color: rgb('red') ;
+					data "Share of maritime" value: 0 color: rgb('blue') ;
+				}
+			}
+		}/**/
+
+		display 'Share of mode of transport (number of vehicles) - Region Picardie' refresh:every(1) {
+			chart  "Share of mode of transport (number of vehicles) - Region Picardie" type: series {
+				RegionObserver sr <- nil;
+				ask RegionObserver {
+					if(self.name = "Picardie"){
+						sr <- self;
+					}
+				}
+				if(sr!=nil){
+					data "Share of road" value: sr.shareRoadVehicleRO color: rgb('green') ;
+					data "Share of river" value: sr.shareRiverVehicleRO color: rgb('red') ;
+					data "Share of maritime" value: sr.shareMaritimeVehicleRO color: rgb('blue') ;
+				}
+				else { // At step 0, RegionObserver are not initialized, so, sr = nil
+					data "Share of road" value: 0 color: rgb('green') ;
+					data "Share of river" value: 0 color: rgb('red') ;
+					data "Share of maritime" value: 0 color: rgb('blue') ;
+				}
+			}
+		}/**/
+
+		display 'Share of mode of transport (quantities of goods)' refresh:every(1) {
+			chart  "Share of mode of transport (quantities of goods)" type: series {
+				data "Share of road" value: shareRoadQuantities color: rgb('green') ;
+				data "Share of river" value: shareRiverQuantities color: rgb('red') ;
+				data "Share of maritime" value: shareMaritimeQuantities color: rgb('blue') ;
+			}
+		}/**/
+
+		display 'Share of mode of transport (quantities of goods) - Region Basse-Normandie' refresh:every(1) {
+			chart  "Share of mode of transport (quantities of goods) - Region Basse-Normandie" type: series {
+				RegionObserver sr <- nil;
+				ask RegionObserver {
+					if(self.name = "Basse-Normandie"){
+						sr <- self;
+					}
+				}
+				if(sr!=nil){
+					data "Share of road" value: sr.shareRoadQuantitiesRO color: rgb('green') ;
+					data "Share of river" value: sr.shareRiverQuantitiesRO color: rgb('red') ;
+					data "Share of maritime" value: sr.shareMaritimeQuantitiesRO color: rgb('blue') ;
+				}
+				else { // At step 0, RegionObserver are not initialized, so, sr = nil
+					data "Share of road" value: 0 color: rgb('green') ;
+					data "Share of river" value: 0 color: rgb('red') ;
+					data "Share of maritime" value: 0 color: rgb('blue') ;
+				}
+			}
+		}/**/
+
+		display 'Share of mode of transport (quantities of goods) - Region Centre' refresh:every(1) {
+			chart  "Share of mode of transport - Region Centre" type: series {
+				RegionObserver sr <- nil;
+				ask RegionObserver {
+					if(self.name = "Centre"){
+						sr <- self;
+					}
+				}
+				if(sr!=nil){
+					data "Share of road" value: sr.shareRoadQuantitiesRO color: rgb('green') ;
+					data "Share of river" value: sr.shareRiverQuantitiesRO color: rgb('red') ;
+					data "Share of maritime" value: sr.shareMaritimeQuantitiesRO color: rgb('blue') ;
+				}
+				else { // At step 0, RegionObserver are not initialized, so, sr = nil
+					data "Share of road" value: 0 color: rgb('green') ;
+					data "Share of river" value: 0 color: rgb('red') ;
+					data "Share of maritime" value: 0 color: rgb('blue') ;
+				}
+			}
+		}/**/
+
+		display 'Share of mode of transport (quantities of goods) - Region Haute-Normandie' refresh:every(1) {
+			chart  "Share of mode of transport - Region Haute-Normandie" type: series {
+				RegionObserver sr <- nil;
+				ask RegionObserver {
+					if(self.name = "Haute-Normandie"){
+						sr <- self;
+					}
+				}
+				if(sr!=nil){
+					data "Share of road" value: sr.shareRoadQuantitiesRO color: rgb('green') ;
+					data "Share of river" value: sr.shareRiverQuantitiesRO color: rgb('red') ;
+					data "Share of maritime" value: sr.shareMaritimeQuantitiesRO color: rgb('blue') ;
+				}
+				else { // At step 0, RegionObserver are not initialized, so, sr = nil
+					data "Share of road" value: 0 color: rgb('green') ;
+					data "Share of river" value: 0 color: rgb('red') ;
+					data "Share of maritime" value: 0 color: rgb('blue') ;
+				}
+			}
+		}/**/
+
+		display 'Share of mode of transport (quantities of goods) - Region Île-de-France' refresh:every(1) {
+			chart  "Share of mode of transport - Region Île-de-France" type: series {
+				RegionObserver sr <- nil;
+				ask RegionObserver {
+					if(self.name = "Île-de-France"){
+						sr <- self;
+					}
+				}
+				if(sr!=nil){
+					data "Share of road" value: sr.shareRoadQuantitiesRO color: rgb('green') ;
+					data "Share of river" value: sr.shareRiverQuantitiesRO color: rgb('red') ;
+					data "Share of maritime" value: sr.shareMaritimeQuantitiesRO color: rgb('blue') ;
+				}
+				else { // At step 0, RegionObserver are not initialized, so, sr = nil
+					data "Share of road" value: 0 color: rgb('green') ;
+					data "Share of river" value: 0 color: rgb('red') ;
+					data "Share of maritime" value: 0 color: rgb('blue') ;
+				}
+			}
+		}/**/
+
+		display 'Share of mode of transport (quantities of goods) - Region Picardie' refresh:every(1) {
+			chart  "Share of mode of transport - Region Picardie" type: series {
+				RegionObserver sr <- nil;
+				ask RegionObserver {
+					if(self.name = "Picardie"){
+						sr <- self;
+					}
+				}
+				if(sr!=nil){
+					data "Share of road" value: sr.shareRoadQuantitiesRO color: rgb('green') ;
+					data "Share of river" value: sr.shareRiverQuantitiesRO color: rgb('red') ;
+					data "Share of maritime" value: sr.shareMaritimeQuantitiesRO color: rgb('blue') ;
+				}
+				else { // At step 0, RegionObserver are not initialized, so, sr = nil
+					data "Share of road" value: 0 color: rgb('green') ;
+					data "Share of river" value: 0 color: rgb('red') ;
+					data "Share of maritime" value: 0 color: rgb('blue') ;
+				}
 			}
 		}/**/
 

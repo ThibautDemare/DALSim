@@ -7,6 +7,7 @@ import "ForwardingAgent.gaml"
 import "Vehicle.gaml"
 import "Perturbator.gaml"
 import "Experiments.gaml"
+import "RegionObserver.gaml"
 
 /*
  * Init global variables and agents
@@ -60,6 +61,11 @@ global {
 	file terminal_A_shapefile <- file(pathBD+"Terminals/maritime_terminals_A_lambert93.shp");
 	file river_terminals <- file(pathBD+"Terminals/river_terminals.shp");
 	
+	// The french regions
+	// Data comes from :
+	// Contours des régions françaises sur OpenStreetMap (consulted the 30/11/2018) -> https://www.data.gouv.fr/fr/datasets/contours-des-regions-francaises-sur-openstreetmap/
+	file regions_shapefile <- file(pathBD+"Regions/regions.shp");
+
 	//Define the border of the environnement according to the road network
 	geometry shape <- envelope(roads_shapefile);
 
@@ -85,6 +91,9 @@ global {
 		create RiverLine from: river_shapefile with: [speed::read("speed") as float, length::read("length") as float, is_new::read("is_new") as int];
 		river_network <- as_edge_graph(RiverLine);
 		
+		// Region observers
+		create RegionObserver from: regions_shapefile with: [name::read("nom") as string];
+
 		// Providers
 		create Provider from: provider_shapefile with: [port::read("Port") as string];
 		
@@ -152,7 +161,7 @@ global {
 		 * The following code can be commented or not, depending if the user want to execute the simulation with every FDM 
 		 * It is mainly used for tests to avoid CPU overload.
 		 */
-		int i <- 400;
+		int i <- 500;
 		list<FinalDestinationManager> lfdm <- shuffle(FinalDestinationManager);
 		loop while: i < length(lfdm) {
 			FinalDestinationManager s <- lfdm[i];
@@ -207,6 +216,11 @@ global {
 			}
 		}
 
+		ask RegionObserver{
+			ask ((Building as list) + (Warehouse as list) + (MaritimeTerminal as list) + (RiverTerminal as list) + (MaritimeRiverTerminal as list)) inside self {
+				myself.buildings <+ self;
+			}
+		}
 		// We associate a provider to each LSPs according to the distance and the attractiveness
 //		LHAttractiveness <- 1.0;
 //		AntAttractiveness <- 3.0;

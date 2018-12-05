@@ -301,6 +301,128 @@ global {
 		}
 	}
 
+	// Share by number of vehicles
+	float shareRoadVehicle;
+	float shareRiverVehicle;
+	float shareMaritimeVehicle;
+	// Share by quantities of goods
+	float shareRoadQuantities;
+	float shareRiverQuantities;
+	float shareMaritimeQuantities;
+	reflex averageModeShare {
+		int sumVehicle;
+		int sumRoadVehicle;
+		int sumRiverVehicle;
+		int sumMaritimeVehicle;
+
+		int sumQuantities;
+		int sumRoadQuantities;
+		int sumRiverQuantities;
+		int sumMaritimeQuantities;
+
+		shareRoadVehicle <- 0;
+		shareRiverVehicle <- 0;
+		shareMaritimeVehicle <- 0;
+
+		shareRoadQuantities <- 0;
+		shareRiverQuantities <- 0;
+		shareMaritimeQuantities <- 0;
+
+		ask RegionObserver {
+			sumVehicleRO <- 0;
+			shareRoadVehicleRO <- 0;
+			shareRiverVehicleRO <- 0;
+			shareMaritimeVehicleRO <- 0;
+
+			sumQuantitiesRO <- 0;
+			shareRoadQuantitiesRO <- 0;
+			shareRiverQuantitiesRO <- 0;
+			shareMaritimeQuantitiesRO <- 0;
+
+			int j <- 0;
+			loop while: j < length(buildings) {
+				Building b <- buildings[j];
+
+				int i <- 0;
+				loop while: i < length(b.nbRoadVehiclesLastSteps) {
+					sumVehicle <- sumVehicle + b.nbRoadVehiclesLastSteps[i] + b.nbRiverVehiclesLastSteps[i] + b.nbMaritimeVehiclesLastSteps[i];
+					sumRoadVehicle <- sumRoadVehicle + b.nbRoadVehiclesLastSteps[i];
+					sumRiverVehicle <- sumRiverVehicle + b.nbRiverVehiclesLastSteps[i];
+					sumMaritimeVehicle <- sumMaritimeVehicle + b.nbMaritimeVehiclesLastSteps[i];
+
+					sumVehicleRO <- sumVehicleRO + b.nbRoadVehiclesLastSteps[i] + b.nbRiverVehiclesLastSteps[i] + b.nbMaritimeVehiclesLastSteps[i];
+					shareRoadVehicleRO <- shareRoadVehicleRO + b.nbRoadVehiclesLastSteps[i];
+					shareRiverVehicleRO <- shareRiverVehicleRO + b.nbRiverVehiclesLastSteps[i];
+					shareMaritimeVehicleRO <- shareMaritimeVehicleRO + b.nbMaritimeVehiclesLastSteps[i];
+
+					sumQuantities <- sumQuantities + b.nbRoadQuantitiesLastSteps[i] + b.nbRiverQuantitiesLastSteps[i] + b.nbMaritimeQuantitiesLastSteps[i];
+					sumRoadQuantities <- sumRoadQuantities + b.nbRoadQuantitiesLastSteps[i];
+					sumRiverQuantities <- sumRiverQuantities + b.nbRiverQuantitiesLastSteps[i];
+					sumMaritimeQuantities <- sumMaritimeQuantities + b.nbMaritimeQuantitiesLastSteps[i];
+
+					sumQuantitiesRO <- sumQuantitiesRO + b.nbRoadQuantitiesLastSteps[i] + b.nbRiverQuantitiesLastSteps[i] + b.nbMaritimeQuantitiesLastSteps[i];
+					shareRoadQuantitiesRO <- shareRoadQuantitiesRO + b.nbRoadQuantitiesLastSteps[i];
+					shareRiverQuantitiesRO <- shareRiverQuantitiesRO + b.nbRiverQuantitiesLastSteps[i];
+					shareMaritimeQuantitiesRO <- shareMaritimeQuantitiesRO + b.nbMaritimeQuantitiesLastSteps[i];
+
+					i <- i + 1;
+				}
+				if(cycle > 5){
+					remove index: 0 from: b.nbRoadVehiclesLastSteps;
+					remove index: 0 from: b.nbRiverVehiclesLastSteps;
+					remove index: 0 from: b.nbMaritimeVehiclesLastSteps;
+
+					remove index: 0 from: b.nbRoadQuantitiesLastSteps;
+					remove index: 0 from: b.nbRiverQuantitiesLastSteps;
+					remove index: 0 from: b.nbMaritimeQuantitiesLastSteps;
+				}
+				b.nbRoadVehiclesLastSteps <+ 0;
+				b.nbRiverVehiclesLastSteps <+ 0;
+				b.nbMaritimeVehiclesLastSteps <+ 0;
+
+				b.nbRoadQuantitiesLastSteps <+ 0;
+				b.nbRiverQuantitiesLastSteps <+ 0;
+				b.nbMaritimeQuantitiesLastSteps <+ 0;
+				j <- j + 1;
+			}
+		}
+		if(sumVehicle > 0){
+			shareRoadVehicle <- sumRoadVehicle / sumVehicle;
+			shareRiverVehicle <- sumRiverVehicle / sumVehicle;
+			shareMaritimeVehicle <- sumMaritimeVehicle / sumVehicle;
+			ask RegionObserver {
+				if(sumVehicleRO > 0){
+					shareRoadVehicleRO <- shareRoadVehicleRO / sumVehicleRO;
+					shareRiverVehicleRO <- shareRiverVehicleRO / sumVehicleRO;
+					shareMaritimeVehicleRO <- shareMaritimeVehicleRO / sumVehicleRO;
+				}
+				else {
+					shareRoadVehicleRO <- 0.0;
+					shareRiverVehicleRO <- 0.0;
+					shareMaritimeVehicleRO <- 0.0;
+				}
+			}
+		}
+
+		if(sumQuantities > 0){
+			shareRoadQuantities <- sumRoadQuantities / sumQuantities;
+			shareRiverQuantities <- sumRiverQuantities / sumQuantities;
+			shareMaritimeQuantities <- sumMaritimeQuantities / sumQuantities;
+			ask RegionObserver {
+				if(sumQuantitiesRO > 0){
+					shareRoadQuantitiesRO <- shareRoadQuantitiesRO / sumQuantitiesRO;
+					shareRiverQuantitiesRO <- shareRiverQuantitiesRO / sumQuantitiesRO;
+					shareMaritimeQuantitiesRO <- shareMaritimeQuantitiesRO / sumQuantitiesRO;
+				}
+				else {
+					shareRoadQuantitiesRO <- 0.0;
+					shareRiverQuantitiesRO <- 0.0;
+					shareMaritimeQuantitiesRO <- 0.0;
+				}
+			}
+		}
+	}
+
 	// Average number of LSP for each strategy
 	list<int> listNbLPStrat1 <- [];
 	list<int> listNbLPStrat2 <- [];
@@ -534,6 +656,25 @@ global {
 			to: filePath + date_simu_starts + "_average_costs" + params  + ".csv" type: text rewrite: false;
 		save "" + ((time/3600.0) as int) + ";" + nbHavre + ";" +  nbAntwerp
 			to: filePath + date_simu_starts + "_competition_between_LH_Antwerp" + params  + ".csv" type: text rewrite: false;
+		save "" + ((time/3600.0) as int) + ";" + shareRoadVehicle + ";" +  shareRiverVehicle + ";" +  shareMaritimeVehicle
+			to: filePath + date_simu_starts + "_share_transport_mode" + params  + ".csv" type: text rewrite: false;
 
+		do saveShareTransportModeRegion(filePath, params, "Basse-Normandie");
+		do saveShareTransportModeRegion(filePath, params, "Haute-Normandie");
+		do saveShareTransportModeRegion(filePath, params, "Centre");
+		do saveShareTransportModeRegion(filePath, params, "Île-de-France");
+		do saveShareTransportModeRegion(filePath, params, "Picardie");
+
+	}
+
+	action saveShareTransportModeRegion(string filePath, string params, string n){
+		RegionObserver sr <- nil;
+		ask RegionObserver {
+			if(self.name = n){
+				sr <- self;
+			}
+		}
+		save "" + ((time/3600.0) as int) + ";" + sr.shareRoadVehicleRO + ";" +  sr.shareRiverVehicleRO + ";" +  sr.shareMaritimeVehicleRO
+			to: filePath + date_simu_starts + "_share_transport_mode_Picardie" + params  + ".csv" type: text rewrite: false;
 	}
 }

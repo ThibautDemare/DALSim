@@ -23,6 +23,13 @@ species Building {
 
 	float cost;
 
+	list<int> nbRoadVehiclesLastSteps <- [0];
+	list<int> nbRiverVehiclesLastSteps <- [0];
+	list<int> nbMaritimeVehiclesLastSteps <- [0];
+	list<int> nbRoadQuantitiesLastSteps <- [0];
+	list<int> nbRiverQuantitiesLastSteps <- [0];
+	list<int> nbMaritimeQuantitiesLastSteps <- [0];
+
 	reflex manageRoadComingCommodities {
 		int i <- 0;
 		loop while:i<length(comingCommodities) {
@@ -38,7 +45,19 @@ species Building {
 		} 
 	}
 
-	action receiveCommodity(Commodity c){
+	action receiveCommodity(Commodity c, string networkType){
+		if(networkType = "road"){
+			nbRoadVehiclesLastSteps[length(nbRoadVehiclesLastSteps)-1] <- nbRoadVehiclesLastSteps[length(nbRoadVehiclesLastSteps)-1] + 1;
+			nbRoadQuantitiesLastSteps[length(nbRoadQuantitiesLastSteps)-1] <- nbRoadQuantitiesLastSteps[length(nbRoadQuantitiesLastSteps)-1] + c.volume;
+		}
+		if(networkType = "river"){
+			nbRiverVehiclesLastSteps[length(nbRiverVehiclesLastSteps)-1] <- nbRiverVehiclesLastSteps[length(nbRiverVehiclesLastSteps)-1] + 1;
+			nbRiverQuantitiesLastSteps[length(nbRiverQuantitiesLastSteps)-1] <- nbRiverQuantitiesLastSteps[length(nbRiverQuantitiesLastSteps)-1] + c.volume;
+		}
+		if(networkType = "maritime"){
+			nbMaritimeVehiclesLastSteps[length(nbMaritimeVehiclesLastSteps)-1] <- nbMaritimeVehiclesLastSteps[length(nbMaritimeVehiclesLastSteps)-1] + 1;
+			nbMaritimeQuantitiesLastSteps[length(nbMaritimeQuantitiesLastSteps)-1] <- nbMaritimeQuantitiesLastSteps[length(nbMaritimeQuantitiesLastSteps)-1] + c.volume;
+		}
 		if(c.finalDestination = self){
 			create AwaitingStock number: 1 returns: ast {
 				self.stepOrderMade <- c.stepOrderMade;
