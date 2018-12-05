@@ -37,7 +37,7 @@ species RiverTransporter parent: Transporter {
 
 species MaritimeTransporter parent: Transporter {
 	string networkType <- "maritime";
-	float timeBetweenVehicles <- 12;
+	float timeBetweenVehicles <- 24;
 	float maximalTransportedVolume <- 38346; // moyenne de 2 324 EVP par porte conteneur (source : Wikipedia). Soit 2324 * 16.5 = 38346 palettes par navires
 	float volumeKilometersCosts <- 0; // Pour le moment le coût du maritime est inutile. Il sera à considérer quand on aura du short sea
 }
