@@ -664,6 +664,7 @@ global {
 		do saveShareTransportModeRegion(filePath, params, "Centre");
 		do saveShareTransportModeRegion(filePath, params, "Île-de-France");
 		do saveShareTransportModeRegion(filePath, params, "Picardie");
+		do saveShareTransportModeRegion(filePath, params, "Antwerpen");
 
 	}
 

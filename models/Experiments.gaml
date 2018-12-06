@@ -314,6 +314,27 @@ experiment 'Every output' type: gui {
 			}
 		}/**/
 
+		display 'Share of mode of transport (number of vehicles) - Region Antwerp' refresh:every(1) {
+			chart  "Share of mode of transport (number of vehicles) - Region Antwerp" type: series {
+				RegionObserver sr <- nil;
+				ask RegionObserver {
+					if(self.name = "Antwerpen"){
+						sr <- self;
+					}
+				}
+				if(sr!=nil){
+					data "Share of road" value: sr.shareRoadVehicleRO color: rgb('green') ;
+					data "Share of river" value: sr.shareRiverVehicleRO color: rgb('red') ;
+					data "Share of maritime" value: sr.shareMaritimeVehicleRO color: rgb('blue') ;
+				}
+				else { // At step 0, RegionObserver are not initialized, so, sr = nil
+					data "Share of road" value: 0 color: rgb('green') ;
+					data "Share of river" value: 0 color: rgb('red') ;
+					data "Share of maritime" value: 0 color: rgb('blue') ;
+				}
+			}
+		}/**/
+
 		display 'Share of mode of transport (quantities of goods)' refresh:every(1) {
 			chart  "Share of mode of transport (quantities of goods)" type: series {
 				data "Share of road" value: shareRoadQuantities color: rgb('green') ;
@@ -411,6 +432,27 @@ experiment 'Every output' type: gui {
 				RegionObserver sr <- nil;
 				ask RegionObserver {
 					if(self.name = "Picardie"){
+						sr <- self;
+					}
+				}
+				if(sr!=nil){
+					data "Share of road" value: sr.shareRoadQuantitiesRO color: rgb('green') ;
+					data "Share of river" value: sr.shareRiverQuantitiesRO color: rgb('red') ;
+					data "Share of maritime" value: sr.shareMaritimeQuantitiesRO color: rgb('blue') ;
+				}
+				else { // At step 0, RegionObserver are not initialized, so, sr = nil
+					data "Share of road" value: 0 color: rgb('green') ;
+					data "Share of river" value: 0 color: rgb('red') ;
+					data "Share of maritime" value: 0 color: rgb('blue') ;
+				}
+			}
+		}/**/
+
+		display 'Share of mode of transport (quantities of goods) - Region Antwerp' refresh:every(1) {
+			chart  "Share of mode of transport - Region Antwerp" type: series {
+				RegionObserver sr <- nil;
+				ask RegionObserver {
+					if(self.name = "Antwerpen"){
 						sr <- self;
 					}
 				}
