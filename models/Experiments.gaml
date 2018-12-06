@@ -203,9 +203,9 @@ experiment 'Every output' type: gui {
 
 		display 'Share of mode of transport (number of vehicles)' refresh:every(1) {
 			chart  "Share of mode of transport (number of vehicles)" type: series {
-				data "Share of road" value: shareRoadVehicle color: rgb('green') ;
-				data "Share of river" value: shareRiverVehicle color: rgb('red') ;
-				data "Share of maritime" value: shareMaritimeVehicle color: rgb('blue') ;
+				data "Share of road" value: shareRoadVehicle * 100.0 color: rgb('green') ;
+				data "Share of river" value: shareRiverVehicle * 100.0 color: rgb('red') ;
+				data "Share of maritime" value: shareMaritimeVehicle * 100.0 color: rgb('blue') ;
 			}
 		}/**/
 
@@ -218,9 +218,9 @@ experiment 'Every output' type: gui {
 					}
 				}
 				if(sr!=nil){
-					data "Share of road" value: sr.shareRoadVehicleRO color: rgb('green') ;
-					data "Share of river" value: sr.shareRiverVehicleRO color: rgb('red') ;
-					data "Share of maritime" value: sr.shareMaritimeVehicleRO color: rgb('blue') ;
+					data "Share of road" value: sr.shareRoadVehicleRO * 100.0 color: rgb('green') ;
+					data "Share of river" value: sr.shareRiverVehicleRO * 100.0 color: rgb('red') ;
+					data "Share of maritime" value: sr.shareMaritimeVehicleRO * 100.0 color: rgb('blue') ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
 					data "Share of road" value: 0 color: rgb('green') ;
@@ -239,9 +239,9 @@ experiment 'Every output' type: gui {
 					}
 				}
 				if(sr!=nil){
-					data "Share of road" value: sr.shareRoadVehicleRO color: rgb('green') ;
-					data "Share of river" value: sr.shareRiverVehicleRO color: rgb('red') ;
-					data "Share of maritime" value: sr.shareMaritimeVehicleRO color: rgb('blue') ;
+					data "Share of road" value: sr.shareRoadVehicleRO * 100.0 color: rgb('green') ;
+					data "Share of river" value: sr.shareRiverVehicleRO * 100.0 color: rgb('red') ;
+					data "Share of maritime" value: sr.shareMaritimeVehicleRO * 100.0 color: rgb('blue') ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
 					data "Share of road" value: 0 color: rgb('green') ;
@@ -260,9 +260,9 @@ experiment 'Every output' type: gui {
 					}
 				}
 				if(sr!=nil){
-					data "Share of road" value: sr.shareRoadVehicleRO color: rgb('green') ;
-					data "Share of river" value: sr.shareRiverVehicleRO color: rgb('red') ;
-					data "Share of maritime" value: sr.shareMaritimeVehicleRO color: rgb('blue') ;
+					data "Share of road" value: sr.shareRoadVehicleRO * 100.0 color: rgb('green') ;
+					data "Share of river" value: sr.shareRiverVehicleRO * 100.0 color: rgb('red') ;
+					data "Share of maritime" value: sr.shareMaritimeVehicleRO * 100.0 color: rgb('blue') ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
 					data "Share of road" value: 0 color: rgb('green') ;
@@ -281,9 +281,9 @@ experiment 'Every output' type: gui {
 					}
 				}
 				if(sr!=nil){
-					data "Share of road" value: sr.shareRoadVehicleRO color: rgb('green') ;
-					data "Share of river" value: sr.shareRiverVehicleRO color: rgb('red') ;
-					data "Share of maritime" value: sr.shareMaritimeVehicleRO color: rgb('blue') ;
+					data "Share of road" value: sr.shareRoadVehicleRO * 100.0 color: rgb('green') ;
+					data "Share of river" value: sr.shareRiverVehicleRO * 100.0 color: rgb('red') ;
+					data "Share of maritime" value: sr.shareMaritimeVehicleRO * 100.0 color: rgb('blue') ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
 					data "Share of road" value: 0 color: rgb('green') ;
@@ -302,9 +302,9 @@ experiment 'Every output' type: gui {
 					}
 				}
 				if(sr!=nil){
-					data "Share of road" value: sr.shareRoadVehicleRO color: rgb('green') ;
-					data "Share of river" value: sr.shareRiverVehicleRO color: rgb('red') ;
-					data "Share of maritime" value: sr.shareMaritimeVehicleRO color: rgb('blue') ;
+					data "Share of road" value: sr.shareRoadVehicleRO * 100.0 color: rgb('green') ;
+					data "Share of river" value: sr.shareRiverVehicleRO * 100.0 color: rgb('red') ;
+					data "Share of maritime" value: sr.shareMaritimeVehicleRO * 100.0 color: rgb('blue') ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
 					data "Share of road" value: 0 color: rgb('green') ;
@@ -323,9 +323,9 @@ experiment 'Every output' type: gui {
 					}
 				}
 				if(sr!=nil){
-					data "Share of road" value: sr.shareRoadVehicleRO color: rgb('green') ;
-					data "Share of river" value: sr.shareRiverVehicleRO color: rgb('red') ;
-					data "Share of maritime" value: sr.shareMaritimeVehicleRO color: rgb('blue') ;
+					data "Share of road" value: sr.shareRoadVehicleRO * 100.0 color: rgb('green') ;
+					data "Share of river" value: sr.shareRiverVehicleRO * 100.0 color: rgb('red') ;
+					data "Share of maritime" value: sr.shareMaritimeVehicleRO * 100.0 color: rgb('blue') ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
 					data "Share of road" value: 0 color: rgb('green') ;
@@ -337,9 +337,9 @@ experiment 'Every output' type: gui {
 
 		display 'Share of mode of transport (quantities of goods)' refresh:every(1) {
 			chart  "Share of mode of transport (quantities of goods)" type: series {
-				data "Share of road" value: shareRoadQuantities color: rgb('green') ;
-				data "Share of river" value: shareRiverQuantities color: rgb('red') ;
-				data "Share of maritime" value: shareMaritimeQuantities color: rgb('blue') ;
+				data "Share of road" value: shareRoadQuantities * 100.0 color: rgb('green') ;
+				data "Share of river" value: shareRiverQuantities * 100.0 color: rgb('red') ;
+				data "Share of maritime" value: shareMaritimeQuantities * 100.0 color: rgb('blue') ;
 			}
 		}/**/
 
@@ -352,9 +352,9 @@ experiment 'Every output' type: gui {
 					}
 				}
 				if(sr!=nil){
-					data "Share of road" value: sr.shareRoadQuantitiesRO color: rgb('green') ;
-					data "Share of river" value: sr.shareRiverQuantitiesRO color: rgb('red') ;
-					data "Share of maritime" value: sr.shareMaritimeQuantitiesRO color: rgb('blue') ;
+					data "Share of road" value: sr.shareRoadQuantitiesRO * 100.0 color: rgb('green') ;
+					data "Share of river" value: sr.shareRiverQuantitiesRO * 100.0 color: rgb('red') ;
+					data "Share of maritime" value: sr.shareMaritimeQuantitiesRO * 100.0 color: rgb('blue') ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
 					data "Share of road" value: 0 color: rgb('green') ;
@@ -373,9 +373,9 @@ experiment 'Every output' type: gui {
 					}
 				}
 				if(sr!=nil){
-					data "Share of road" value: sr.shareRoadQuantitiesRO color: rgb('green') ;
-					data "Share of river" value: sr.shareRiverQuantitiesRO color: rgb('red') ;
-					data "Share of maritime" value: sr.shareMaritimeQuantitiesRO color: rgb('blue') ;
+					data "Share of road" value: sr.shareRoadQuantitiesRO * 100.0 color: rgb('green') ;
+					data "Share of river" value: sr.shareRiverQuantitiesRO * 100.0 color: rgb('red') ;
+					data "Share of maritime" value: sr.shareMaritimeQuantitiesRO * 100.0 color: rgb('blue') ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
 					data "Share of road" value: 0 color: rgb('green') ;
@@ -394,9 +394,9 @@ experiment 'Every output' type: gui {
 					}
 				}
 				if(sr!=nil){
-					data "Share of road" value: sr.shareRoadQuantitiesRO color: rgb('green') ;
-					data "Share of river" value: sr.shareRiverQuantitiesRO color: rgb('red') ;
-					data "Share of maritime" value: sr.shareMaritimeQuantitiesRO color: rgb('blue') ;
+					data "Share of road" value: sr.shareRoadQuantitiesRO * 100.0 color: rgb('green') ;
+					data "Share of river" value: sr.shareRiverQuantitiesRO * 100.0 color: rgb('red') ;
+					data "Share of maritime" value: sr.shareMaritimeQuantitiesRO * 100.0 color: rgb('blue') ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
 					data "Share of road" value: 0 color: rgb('green') ;
@@ -415,9 +415,9 @@ experiment 'Every output' type: gui {
 					}
 				}
 				if(sr!=nil){
-					data "Share of road" value: sr.shareRoadQuantitiesRO color: rgb('green') ;
-					data "Share of river" value: sr.shareRiverQuantitiesRO color: rgb('red') ;
-					data "Share of maritime" value: sr.shareMaritimeQuantitiesRO color: rgb('blue') ;
+					data "Share of road" value: sr.shareRoadQuantitiesRO * 100.0 color: rgb('green') ;
+					data "Share of river" value: sr.shareRiverQuantitiesRO * 100.0 color: rgb('red') ;
+					data "Share of maritime" value: sr.shareMaritimeQuantitiesRO * 100.0 color: rgb('blue') ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
 					data "Share of road" value: 0 color: rgb('green') ;
@@ -436,9 +436,9 @@ experiment 'Every output' type: gui {
 					}
 				}
 				if(sr!=nil){
-					data "Share of road" value: sr.shareRoadQuantitiesRO color: rgb('green') ;
-					data "Share of river" value: sr.shareRiverQuantitiesRO color: rgb('red') ;
-					data "Share of maritime" value: sr.shareMaritimeQuantitiesRO color: rgb('blue') ;
+					data "Share of road" value: sr.shareRoadQuantitiesRO * 100.0 color: rgb('green') ;
+					data "Share of river" value: sr.shareRiverQuantitiesRO * 100.0 color: rgb('red') ;
+					data "Share of maritime" value: sr.shareMaritimeQuantitiesRO * 100.0 color: rgb('blue') ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
 					data "Share of road" value: 0 color: rgb('green') ;
@@ -457,9 +457,9 @@ experiment 'Every output' type: gui {
 					}
 				}
 				if(sr!=nil){
-					data "Share of road" value: sr.shareRoadQuantitiesRO color: rgb('green') ;
-					data "Share of river" value: sr.shareRiverQuantitiesRO color: rgb('red') ;
-					data "Share of maritime" value: sr.shareMaritimeQuantitiesRO color: rgb('blue') ;
+					data "Share of road" value: sr.shareRoadQuantitiesRO * 100.0 color: rgb('green') ;
+					data "Share of river" value: sr.shareRiverQuantitiesRO * 100.0 color: rgb('red') ;
+					data "Share of maritime" value: sr.shareMaritimeQuantitiesRO * 100.0 color: rgb('blue') ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
 					data "Share of road" value: 0 color: rgb('green') ;
