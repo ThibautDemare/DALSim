@@ -5,6 +5,12 @@ import "Networks.gaml"
 import "Perturbator.gaml"
 import "CellsStockShortage.gaml"
 
+experiment 'Docker' type: gui {
+	parameter "saver" var: saveObservations <- true;
+	parameter "pathBD" var: pathBD <- "/bd/Used/";
+	parameter "CSVFolderPath" var: CSVFolderPath <- "/CSV/";
+}
+
 experiment 'No ouput' type: gui {
 	
 }

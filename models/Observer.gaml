@@ -565,6 +565,7 @@ global {
 		}
 	}
 
+	string CSVFolderPath <- "../results/CSV/";
 	reflex saveObservations when: saveObservations {
 		if(date_simu_starts = nil) {
 			// TODO : when gama dev will have republish  as_system_date "%Y-%M-%D-%h-%m-%s", use it instead
@@ -573,11 +574,10 @@ global {
 
 		string params <- "_Strats" + possibleSelectingWarehouseStrategies;
 
-		string filePath <- "../results/CSV/";
 		save "" + ((time/3600.0) as int) + ";" +stockInWarehouse + ";" + freeSurfaceInWarehouse + ";"
-			to: filePath + date_simu_starts + "_stocks_warehouses" + params + ".csv" type: text rewrite: false;
+			to: CSVFolderPath + date_simu_starts + "_stocks_warehouses" + params + ".csv" type: text rewrite: false;
 		save "" + ((time/3600.0) as int) + ";" +stockInFinalDest + ";" + freeSurfaceInFinalDest + ";"
-			to: filePath + date_simu_starts + "_stocks_final_dests" + params  + ".csv" type: text rewrite: false;
+			to: CSVFolderPath + date_simu_starts + "_stocks_final_dests" + params  + ".csv" type: text rewrite: false;
 //		save "" + ((time/3600.0) as int) + ";" + averageGoodsQuantityPerBatch
 //			to: filePath + date_simu_starts + "averageGoodsQuantityPerBatch" + params  + ".csv" type: text rewrite: false;
 //		save "" + ((time/3600.0) as int) + ";" + cumulativeNumberOfBatch + ";" + cumulativeNumberOfBatchProviderToLarge + ";" + cumulativeNumberOfBatchLargeToClose + ";" + cumulativeNumberOfBatchCloseToFinal + ";" 
@@ -589,45 +589,45 @@ global {
 //		save "" + ((time/3600.0) as int) + ";" + stockOnRoads + ";" + stockOnRoadsProviderToLarge + ";" + stockOnRoadsLargeToClose + ";" + stockOnRoadsCloseToFinal + ";"
 //			to: filePath + date_simu_starts + "_stock_on_roads" + params  + ".csv" type: text rewrite: false;
 		save "" + ((time/3600.0) as int) + ";" + numberofEmptyStockInFinalDests + ";"
-			to: filePath + date_simu_starts + "_number_empty_stock_final_dest" + params  + ".csv" type: text rewrite: false;
+			to: CSVFolderPath + date_simu_starts + "_number_empty_stock_final_dest" + params  + ".csv" type: text rewrite: false;
 		save "" + ((time/3600.0) as int) + ";" + numberOfEmptyStockInWarehouses + ";"
-			to: filePath + date_simu_starts + "_number_empty_stock_warehouses" + params + ".csv" type: text rewrite: false;
+			to: CSVFolderPath + date_simu_starts + "_number_empty_stock_warehouses" + params + ".csv" type: text rewrite: false;
 		save "" + ((time/3600.0) as int) + ";" + averageTimeToDeliver + ";"
-			to: filePath + date_simu_starts + "_average_time_to_deliver" + params  + ".csv" type: text rewrite: false;
+			to: CSVFolderPath + date_simu_starts + "_average_time_to_deliver" + params  + ".csv" type: text rewrite: false;
 		save "" + ((time/3600.0) as int) + ";" + averageTimeToBeDelivered + ";"
-			to: filePath + date_simu_starts + "_average_time_to_be_delivered" + params  + ".csv" type: text rewrite: false;
+			to: CSVFolderPath + date_simu_starts + "_average_time_to_be_delivered" + params  + ".csv" type: text rewrite: false;
 		save "" + ((time/3600.0) as int) + ";" + nbLPStrat1 + ";" + nbLPStrat2 + ";" + nbLPStrat3 + ";" + nbLPStrat4 + ";"
-			to: filePath + date_simu_starts + "_strategies_adoption_share" + params  + ".csv" type: text rewrite: false;
+			to: CSVFolderPath + date_simu_starts + "_strategies_adoption_share" + params  + ".csv" type: text rewrite: false;
 		save "" + ((time/3600.0) as int) + ";" + nbStocksAwaitingToEnterBuilding + ";" + nbStocksAwaitingToEnterWarehouse + ";" + nbStocksAwaitingToLeaveWarehouse + ";" + nbStocksAwaitingToLeaveProvider + ";"
-			to: filePath + date_simu_starts + "_nb_stocks_awaiting" + params  + ".csv" type: text rewrite: false;
+			to: CSVFolderPath + date_simu_starts + "_nb_stocks_awaiting" + params  + ".csv" type: text rewrite: false;
 		save "" + ((time/3600.0) as int) + ";" + averageThreshold + ";"
-			to: filePath + date_simu_starts + "_averageThreshold" + params  + ".csv" type: text rewrite: false;
+			to: CSVFolderPath + date_simu_starts + "_averageThreshold" + params  + ".csv" type: text rewrite: false;
 		save "" + ((time/3600.0) as int) + ";" + nbLPStrat1LowThreshold + ";" + nbLPStrat1LowMediumThreshold + ";" + nbLPStrat1HighMediumThreshold + ";" + nbLPStrat1HighThreshold + ";"
-			to: filePath + date_simu_starts + "_strat1_threshold_adoption_share" + params  + ".csv" type: text rewrite: false;
+			to: CSVFolderPath + date_simu_starts + "_strat1_threshold_adoption_share" + params  + ".csv" type: text rewrite: false;
 		save "" + ((time/3600.0) as int) + ";" + nbLPStrat2LowThreshold + ";" + nbLPStrat2LowMediumThreshold + ";" + nbLPStrat2HighMediumThreshold + ";" + nbLPStrat2HighThreshold + ";"
-			to: filePath + date_simu_starts + "_strat2_threshold_adoption_share" + params  + ".csv" type: text rewrite: false;
+			to: CSVFolderPath + date_simu_starts + "_strat2_threshold_adoption_share" + params  + ".csv" type: text rewrite: false;
 		save "" + ((time/3600.0) as int) + ";" + nbLPStrat3LowThreshold + ";" + nbLPStrat3LowMediumThreshold + ";" + nbLPStrat3HighMediumThreshold + ";" + nbLPStrat3HighThreshold + ";"
-			to: filePath + date_simu_starts + "_strat3_threshold_adoption_share" + params  + ".csv" type: text rewrite: false;
+			to: CSVFolderPath + date_simu_starts + "_strat3_threshold_adoption_share" + params  + ".csv" type: text rewrite: false;
 		save "" + ((time/3600.0) as int) + ";" + nbLPStrat4LowThreshold + ";" + nbLPStrat4LowMediumThreshold + ";" + nbLPStrat4HighMediumThreshold + ";" + nbLPStrat4HighThreshold + ";"
-			to: filePath + date_simu_starts + "_strat4_threshold_adoption_share" + params  + ".csv" type: text rewrite: false;
+			to: CSVFolderPath + date_simu_starts + "_strat4_threshold_adoption_share" + params  + ".csv" type: text rewrite: false;
 
 		save "" + ((time/3600.0) as int) + ";" + averageCosts
-			to: filePath + date_simu_starts + "_average_costs" + params  + ".csv" type: text rewrite: false;
+			to: CSVFolderPath + date_simu_starts + "_average_costs" + params  + ".csv" type: text rewrite: false;
 		save "" + ((time/3600.0) as int) + ";" + nbHavre + ";" +  nbAntwerp
-			to: filePath + date_simu_starts + "_competition_between_LH_Antwerp" + params  + ".csv" type: text rewrite: false;
+			to: CSVFolderPath + date_simu_starts + "_competition_between_LH_Antwerp" + params  + ".csv" type: text rewrite: false;
 		save "" + ((time/3600.0) as int) + ";" + sumRoadVehicle + ";" +  sumRiverVehicle + ";" +  sumMaritimeVehicle
-			to: filePath + date_simu_starts + "_share_transport_mode" + params  + ".csv" type: text rewrite: false;
+			to: CSVFolderPath + date_simu_starts + "_share_transport_mode" + params  + ".csv" type: text rewrite: false;
 
-		do saveShareTransportModeRegion(filePath, params, "Basse-Normandie");
-		do saveShareTransportModeRegion(filePath, params, "Haute-Normandie");
-		do saveShareTransportModeRegion(filePath, params, "Centre");
-		do saveShareTransportModeRegion(filePath, params, "Ile-de-France");
-		do saveShareTransportModeRegion(filePath, params, "Picardie");
-		do saveShareTransportModeRegion(filePath, params, "Antwerpen");
+		do saveShareTransportModeRegion(params, "Basse-Normandie");
+		do saveShareTransportModeRegion(params, "Haute-Normandie");
+		do saveShareTransportModeRegion(params, "Centre");
+		do saveShareTransportModeRegion(params, "Ile-de-France");
+		do saveShareTransportModeRegion(params, "Picardie");
+		do saveShareTransportModeRegion(params, "Antwerpen");
 
 	}
 
-	action saveShareTransportModeRegion(string filePath, string params, string n){
+	action saveShareTransportModeRegion(string params, string n){
 		RegionObserver sr <- nil;
 		ask RegionObserver {
 			if(self.name = n){
@@ -635,8 +635,8 @@ global {
 			}
 		}
 		save "" + ((time/3600.0) as int) + ";" + sr.sumRoadVehicleRO + ";" +  sr.sumRiverVehicleRO + ";" +  sr.sumMaritimeVehicleRO
-			to: filePath + date_simu_starts + "_share_transport_mode_" + n + params  + ".csv" type: text rewrite: false;
+			to: CSVFolderPath + date_simu_starts + "_share_transport_mode_" + n + params  + ".csv" type: text rewrite: false;
 		save "" + ((time/3600.0) as int) + ";" + sr.sumRoadQuantitiesRO + ";" +  sr.sumRiverQuantitiesRO + ";" +  sr.sumMaritimeQuantitiesRO
-			to: filePath + date_simu_starts + "_share_transport_mode_quantities_" + n + params  + ".csv" type: text rewrite: false;
+			to: CSVFolderPath + date_simu_starts + "_share_transport_mode_quantities_" + n + params  + ".csv" type: text rewrite: false;
 	}
 }
