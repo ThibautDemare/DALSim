@@ -302,42 +302,36 @@ global {
 	}
 
 	// Share by number of vehicles
-	float shareRoadVehicle;
-	float shareRiverVehicle;
-	float shareMaritimeVehicle;
+	int sumVehicle;
+	int sumRoadVehicle;
+	int sumRiverVehicle;
+	int sumMaritimeVehicle;
 	// Share by quantities of goods
-	float shareRoadQuantities;
-	float shareRiverQuantities;
-	float shareMaritimeQuantities;
+	float sumQuantities;
+	float sumRoadQuantities;
+	float sumRiverQuantities;
+	float sumMaritimeQuantities;
 	reflex averageModeShare {
-		int sumVehicle;
-		int sumRoadVehicle;
-		int sumRiverVehicle;
-		int sumMaritimeVehicle;
+		sumVehicle <- 0;
+		sumRoadVehicle <- 0;
+		sumRiverVehicle <- 0;
+		sumMaritimeVehicle <- 0;
 
-		int sumQuantities;
-		int sumRoadQuantities;
-		int sumRiverQuantities;
-		int sumMaritimeQuantities;
-
-		shareRoadVehicle <- 0;
-		shareRiverVehicle <- 0;
-		shareMaritimeVehicle <- 0;
-
-		shareRoadQuantities <- 0;
-		shareRiverQuantities <- 0;
-		shareMaritimeQuantities <- 0;
+		sumQuantities <- 0;
+		sumRoadQuantities <- 0;
+		sumRiverQuantities <- 0;
+		sumMaritimeQuantities <- 0;
 
 		ask RegionObserver {
 			sumVehicleRO <- 0;
-			shareRoadVehicleRO <- 0;
-			shareRiverVehicleRO <- 0;
-			shareMaritimeVehicleRO <- 0;
+			sumRoadVehicleRO <- 0;
+			sumRiverVehicleRO <- 0;
+			sumMaritimeVehicleRO <- 0;
 
 			sumQuantitiesRO <- 0;
-			shareRoadQuantitiesRO <- 0;
-			shareRiverQuantitiesRO <- 0;
-			shareMaritimeQuantitiesRO <- 0;
+			sumRoadQuantitiesRO <- 0;
+			sumRiverQuantitiesRO <- 0;
+			sumMaritimeQuantitiesRO <- 0;
 
 			int j <- 0;
 			loop while: j < length(buildings) {
@@ -351,9 +345,9 @@ global {
 					sumMaritimeVehicle <- sumMaritimeVehicle + b.nbMaritimeVehiclesLastSteps[i];
 
 					sumVehicleRO <- sumVehicleRO + b.nbRoadVehiclesLastSteps[i] + b.nbRiverVehiclesLastSteps[i] + b.nbMaritimeVehiclesLastSteps[i];
-					shareRoadVehicleRO <- shareRoadVehicleRO + b.nbRoadVehiclesLastSteps[i];
-					shareRiverVehicleRO <- shareRiverVehicleRO + b.nbRiverVehiclesLastSteps[i];
-					shareMaritimeVehicleRO <- shareMaritimeVehicleRO + b.nbMaritimeVehiclesLastSteps[i];
+					sumRoadVehicleRO <- sumRoadVehicleRO + b.nbRoadVehiclesLastSteps[i];
+					sumRiverVehicleRO <- sumRiverVehicleRO + b.nbRiverVehiclesLastSteps[i];
+					sumMaritimeVehicleRO <- sumMaritimeVehicleRO + b.nbMaritimeVehiclesLastSteps[i];
 
 					sumQuantities <- sumQuantities + b.nbRoadQuantitiesLastSteps[i] + b.nbRiverQuantitiesLastSteps[i] + b.nbMaritimeQuantitiesLastSteps[i];
 					sumRoadQuantities <- sumRoadQuantities + b.nbRoadQuantitiesLastSteps[i];
@@ -361,13 +355,13 @@ global {
 					sumMaritimeQuantities <- sumMaritimeQuantities + b.nbMaritimeQuantitiesLastSteps[i];
 
 					sumQuantitiesRO <- sumQuantitiesRO + b.nbRoadQuantitiesLastSteps[i] + b.nbRiverQuantitiesLastSteps[i] + b.nbMaritimeQuantitiesLastSteps[i];
-					shareRoadQuantitiesRO <- shareRoadQuantitiesRO + b.nbRoadQuantitiesLastSteps[i];
-					shareRiverQuantitiesRO <- shareRiverQuantitiesRO + b.nbRiverQuantitiesLastSteps[i];
-					shareMaritimeQuantitiesRO <- shareMaritimeQuantitiesRO + b.nbMaritimeQuantitiesLastSteps[i];
+					sumRoadQuantitiesRO <- sumRoadQuantitiesRO + b.nbRoadQuantitiesLastSteps[i];
+					sumRiverQuantitiesRO <- sumRiverQuantitiesRO + b.nbRiverQuantitiesLastSteps[i];
+					sumMaritimeQuantitiesRO <- sumMaritimeQuantitiesRO + b.nbMaritimeQuantitiesLastSteps[i];
 
 					i <- i + 1;
 				}
-				if(cycle > 5){
+				if(cycle > -1){
 					remove index: 0 from: b.nbRoadVehiclesLastSteps;
 					remove index: 0 from: b.nbRiverVehiclesLastSteps;
 					remove index: 0 from: b.nbMaritimeVehiclesLastSteps;
@@ -384,41 +378,6 @@ global {
 				b.nbRiverQuantitiesLastSteps <+ 0;
 				b.nbMaritimeQuantitiesLastSteps <+ 0;
 				j <- j + 1;
-			}
-		}
-		if(sumVehicle > 0){
-			shareRoadVehicle <- sumRoadVehicle / sumVehicle;
-			shareRiverVehicle <- sumRiverVehicle / sumVehicle;
-			shareMaritimeVehicle <- sumMaritimeVehicle / sumVehicle;
-			ask RegionObserver {
-				if(sumVehicleRO > 0){
-					shareRoadVehicleRO <- shareRoadVehicleRO / sumVehicleRO;
-					shareRiverVehicleRO <- shareRiverVehicleRO / sumVehicleRO;
-					shareMaritimeVehicleRO <- shareMaritimeVehicleRO / sumVehicleRO;
-				}
-				else {
-					shareRoadVehicleRO <- 0.0;
-					shareRiverVehicleRO <- 0.0;
-					shareMaritimeVehicleRO <- 0.0;
-				}
-			}
-		}
-
-		if(sumQuantities > 0){
-			shareRoadQuantities <- sumRoadQuantities / sumQuantities;
-			shareRiverQuantities <- sumRiverQuantities / sumQuantities;
-			shareMaritimeQuantities <- sumMaritimeQuantities / sumQuantities;
-			ask RegionObserver {
-				if(sumQuantitiesRO > 0){
-					shareRoadQuantitiesRO <- shareRoadQuantitiesRO / sumQuantitiesRO;
-					shareRiverQuantitiesRO <- shareRiverQuantitiesRO / sumQuantitiesRO;
-					shareMaritimeQuantitiesRO <- shareMaritimeQuantitiesRO / sumQuantitiesRO;
-				}
-				else {
-					shareRoadQuantitiesRO <- 0.0;
-					shareRiverQuantitiesRO <- 0.0;
-					shareMaritimeQuantitiesRO <- 0.0;
-				}
 			}
 		}
 	}
@@ -656,13 +615,13 @@ global {
 			to: filePath + date_simu_starts + "_average_costs" + params  + ".csv" type: text rewrite: false;
 		save "" + ((time/3600.0) as int) + ";" + nbHavre + ";" +  nbAntwerp
 			to: filePath + date_simu_starts + "_competition_between_LH_Antwerp" + params  + ".csv" type: text rewrite: false;
-		save "" + ((time/3600.0) as int) + ";" + shareRoadVehicle + ";" +  shareRiverVehicle + ";" +  shareMaritimeVehicle
+		save "" + ((time/3600.0) as int) + ";" + sumRoadVehicle + ";" +  sumRiverVehicle + ";" +  sumMaritimeVehicle
 			to: filePath + date_simu_starts + "_share_transport_mode" + params  + ".csv" type: text rewrite: false;
 
 		do saveShareTransportModeRegion(filePath, params, "Basse-Normandie");
 		do saveShareTransportModeRegion(filePath, params, "Haute-Normandie");
 		do saveShareTransportModeRegion(filePath, params, "Centre");
-		do saveShareTransportModeRegion(filePath, params, "Île-de-France");
+		do saveShareTransportModeRegion(filePath, params, "Ile-de-France");
 		do saveShareTransportModeRegion(filePath, params, "Picardie");
 		do saveShareTransportModeRegion(filePath, params, "Antwerpen");
 
@@ -675,7 +634,9 @@ global {
 				sr <- self;
 			}
 		}
-		save "" + ((time/3600.0) as int) + ";" + sr.shareRoadVehicleRO + ";" +  sr.shareRiverVehicleRO + ";" +  sr.shareMaritimeVehicleRO
-			to: filePath + date_simu_starts + "_share_transport_mode_Picardie" + params  + ".csv" type: text rewrite: false;
+		save "" + ((time/3600.0) as int) + ";" + sr.sumRoadVehicleRO + ";" +  sr.sumRiverVehicleRO + ";" +  sr.sumMaritimeVehicleRO
+			to: filePath + date_simu_starts + "_share_transport_mode_" + n + params  + ".csv" type: text rewrite: false;
+		save "" + ((time/3600.0) as int) + ";" + sr.sumRoadQuantitiesRO + ";" +  sr.sumRiverQuantitiesRO + ";" +  sr.sumMaritimeQuantitiesRO
+			to: filePath + date_simu_starts + "_share_transport_mode_quantities_" + n + params  + ".csv" type: text rewrite: false;
 	}
 }
