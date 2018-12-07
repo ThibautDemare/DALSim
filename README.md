@@ -1,5 +1,20 @@
 Source code of the DALSim (Dynamic Graphs and Agents for Logistics Simulations)
 
+HOW TO USE IT
+-------------
+
+In order to execute the simulation of this model, you need a special build of the GAMA Platform which includes the plugins developed in parallel of this work.
+
+You can find the release of the GAMA Platform here:
+
+https://git.litislab.fr/tdemare/DALSim/tags/v1.0
+
+Once you started the platform, you just need to import this repository as a project. 
+
+Then, you can execute a simulation !
+
+If you need to use the developer version, you must follow these instructions:
+
 INSTALL
 -------
 
