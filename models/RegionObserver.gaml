@@ -8,15 +8,21 @@ species RegionObserver {
 
 	// Share by number of vehicle
 	float sumRoadVehicleRO <- 0.0;
+	float shareRoadVehicleRO <- 0.0;
 	float sumRiverVehicleRO <- 0.0;
+	float shareRiverVehicleRO <- 0.0;
 	float sumMaritimeVehicleRO <- 0.0;
-	int sumVehicleRO;
+	float shareMaritimeVehicleRO <- 0.0;
+	float sumVehicleRO;
 
 	// Share by quantity of goods
 	float sumRoadQuantitiesRO <- 0.0;
+	float shareRoadQuantitiesRO <- 0.0;
 	float sumRiverQuantitiesRO <- 0.0;
+	float shareRiverQuantitiesRO <- 0.0;
 	float sumMaritimeQuantitiesRO <- 0.0;
-	int sumQuantitiesRO;
+	float shareMaritimeQuantitiesRO <- 0.0;
+	float sumQuantitiesRO;
 
 	list<Building> buildings <- [];
 

@@ -23,12 +23,12 @@ species Building {
 
 	float cost;
 
-	list<int> nbRoadVehiclesLastSteps <- [0];
-	list<int> nbRiverVehiclesLastSteps <- [0];
-	list<int> nbMaritimeVehiclesLastSteps <- [0];
-	list<int> nbRoadQuantitiesLastSteps <- [0];
-	list<int> nbRiverQuantitiesLastSteps <- [0];
-	list<int> nbMaritimeQuantitiesLastSteps <- [0];
+	list<float> nbRoadVehiclesLastSteps <- [0.0];
+	list<float> nbRiverVehiclesLastSteps <- [0.0];
+	list<float> nbMaritimeVehiclesLastSteps <- [0.0];
+	list<float> nbRoadQuantitiesLastSteps <- [0.0];
+	list<float> nbRiverQuantitiesLastSteps <- [0.0];
+	list<float> nbMaritimeQuantitiesLastSteps <- [0.0];
 
 	reflex manageRoadComingCommodities {
 		int i <- 0;
@@ -47,15 +47,15 @@ species Building {
 
 	action receiveCommodity(Commodity c, string networkType){
 		if(networkType = "road"){
-			nbRoadVehiclesLastSteps[length(nbRoadVehiclesLastSteps)-1] <- nbRoadVehiclesLastSteps[length(nbRoadVehiclesLastSteps)-1] + 1;
+			nbRoadVehiclesLastSteps[length(nbRoadVehiclesLastSteps)-1] <- nbRoadVehiclesLastSteps[length(nbRoadVehiclesLastSteps)-1] + 1.0;
 			nbRoadQuantitiesLastSteps[length(nbRoadQuantitiesLastSteps)-1] <- nbRoadQuantitiesLastSteps[length(nbRoadQuantitiesLastSteps)-1] + c.volume;
 		}
 		if(networkType = "river"){
-			nbRiverVehiclesLastSteps[length(nbRiverVehiclesLastSteps)-1] <- nbRiverVehiclesLastSteps[length(nbRiverVehiclesLastSteps)-1] + 1;
+			nbRiverVehiclesLastSteps[length(nbRiverVehiclesLastSteps)-1] <- nbRiverVehiclesLastSteps[length(nbRiverVehiclesLastSteps)-1] + 1.0;
 			nbRiverQuantitiesLastSteps[length(nbRiverQuantitiesLastSteps)-1] <- nbRiverQuantitiesLastSteps[length(nbRiverQuantitiesLastSteps)-1] + c.volume;
 		}
 		if(networkType = "maritime"){
-			nbMaritimeVehiclesLastSteps[length(nbMaritimeVehiclesLastSteps)-1] <- nbMaritimeVehiclesLastSteps[length(nbMaritimeVehiclesLastSteps)-1] + 1;
+			nbMaritimeVehiclesLastSteps[length(nbMaritimeVehiclesLastSteps)-1] <- nbMaritimeVehiclesLastSteps[length(nbMaritimeVehiclesLastSteps)-1] + 1.0;
 			nbMaritimeQuantitiesLastSteps[length(nbMaritimeQuantitiesLastSteps)-1] <- nbMaritimeQuantitiesLastSteps[length(nbMaritimeQuantitiesLastSteps)-1] + c.volume;
 		}
 		if(c.finalDestination = self){
