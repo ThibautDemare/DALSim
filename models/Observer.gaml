@@ -681,10 +681,14 @@ global {
 
 	action saveShareTransportModeRegion(string params, string n){
 		RegionObserver sr <- nil;
-		ask RegionObserver {
+		int i <- 0;
+		bool notfound <- true;
+		loop while: i < length(RegionObserver) and notfound {
 			if(self.name = n){
 				sr <- self;
+				notfound <- false;
 			}
+			i <- i + 1;
 		}
 		save "" + ((time/3600.0) as int) + ";" + sr.sumRoadVehicleRO + ";" +  sr.sumRiverVehicleRO + ";" +  sr.sumMaritimeVehicleRO
 			to: CSVFolderPath + date_simu_starts + "_share_transport_mode_" + n + params  + ".csv" type: text rewrite: false;
