@@ -27,27 +27,6 @@ global {
 	float freeSurfaceInFinalDest <- 0.0;
 	float stockInWarehouse <- 0.0;
 	float freeSurfaceInWarehouse <- 0.0;
-	
-//	int totalNumberOfBatch <- 0;
-//	int cumulativeNumberOfBatch <- 0;
-//	int numberOfBatchProviderToLarge <- 0;
-//	int cumulativeNumberOfBatchProviderToLarge <- 0;
-//	int numberOfBatchLargeToClose <- 0;
-//	int cumulativeNumberOfBatchLargeToClose <- 0;
-//	int numberOfBatchCloseToFinal <- 0;
-//	int cumulativeNumberOfBatchCloseToFinal <- 0;
-//	
-//	float stockOnRoads <- 0.0;
-//	float cumulativeStockOnRoads <- 0.0;
-//	float stockOnRoadsProviderToLarge <- 0.0;
-//	float cumulativeStockOnRoadsProviderToLarge <- 0.0;
-//	float stockOnRoadsLargeToClose <- 0.0;
-//	float cumulativeStockOnRoadsLargeToClose <- 0.0;
-//	float stockOnRoadsCloseToFinal <- 0.0;
-//	float cumulativeStockOnRoadsCloseToFinal <- 0.0;
-//
-//	float averageGoodsQuantityPerBatch <- 0.0;
-//	float sumGoods <- 0.0;
 
 	// These variables are used to measure the efficiency of the logistic provider to deliver quickly the goods
 	float averageTimeToDeliver <- 0.0;
@@ -558,7 +537,7 @@ global {
 			date_simu_starts <- ""+gama.machine_time;// as_system_date "%Y-%M-%D-%h-%m-%s"; 
 		}
 
-		string params <- "_Strats" + possibleSelectingWarehouseStrategies;
+		string params <- setParams();
 
 		save "" + ((time/3600.0) as int) + ";" +stockInWarehouse + ";" + freeSurfaceInWarehouse + ";"
 			to: CSVFolderPath + date_simu_starts + "_stocks_warehouses" + params + ".csv" type: text rewrite: false;
@@ -610,15 +589,53 @@ global {
 		int i <- 0;
 		bool notfound <- true;
 		loop while: i < length(RegionObserver) and notfound {
-			if(self.name = n){
-				sr <- self;
+			if(RegionObserver[i].name = n){
+				sr <- RegionObserver[i];
+				save "" + ((time/3600.0) as int) + ";" + sr.sumRoadVehicleRO + ";" +  sr.sumRiverVehicleRO + ";" +  sr.sumMaritimeVehicleRO
+					to: CSVFolderPath + date_simu_starts + "_share_transport_mode_" + n + params  + ".csv" type: text rewrite: false;
+				save "" + ((time/3600.0) as int) + ";" + sr.sumRoadQuantitiesRO + ";" +  sr.sumRiverQuantitiesRO + ";" +  sr.sumMaritimeQuantitiesRO
+					to: CSVFolderPath + date_simu_starts + "_share_transport_mode_quantities_" + n + params  + ".csv" type: text rewrite: false;
 				notfound <- false;
 			}
 			i <- i + 1;
 		}
-		save "" + ((time/3600.0) as int) + ";" + sr.sumRoadVehicleRO + ";" +  sr.sumRiverVehicleRO + ";" +  sr.sumMaritimeVehicleRO
-			to: CSVFolderPath + date_simu_starts + "_share_transport_mode_" + n + params  + ".csv" type: text rewrite: false;
-		save "" + ((time/3600.0) as int) + ";" + sr.sumRoadQuantitiesRO + ";" +  sr.sumRiverQuantitiesRO + ";" +  sr.sumMaritimeQuantitiesRO
-			to: CSVFolderPath + date_simu_starts + "_share_transport_mode_quantities_" + n + params  + ".csv" type: text rewrite: false;
+	}
+
+	string setParams {
+		string params <- "";
+		if(allowScenarionCanalSeineNord){
+			params <- params + "_CSN"+allowScenarionCanalSeineNord;
+		}
+		if(allowScenarioBlockRoads){
+			params <- params + "_BR"+allowScenarioBlockRoads;
+		}
+		if(allowScenarioAttractiveness){
+			params <- params + "_Attr"+allowScenarioAttractiveness;
+		}
+		if(isLocalLSPSwitcStrat) {
+			params <- params + "_LSPSwitchStrats"+possibleLSPSwitcStrats;
+		}
+		else {
+			params <- params + "_LSPSwitchStrat"+globalLSPSwitchStrat;
+		}
+		if(localThreshold) {
+			params <- params + "_Thresholds"+minlocalThreshold*100+"-"+maxlocalThreshold*100;
+		}
+		else {
+			params <- params + "_Threshold"+globalThreshold*100;
+		}
+		if(isLocalCostPathStrategy) {
+			params <- params + "_PathStrats"+possibleCostPathStrategies;
+		}
+		else {
+			params <- params + "_PathStrat"+globalCostPathStrategy;
+		}
+		if(isLocalSelectingWarehouseStrategies) {
+			params <- params + "_SelectingWarehouseStrats"+possibleSelectingWarehouseStrategies;
+		}
+		else {
+			params <- params + "_SelectingWarehouseStrat"+globalSelectingWarehouseStrategies;
+		}
+		return params;
 	}
 }
