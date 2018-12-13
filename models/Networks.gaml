@@ -1,7 +1,5 @@
 model Networks
 
-import "Experiments.gaml"
-
 global {
 	graph road_network;
 	graph maritime_network;
