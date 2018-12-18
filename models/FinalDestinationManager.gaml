@@ -111,7 +111,7 @@ species FinalDestinationManager {
 	 */
 	reflex manageContractWithLP when: allowLSPSwitch {
 		numberOfHoursOfContract <- numberOfHoursOfContract + 1;
-		if(numberOfHoursOfContract > minimalNumberOfHoursOfContract){
+		if(numberOfHoursOfContract mod minimalNumberOfHoursOfContract = 0){
 			if(shouldISwitchMyLSP()){
 				// the logsitic provider is not efficient enough. He must be replaced by another one.
 				// Inform the current logistic provider that he losts a customer
