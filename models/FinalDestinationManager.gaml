@@ -13,7 +13,7 @@ species FinalDestinationManager {
 	// Relative to contract with LSP
 	LogisticsServiceProvider logisticsServiceProvider;
 	int timeShifting <- rnd(23);
-	int numberOfHoursOfContract <- rnd(336) - 100;
+	int numberOfHoursOfContract <- rnd(minimalNumberOfHoursOfContract) - 100;
 
 	// Measures of efficiency
 	int stratMeasureLSPEfficiency <- 0;
