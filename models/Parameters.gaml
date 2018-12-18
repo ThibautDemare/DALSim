@@ -47,9 +47,9 @@ global {
 	 */
 	 
 	// The minimal number of days a final destination manager must wait before he can decide if he wants to change of logistic provider
-	int minimalNumberOfHoursOfContract <- 336;
+	int minimalNumberOfHoursOfContract <- 336; // number of steps for two weeks
 	// The number of steps considered to compute the logistic provider efficiency
-	int nbStepsConsideredForLPEfficiency <- 336; // number of steps for two weeks
+	int nbStepsConsideredForLPEfficiency <- 96; // 4 days
 	// The numbers of steps between each calls to the reflex "decreasingStocks"
 	int nbStepsbetweenDS <- 24;
 	// The numbers of steps between each calls to the reflex "testRestockNeeded"
