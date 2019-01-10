@@ -16,6 +16,9 @@ global {
 
 	string pathBD <- "../../../BD_SIG/Used/";
 
+	// To draw the borders of the countries and therefore the coastline
+	file countries_borders <- file(pathBD+"Countries/borders.shp");
+
 	// The road network
 	//This data comes from "EuroGlobalMap" (EuroGeographics)
 	// Each road has an attribute giving the speed in km/h
@@ -95,6 +98,9 @@ global {
 		create RiverLine from: river_shapefile with: [speed::read("speed") as float, length::read("length") as float, is_new::read("is_new") as int];
 		river_network <- as_edge_graph(RiverLine);
 
+		// Countries
+		create Country from: countries_borders;
+
 		// Region observers
 		create RegionObserver from: regions_shapefile with: [name::read("nom") as string];
 		create RegionObserver from: antwerp_shapefile with: [name::read("Name") as string];
@@ -163,7 +169,7 @@ global {
 		 * The following code can be commented or not, depending if the user want to execute the simulation with every LSP 
 		 * It is mainly used for tests to avoid CPU overload.
 		 */
-		/*int i <- 100;
+		int i <- 50;
 		list<LogisticsServiceProvider> llsp <- shuffle(LogisticsServiceProvider);
 		loop while: i < length(llsp) {
 			LogisticsServiceProvider s <- llsp[i];
@@ -180,7 +186,7 @@ global {
 		 * The following code can be commented or not, depending if the user want to execute the simulation with every FDM 
 		 * It is mainly used for tests to avoid CPU overload.
 		 */
-		int i <- 500;
+		int i <- 50;
 		list<FinalDestinationManager> lfdm <- shuffle(FinalDestinationManager);
 		loop while: i < length(lfdm) {
 			FinalDestinationManager s <- lfdm[i];
@@ -244,5 +250,11 @@ global {
 //		LHAttractiveness <- 1.0;
 //		AntAttractiveness <- 3.0;
 //		do update_proba_to_choose_provider;
+	}
+}
+
+species Country {
+	aspect geom {
+		draw shape color: rgb("#91bfdb") border: rgb("grey");
 	}
 }
