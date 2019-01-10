@@ -11,17 +11,47 @@ species Network {
 	float speed;
 	float length;
 	int colorValue <- -1; // This value is filled by the custom GAMA Plugin : MovingOnNetwork. It allows to colour the road according to the quantity of goods on the road.
+	string colorRVBValue <- "";
+	int sizeShape <- 1;
 	bool blocked <- false;
+	float current_marks;
+	float cumulative_marks;
+	float cumulative_nb_agents;
+
 	aspect geom {
 		if(blocked){
-			draw shape + 2°px color: rgb(0, 255, 0) border: rgb(0, 255, 0);
+			draw shape + 2°px color: rgb("#4575b4") border: rgb("#4575b4");
 		}
 		else{
-			if(colorValue = -1){
-				draw shape + 2°px color: rgb(col) border: rgb(col);
+			if(colorRVBValue = ""){
+				if(sizeShape = 0){
+					draw shape color: rgb(col) border: rgb(col);
+				}
+				else {
+					draw shape color: rgb(col) border: rgb(col);
+				}
 			}
 			else {
-				draw shape + 2°px color: rgb(255, colorValue, 0) border:rgb(255, colorValue, 0);
+				if(sizeShape = 0){
+					draw shape color: rgb(colorRVBValue) border:rgb(colorRVBValue);
+				}
+				else {
+					draw shape + sizeShape°px color: rgb(colorRVBValue) border:rgb(colorRVBValue);
+				}
+			}
+		}
+	}
+
+	aspect lightGeom {
+		if(blocked){
+			draw shape color: rgb("#4575b4") border: rgb("#4575b4");
+		}
+		else{
+			if(colorRVBValue = ""){
+				draw shape color: rgb(col) border: rgb(col);
+			}
+			else {
+				draw shape color: rgb(colorRVBValue) border:rgb(colorRVBValue);
 			}
 		}
 	}
