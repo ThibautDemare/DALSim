@@ -31,6 +31,6 @@ species RegionObserver {
 	int nbHavre <- 0;
 
 	aspect geom {
-		draw shape color: rgb("grey") border: rgb("black");	
+		draw shape color: rgb("#91bfdb") border: rgb("grey");
 	}
 }
