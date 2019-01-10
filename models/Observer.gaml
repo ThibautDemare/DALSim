@@ -515,6 +515,23 @@ global {
 		}
 	}
 
+	reflex portsSharePerRegion {
+		ask RegionObserver {
+			nbAntwerp <- 0;
+			nbHavre <- 0;
+			int i <- 0;
+			loop while: i < length(fcs) {
+				if(fcs[i].logisticsServiceProvider.provider.port = "ANTWERP") {
+					nbAntwerp <- nbAntwerp + 1;
+				}
+				else {
+					nbHavre <- nbHavre + 1;
+				}
+				i <- i + 1;
+			}
+		}
+	}
+
 	float averageThreshold <- 0.0;
 	reflex computeAverageThreshold {
 		float sum <- 0.0;
@@ -582,6 +599,12 @@ global {
 		do saveShareTransportModeRegion(params, "Picardie");
 		do saveShareTransportModeRegion(params, "Antwerpen");
 
+		do saveSharePortOriginRegion(params, "Basse-Normandie");
+		do saveSharePortOriginRegion(params, "Haute-Normandie");
+		do saveSharePortOriginRegion(params, "Centre");
+		do saveSharePortOriginRegion(params, "Ile-de-France");
+		do saveSharePortOriginRegion(params, "Picardie");
+		do saveSharePortOriginRegion(params, "Antwerpen");
 	}
 
 	action saveShareTransportModeRegion(string params, string n){
@@ -595,6 +618,21 @@ global {
 					to: CSVFolderPath + date_simu_starts + "_share_transport_mode_" + n + params  + ".csv" type: text rewrite: false;
 				save "" + ((time/3600.0) as int) + ";" + sr.sumRoadQuantitiesRO + ";" +  sr.sumRiverQuantitiesRO + ";" +  sr.sumMaritimeQuantitiesRO
 					to: CSVFolderPath + date_simu_starts + "_share_transport_mode_quantities_" + n + params  + ".csv" type: text rewrite: false;
+				notfound <- false;
+			}
+			i <- i + 1;
+		}
+	}
+
+	action saveSharePortOriginRegion(string params, string n){
+		RegionObserver sr <- nil;
+		int i <- 0;
+		bool notfound <- true;
+		loop while: i < length(RegionObserver) and notfound {
+			if(RegionObserver[i].name = n){
+				sr <- RegionObserver[i];
+				save "" + ((time/3600.0) as int) + ";" + sr.nbAntwerp + ";" +  sr.nbHavre + ";"
+					to: CSVFolderPath + date_simu_starts + "_share_port_origin_region_" + n + params  + ".csv" type: text rewrite: false;
 				notfound <- false;
 			}
 			i <- i + 1;

@@ -5,6 +5,8 @@ import "Building.gaml"
 
 species RegionObserver {
 	string name;
+	list<Building> buildings <- [];
+	list<FinalDestinationManager> fcs <- [];
 
 	// Share by number of vehicle
 	float sumRoadVehicleRO <- 0.0;
@@ -24,7 +26,9 @@ species RegionObserver {
 	float shareMaritimeQuantitiesRO <- 0.0;
 	float sumQuantitiesRO;
 
-	list<Building> buildings <- [];
+	// Share of FC by origin port
+	int nbAntwerp <- 0;
+	int nbHavre <- 0;
 
 	aspect geom {
 		draw shape color: rgb("grey") border: rgb("black");	

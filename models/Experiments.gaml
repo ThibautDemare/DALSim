@@ -456,6 +456,120 @@ experiment 'Every output' type: gui {
 			}
 		}/**/
 
+		display 'Share of port origin - Region Basse-Normandie' refresh:every(1) {
+			chart  "Share of port origin - Region Basse-Normandie" type: series {
+				RegionObserver sr <- nil;
+				ask RegionObserver {
+					if(self.name = "Basse-Normandie"){
+						sr <- self;
+					}
+				}
+				if(sr!=nil){
+					data "Number of FC choosing Antwerp" value: sr.nbAntwerp color: rgb('green') ;
+					data "Number of FC choosing Le Havre" value: sr.nbHavre color: rgb('red') ;
+				}
+				else { // At step 0, RegionObserver are not initialized, so, sr = nil
+					data "Number of FC choosing Antwerp" value: 0 color: rgb('green') ;
+					data "Number of FC choosing Le Havre" value: 0 color: rgb('red') ;
+				}
+			}
+		}/**/
+
+		display 'Share of port origin - Region Centre' refresh:every(1) {
+			chart  "Share of port origin - Region Centre" type: series {
+				RegionObserver sr <- nil;
+				ask RegionObserver {
+					if(self.name = "Centre"){
+						sr <- self;
+					}
+				}
+				if(sr!=nil){
+					data "Number of FC choosing Antwerp" value: sr.nbAntwerp color: rgb('green') ;
+					data "Number of FC choosing Le Havre" value: sr.nbHavre color: rgb('red') ;
+				}
+				else { // At step 0, RegionObserver are not initialized, so, sr = nil
+					data "Number of FC choosing Antwerp" value: 0 color: rgb('green') ;
+					data "Number of FC choosing Le Havre" value: 0 color: rgb('red') ;
+				}
+			}
+		}/**/
+
+		display 'Share of port origin - Region Haute-Normandie' refresh:every(1) {
+			chart  "Share of port origin - Region Haute-Normandie" type: series {
+				RegionObserver sr <- nil;
+				ask RegionObserver {
+					if(self.name = "Haute-Normandie"){
+						sr <- self;
+					}
+				}
+				if(sr!=nil){
+					data "Number of FC choosing Antwerp" value: sr.nbAntwerp color: rgb('green') ;
+					data "Number of FC choosing Le Havre" value: sr.nbHavre color: rgb('red') ;
+				}
+				else { // At step 0, RegionObserver are not initialized, so, sr = nil
+					data "Number of FC choosing Antwerp" value: 0 color: rgb('green') ;
+					data "Number of FC choosing Le Havre" value: 0 color: rgb('red') ;
+				}
+			}
+		}/**/
+
+		display 'Share of port origin - Region Ile-de-France' refresh:every(1) {
+			chart  "Share of port origin - Region Ile-de-France" type: series {
+				RegionObserver sr <- nil;
+				ask RegionObserver {
+					if(self.name = "Ile-de-France"){
+						sr <- self;
+					}
+				}
+				if(sr!=nil){
+					data "Number of FC choosing Antwerp" value: sr.nbAntwerp color: rgb('green') ;
+					data "Number of FC choosing Le Havre" value: sr.nbHavre color: rgb('red') ;
+				}
+				else { // At step 0, RegionObserver are not initialized, so, sr = nil
+					data "Number of FC choosing Antwerp" value: 0 color: rgb('green') ;
+					data "Number of FC choosing Le Havre" value: 0 color: rgb('red') ;
+				}
+			}
+		}/**/
+
+		display 'Share of port origin - Region Picardie' refresh:every(1) {
+			chart  "Share of port origin - Region Picardie" type: series {
+				RegionObserver sr <- nil;
+				ask RegionObserver {
+					if(self.name = "Picardie"){
+						sr <- self;
+					}
+				}
+				if(sr!=nil){
+					data "Number of FC choosing Antwerp" value: sr.nbAntwerp color: rgb('green') ;
+					data "Number of FC choosing Le Havre" value: sr.nbHavre color: rgb('red') ;
+				}
+				else { // At step 0, RegionObserver are not initialized, so, sr = nil
+					data "Number of FC choosing Antwerp" value: 0 color: rgb('green') ;
+					data "Number of FC choosing Le Havre" value: 0 color: rgb('red') ;
+				}
+			}
+		}/**/
+
+		display 'Share of port origin - Region Antwerp' refresh:every(1) {
+			chart  "Share of port origin - Region Antwerp" type: series {
+				RegionObserver sr <- nil;
+				ask RegionObserver {
+					if(self.name = "Antwerpen"){
+						sr <- self;
+					}
+				}
+				if(sr!=nil){
+					data "Number of FC choosing Antwerp" value: sr.nbAntwerp color: rgb('green') ;
+					data "Number of FC choosing Le Havre" value: sr.nbHavre color: rgb('red') ;
+				}
+				else { // At step 0, RegionObserver are not initialized, so, sr = nil
+					data "Number of FC choosing Antwerp" value: 0 color: rgb('green') ;
+					data "Number of FC choosing Le Havre" value: 0 color: rgb('red') ;
+				}
+			}
+		}/**/
+
 		display 'Share of the different strategies adopted' refresh:every(1) {
 			chart  "Share of the different strategies adopted" type: series {
 				data "Strategy 1 (closest/largest warehouse according to a probability)" value: nbLPStrat1 color: rgb('green') ;

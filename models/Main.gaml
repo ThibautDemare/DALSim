@@ -245,6 +245,9 @@ global {
 			ask ((Building as list) + (Warehouse as list) + (MaritimeTerminal as list) + (RiverTerminal as list) + (MaritimeRiverTerminal as list)) inside self {
 				myself.buildings <+ self;
 			}
+			ask ((FinalDestinationManager as list)) inside self {
+				myself.fcs <+ self;
+			}
 		}
 		// We associate a provider to each LSPs according to the distance and the attractiveness
 //		LHAttractiveness <- 1.0;
