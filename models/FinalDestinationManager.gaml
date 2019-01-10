@@ -207,7 +207,18 @@ species FinalDestinationManager {
 	aspect base { 
 		draw shape+3°px color: rgb("DarkOrange") ;
 	}
-	
+
+	aspect aspectPortChoice {
+		if(logisticsServiceProvider != nil and logisticsServiceProvider.provider != nil){
+			if(logisticsServiceProvider.provider.port = "ANTWERP"){
+				draw shape+4°px color: rgb("#1b9e77") ;
+			}
+			else {
+				draw shape+4°px color: rgb("#d95f02") ;
+			}
+		}
+	}
+
 	action buildRandStock{
 		// Built its stocks
  		float freeSurface <- (building.totalSurface - building.occupiedSurface);// The free surface of the building according to the max quantity
