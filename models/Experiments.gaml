@@ -5,6 +5,18 @@ import "Networks.gaml"
 import "Perturbator.gaml"
 import "CellsStockShortage.gaml"
 
+global {
+	// colorblind safe colors
+	rgb divergingCol1 <- rgb("#a6cee3"); // light blue
+	rgb divergingCol2 <- rgb("#1f78b4"); // blue
+	rgb divergingCol3 <- rgb("#b2df8a"); // light green
+	rgb divergingCol4 <- rgb("#33a02c"); // green
+
+	rgb divergingCol5 <- rgb(95, 130, 10); // green
+	rgb divergingCol6 <- rgb(49, 130, 189); // blue
+	rgb divergingCol7 <- rgb(160, 55, 100); // purple
+}
+
 experiment 'Docker' type: gui {
 	parameter "saver" var: saveObservations <- true;
 	parameter "pathBD" var: pathBD <- "/bd/Used/";
@@ -146,53 +158,53 @@ experiment 'Every output' type: gui {
 
 		display 'Stocks in final destination' refresh:every(1) {
 			chart  "Stock quantity in final destinations" type: series {
-				data "Total stock quantity in final destinations" value: stockInFinalDest color: rgb('green') ;
-				data "Total free surface in final destinations" value: freeSurfaceInFinalDest color: rgb('blue') ;
+				data "Total stock quantity in final destinations" value: stockInFinalDest color: divergingCol2 ;
+				data "Total free surface in final destinations" value: freeSurfaceInFinalDest color: divergingCol4 ;
 			}
 		}/**/
 
 		display 'Stocks in warehouses' refresh:every(1) {
 			chart  "Stock quantity in warehouses" type: series {
-				data "Total stock quantity in warehouses" value: stockInWarehouse color: rgb('green') ;
-				data "Total free surface in warehouses" value: freeSurfaceInWarehouse color: rgb('blue') ;
+				data "Total stock quantity in warehouses" value: stockInWarehouse color: divergingCol2 ;
+				data "Total free surface in warehouses" value: freeSurfaceInWarehouse color: divergingCol4 ;
 			}
 		}/**/
 
 		display 'Empty stocks in final destination' refresh:every(1) {
 			chart  "Number of empty stock in final destinations" type: series {
-				data "Number of empty stock in final destinations" value: numberofEmptyStockInFinalDests color: rgb('green') ;
+				data "Number of empty stock in final destinations" value: numberofEmptyStockInFinalDests color: divergingCol2 ;
 			}
 		}/**/
 
 		display 'Empty stocks in warehouses' refresh:every(1) {
 			chart  "Number of empty stock in warehouses" type: series {
-				data "Number of empty stock in warehouses" value: numberOfEmptyStockInWarehouses color: rgb('green') ;
+				data "Number of empty stock in warehouses" value: numberOfEmptyStockInWarehouses color: divergingCol2 ;
 			}
 		}/**/
 
 		display 'Average time to deliver goods somewhere' refresh:every(1) {
 			chart  "Average time that the LPs took to deliver goods somewhere" type: series {
-				data "Average time that the LPs took to deliver goods somewhere" value: averageTimeToDeliver color: rgb('green') ;
+				data "Average time that the LPs took to deliver goods somewhere" value: averageTimeToDeliver color: divergingCol2 ;
 			}
 		}/**/
 
 		display 'Average time to deliver goods to final destinations' refresh:every(1) {
 			chart  "Average time that the LPs took to deliver goods to FDMs" type: series {
-				data "Average time that the LPs took to deliver goods to FDMs" value: averageTimeToBeDelivered color: rgb('green') ;
+				data "Average time that the LPs took to deliver goods to FDMs" value: averageTimeToBeDelivered color: divergingCol2 ;
 			}
 		}/**/
 
 		display 'Average transportation and warehousing costs' refresh:every(1) {
 			chart  "Average transportation and warehousing costs" type: series {
-				data "Average transportation and warehousing costs" value: averageCosts color: rgb('green') ;
+				data "Average transportation and warehousing costs" value: averageCosts color: divergingCol2 ;
 			}
 		}/**/
 
 		display 'Share of mode of transport (number of vehicles)' refresh:every(1) {
 			chart  "Share of mode of transport (number of vehicles)" type: series {
-				data "Share of road" value: shareRoadVehicle color: rgb('green') ;
-				data "Share of river" value: shareRiverVehicle color: rgb('red') ;
-				data "Share of maritime" value: shareMaritimeVehicle color: rgb('blue') ;
+				data "Share of road" value: shareRoadVehicle color: divergingCol5 ;
+				data "Share of river" value: shareRiverVehicle color: divergingCol6 ;
+				data "Share of maritime" value: shareMaritimeVehicle color: divergingCol7 ;
 			}
 		}/**/
 
@@ -205,14 +217,14 @@ experiment 'Every output' type: gui {
 					}
 				}
 				if(sr!=nil){
-					data "Share of road" value: sr.shareRoadVehicleRO * 100.0 color: rgb('green') ;
-					data "Share of river" value: sr.shareRiverVehicleRO * 100.0 color: rgb('red') ;
-					data "Share of maritime" value: sr.shareMaritimeVehicleRO * 100.0 color: rgb('blue') ;
+					data "Share of road" value: sr.shareRoadVehicleRO * 100.0 color: divergingCol5 ;
+					data "Share of river" value: sr.shareRiverVehicleRO * 100.0 color: divergingCol6 ;
+					data "Share of maritime" value: sr.shareMaritimeVehicleRO * 100.0 color: divergingCol7 ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
-					data "Share of road" value: 0 color: rgb('green') ;
-					data "Share of river" value: 0 color: rgb('red') ;
-					data "Share of maritime" value: 0 color: rgb('blue') ;
+					data "Share of road" value: 0 color: divergingCol5 ;
+					data "Share of river" value: 0 color: divergingCol6 ;
+					data "Share of maritime" value: 0 color: divergingCol7 ;
 				}
 			}
 		}/**/
@@ -226,14 +238,14 @@ experiment 'Every output' type: gui {
 					}
 				}
 				if(sr!=nil){
-					data "Share of road" value: sr.shareRoadVehicleRO * 100.0 color: rgb('green') ;
-					data "Share of river" value: sr.shareRiverVehicleRO * 100.0 color: rgb('red') ;
-					data "Share of maritime" value: sr.shareMaritimeVehicleRO * 100.0 color: rgb('blue') ;
+					data "Share of road" value: sr.shareRoadVehicleRO * 100.0 color: divergingCol5 ;
+					data "Share of river" value: sr.shareRiverVehicleRO * 100.0 color: divergingCol6 ;
+					data "Share of maritime" value: sr.shareMaritimeVehicleRO * 100.0 color: divergingCol7 ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
-					data "Share of road" value: 0 color: rgb('green') ;
-					data "Share of river" value: 0 color: rgb('red') ;
-					data "Share of maritime" value: 0 color: rgb('blue') ;
+					data "Share of road" value: 0 color: divergingCol5 ;
+					data "Share of river" value: 0 color: divergingCol6 ;
+					data "Share of maritime" value: 0 color: divergingCol7 ;
 				}
 			}
 		}/**/
@@ -247,14 +259,14 @@ experiment 'Every output' type: gui {
 					}
 				}
 				if(sr!=nil){
-					data "Share of road" value: sr.shareRoadVehicleRO * 100.0 color: rgb('green') ;
-					data "Share of river" value: sr.shareRiverVehicleRO * 100.0 color: rgb('red') ;
-					data "Share of maritime" value: sr.shareMaritimeVehicleRO * 100.0 color: rgb('blue') ;
+					data "Share of road" value: sr.shareRoadVehicleRO * 100.0 color: divergingCol5 ;
+					data "Share of river" value: sr.shareRiverVehicleRO * 100.0 color: divergingCol6 ;
+					data "Share of maritime" value: sr.shareMaritimeVehicleRO * 100.0 color: divergingCol7 ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
-					data "Share of road" value: 0 color: rgb('green') ;
-					data "Share of river" value: 0 color: rgb('red') ;
-					data "Share of maritime" value: 0 color: rgb('blue') ;
+					data "Share of road" value: 0 color: divergingCol5 ;
+					data "Share of river" value: 0 color: divergingCol6 ;
+					data "Share of maritime" value: 0 color: divergingCol7 ;
 				}
 			}
 		}/**/
@@ -268,14 +280,14 @@ experiment 'Every output' type: gui {
 					}
 				}
 				if(sr!=nil){
-					data "Share of road" value: sr.shareRoadVehicleRO * 100.0 color: rgb('green') ;
-					data "Share of river" value: sr.shareRiverVehicleRO * 100.0 color: rgb('red') ;
-					data "Share of maritime" value: sr.shareMaritimeVehicleRO * 100.0 color: rgb('blue') ;
+					data "Share of road" value: sr.shareRoadVehicleRO * 100.0 color: divergingCol5 ;
+					data "Share of river" value: sr.shareRiverVehicleRO * 100.0 color: divergingCol6 ;
+					data "Share of maritime" value: sr.shareMaritimeVehicleRO * 100.0 color: divergingCol7 ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
-					data "Share of road" value: 0 color: rgb('green') ;
-					data "Share of river" value: 0 color: rgb('red') ;
-					data "Share of maritime" value: 0 color: rgb('blue') ;
+					data "Share of road" value: 0 color: divergingCol5 ;
+					data "Share of river" value: 0 color: divergingCol6 ;
+					data "Share of maritime" value: 0 color: divergingCol7 ;
 				}
 			}
 		}/**/
@@ -289,14 +301,14 @@ experiment 'Every output' type: gui {
 					}
 				}
 				if(sr!=nil){
-					data "Share of road" value: sr.shareRoadVehicleRO * 100.0 color: rgb('green') ;
-					data "Share of river" value: sr.shareRiverVehicleRO * 100.0 color: rgb('red') ;
-					data "Share of maritime" value: sr.shareMaritimeVehicleRO * 100.0 color: rgb('blue') ;
+					data "Share of road" value: sr.shareRoadVehicleRO * 100.0 color: divergingCol5 ;
+					data "Share of river" value: sr.shareRiverVehicleRO * 100.0 color: divergingCol6 ;
+					data "Share of maritime" value: sr.shareMaritimeVehicleRO * 100.0 color: divergingCol7 ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
-					data "Share of road" value: 0 color: rgb('green') ;
-					data "Share of river" value: 0 color: rgb('red') ;
-					data "Share of maritime" value: 0 color: rgb('blue') ;
+					data "Share of road" value: 0 color: divergingCol5 ;
+					data "Share of river" value: 0 color: divergingCol6 ;
+					data "Share of maritime" value: 0 color: divergingCol7 ;
 				}
 			}
 		}/**/
@@ -310,23 +322,23 @@ experiment 'Every output' type: gui {
 					}
 				}
 				if(sr!=nil){
-					data "Share of road" value: sr.shareRoadVehicleRO * 100.0 color: rgb('green') ;
-					data "Share of river" value: sr.shareRiverVehicleRO * 100.0 color: rgb('red') ;
-					data "Share of maritime" value: sr.shareMaritimeVehicleRO * 100.0 color: rgb('blue') ;
+					data "Share of road" value: sr.shareRoadVehicleRO * 100.0 color: divergingCol5 ;
+					data "Share of river" value: sr.shareRiverVehicleRO * 100.0 color: divergingCol6 ;
+					data "Share of maritime" value: sr.shareMaritimeVehicleRO * 100.0 color: divergingCol7 ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
-					data "Share of road" value: 0 color: rgb('green') ;
-					data "Share of river" value: 0 color: rgb('red') ;
-					data "Share of maritime" value: 0 color: rgb('blue') ;
+					data "Share of road" value: 0 color: divergingCol5 ;
+					data "Share of river" value: 0 color: divergingCol6 ;
+					data "Share of maritime" value: 0 color: divergingCol7 ;
 				}
 			}
 		}/**/
 
 		display 'Share of mode of transport (quantities of goods)' refresh:every(1) {
 			chart  "Share of mode of transport (quantities of goods)" type: series {
-				data "Share of road" value: shareRoadQuantities * 100 color: rgb('green') ;
-				data "Share of river" value: shareRiverQuantities * 100 color: rgb('red') ;
-				data "Share of maritime" value: shareMaritimeQuantities * 100 color: rgb('blue') ;
+				data "Share of road" value: shareRoadQuantities * 100 color: divergingCol5 ;
+				data "Share of river" value: shareRiverQuantities * 100 color: divergingCol6 ;
+				data "Share of maritime" value: shareMaritimeQuantities * 100 color: divergingCol7 ;
 			}
 		}/**/
 
@@ -339,14 +351,14 @@ experiment 'Every output' type: gui {
 					}
 				}
 				if(sr!=nil){
-					data "Share of road" value: sr.shareRoadQuantitiesRO * 100.0 color: rgb('green') ;
-					data "Share of river" value: sr.shareRiverQuantitiesRO * 100.0 color: rgb('red') ;
-					data "Share of maritime" value: sr.shareMaritimeQuantitiesRO * 100.0 color: rgb('blue') ;
+					data "Share of road" value: sr.shareRoadQuantitiesRO * 100.0 color: divergingCol5 ;
+					data "Share of river" value: sr.shareRiverQuantitiesRO * 100.0 color: divergingCol6 ;
+					data "Share of maritime" value: sr.shareMaritimeQuantitiesRO * 100.0 color: divergingCol7 ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
-					data "Share of road" value: 0 color: rgb('green') ;
-					data "Share of river" value: 0 color: rgb('red') ;
-					data "Share of maritime" value: 0 color: rgb('blue') ;
+					data "Share of road" value: 0 color: divergingCol5 ;
+					data "Share of river" value: 0 color: divergingCol6 ;
+					data "Share of maritime" value: 0 color: divergingCol7 ;
 				}
 			}
 		}/**/
@@ -360,14 +372,14 @@ experiment 'Every output' type: gui {
 					}
 				}
 				if(sr!=nil){
-					data "Share of road" value: sr.shareRoadQuantitiesRO * 100.0 color: rgb('green') ;
-					data "Share of river" value: sr.shareRiverQuantitiesRO * 100.0 color: rgb('red') ;
-					data "Share of maritime" value: sr.shareMaritimeQuantitiesRO * 100.0 color: rgb('blue') ;
+					data "Share of road" value: sr.shareRoadQuantitiesRO * 100.0 color: divergingCol5 ;
+					data "Share of river" value: sr.shareRiverQuantitiesRO * 100.0 color: divergingCol6 ;
+					data "Share of maritime" value: sr.shareMaritimeQuantitiesRO * 100.0 color: divergingCol7 ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
-					data "Share of road" value: 0 color: rgb('green') ;
-					data "Share of river" value: 0 color: rgb('red') ;
-					data "Share of maritime" value: 0 color: rgb('blue') ;
+					data "Share of road" value: 0 color: divergingCol5 ;
+					data "Share of river" value: 0 color: divergingCol6 ;
+					data "Share of maritime" value: 0 color: divergingCol7 ;
 				}
 			}
 		}/**/
@@ -381,14 +393,14 @@ experiment 'Every output' type: gui {
 					}
 				}
 				if(sr!=nil){
-					data "Share of road" value: sr.shareRoadQuantitiesRO * 100.0 color: rgb('green') ;
-					data "Share of river" value: sr.shareRiverQuantitiesRO * 100.0 color: rgb('red') ;
-					data "Share of maritime" value: sr.shareMaritimeQuantitiesRO * 100.0 color: rgb('blue') ;
+					data "Share of road" value: sr.shareRoadQuantitiesRO * 100.0 color: divergingCol5 ;
+					data "Share of river" value: sr.shareRiverQuantitiesRO * 100.0 color: divergingCol6 ;
+					data "Share of maritime" value: sr.shareMaritimeQuantitiesRO * 100.0 color: divergingCol7 ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
-					data "Share of road" value: 0 color: rgb('green') ;
-					data "Share of river" value: 0 color: rgb('red') ;
-					data "Share of maritime" value: 0 color: rgb('blue') ;
+					data "Share of road" value: 0 color: divergingCol5 ;
+					data "Share of river" value: 0 color: divergingCol6 ;
+					data "Share of maritime" value: 0 color: divergingCol7 ;
 				}
 			}
 		}/**/
@@ -402,14 +414,14 @@ experiment 'Every output' type: gui {
 					}
 				}
 				if(sr!=nil){
-					data "Share of road" value: sr.shareRoadQuantitiesRO * 100.0 color: rgb('green') ;
-					data "Share of river" value: sr.shareRiverQuantitiesRO * 100.0 color: rgb('red') ;
-					data "Share of maritime" value: sr.shareMaritimeQuantitiesRO * 100.0 color: rgb('blue') ;
+					data "Share of road" value: sr.shareRoadQuantitiesRO * 100.0 color: divergingCol5 ;
+					data "Share of river" value: sr.shareRiverQuantitiesRO * 100.0 color: divergingCol6 ;
+					data "Share of maritime" value: sr.shareMaritimeQuantitiesRO * 100.0 color: divergingCol7 ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
-					data "Share of road" value: 0 color: rgb('green') ;
-					data "Share of river" value: 0 color: rgb('red') ;
-					data "Share of maritime" value: 0 color: rgb('blue') ;
+					data "Share of road" value: 0 color: divergingCol5 ;
+					data "Share of river" value: 0 color: divergingCol6 ;
+					data "Share of maritime" value: 0 color: divergingCol7 ;
 				}
 			}
 		}/**/
@@ -423,14 +435,14 @@ experiment 'Every output' type: gui {
 					}
 				}
 				if(sr!=nil){
-					data "Share of road" value: sr.shareRoadQuantitiesRO * 100.0 color: rgb('green') ;
-					data "Share of river" value: sr.shareRiverQuantitiesRO * 100.0 color: rgb('red') ;
-					data "Share of maritime" value: sr.shareMaritimeQuantitiesRO * 100.0 color: rgb('blue') ;
+					data "Share of road" value: sr.shareRoadQuantitiesRO * 100.0 color: divergingCol5 ;
+					data "Share of river" value: sr.shareRiverQuantitiesRO * 100.0 color: divergingCol6 ;
+					data "Share of maritime" value: sr.shareMaritimeQuantitiesRO * 100.0 color: divergingCol7 ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
-					data "Share of road" value: 0 color: rgb('green') ;
-					data "Share of river" value: 0 color: rgb('red') ;
-					data "Share of maritime" value: 0 color: rgb('blue') ;
+					data "Share of road" value: 0 color: divergingCol5 ;
+					data "Share of river" value: 0 color: divergingCol6 ;
+					data "Share of maritime" value: 0 color: divergingCol7 ;
 				}
 			}
 		}/**/
@@ -444,14 +456,14 @@ experiment 'Every output' type: gui {
 					}
 				}
 				if(sr!=nil){
-					data "Share of road" value: sr.shareRoadQuantitiesRO * 100.0 color: rgb('green') ;
-					data "Share of river" value: sr.shareRiverQuantitiesRO * 100.0 color: rgb('red') ;
-					data "Share of maritime" value: sr.shareMaritimeQuantitiesRO * 100.0 color: rgb('blue') ;
+					data "Share of road" value: sr.shareRoadQuantitiesRO * 100.0 color: divergingCol5 ;
+					data "Share of river" value: sr.shareRiverQuantitiesRO * 100.0 color: divergingCol6 ;
+					data "Share of maritime" value: sr.shareMaritimeQuantitiesRO * 100.0 color: divergingCol7 ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
-					data "Share of road" value: 0 color: rgb('green') ;
-					data "Share of river" value: 0 color: rgb('red') ;
-					data "Share of maritime" value: 0 color: rgb('blue') ;
+					data "Share of road" value: 0 color: divergingCol5 ;
+					data "Share of river" value: 0 color: divergingCol6 ;
+					data "Share of maritime" value: 0 color: divergingCol7 ;
 				}
 			}
 		}/**/
@@ -465,12 +477,12 @@ experiment 'Every output' type: gui {
 					}
 				}
 				if(sr!=nil){
-					data "Number of FC choosing Antwerp" value: sr.nbAntwerp color: rgb('green') ;
-					data "Number of FC choosing Le Havre" value: sr.nbHavre color: rgb('red') ;
+					data "Number of FC choosing Antwerp" value: sr.nbAntwerp color: divergingCol2 ;
+					data "Number of FC choosing Le Havre" value: sr.nbHavre color: divergingCol4 ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
-					data "Number of FC choosing Antwerp" value: 0 color: rgb('green') ;
-					data "Number of FC choosing Le Havre" value: 0 color: rgb('red') ;
+					data "Number of FC choosing Antwerp" value: 0 color: divergingCol2 ;
+					data "Number of FC choosing Le Havre" value: 0 color: divergingCol4 ;
 				}
 			}
 		}/**/
@@ -484,12 +496,12 @@ experiment 'Every output' type: gui {
 					}
 				}
 				if(sr!=nil){
-					data "Number of FC choosing Antwerp" value: sr.nbAntwerp color: rgb('green') ;
-					data "Number of FC choosing Le Havre" value: sr.nbHavre color: rgb('red') ;
+					data "Number of FC choosing Antwerp" value: sr.nbAntwerp color: divergingCol2 ;
+					data "Number of FC choosing Le Havre" value: sr.nbHavre color: divergingCol4 ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
-					data "Number of FC choosing Antwerp" value: 0 color: rgb('green') ;
-					data "Number of FC choosing Le Havre" value: 0 color: rgb('red') ;
+					data "Number of FC choosing Antwerp" value: 0 color: divergingCol2 ;
+					data "Number of FC choosing Le Havre" value: 0 color: divergingCol4 ;
 				}
 			}
 		}/**/
@@ -503,12 +515,12 @@ experiment 'Every output' type: gui {
 					}
 				}
 				if(sr!=nil){
-					data "Number of FC choosing Antwerp" value: sr.nbAntwerp color: rgb('green') ;
-					data "Number of FC choosing Le Havre" value: sr.nbHavre color: rgb('red') ;
+					data "Number of FC choosing Antwerp" value: sr.nbAntwerp color: divergingCol2 ;
+					data "Number of FC choosing Le Havre" value: sr.nbHavre color: divergingCol4 ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
-					data "Number of FC choosing Antwerp" value: 0 color: rgb('green') ;
-					data "Number of FC choosing Le Havre" value: 0 color: rgb('red') ;
+					data "Number of FC choosing Antwerp" value: 0 color: divergingCol2 ;
+					data "Number of FC choosing Le Havre" value: 0 color: divergingCol4 ;
 				}
 			}
 		}/**/
@@ -522,12 +534,12 @@ experiment 'Every output' type: gui {
 					}
 				}
 				if(sr!=nil){
-					data "Number of FC choosing Antwerp" value: sr.nbAntwerp color: rgb('green') ;
-					data "Number of FC choosing Le Havre" value: sr.nbHavre color: rgb('red') ;
+					data "Number of FC choosing Antwerp" value: sr.nbAntwerp color: divergingCol2 ;
+					data "Number of FC choosing Le Havre" value: sr.nbHavre color: divergingCol4 ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
-					data "Number of FC choosing Antwerp" value: 0 color: rgb('green') ;
-					data "Number of FC choosing Le Havre" value: 0 color: rgb('red') ;
+					data "Number of FC choosing Antwerp" value: 0 color: divergingCol2 ;
+					data "Number of FC choosing Le Havre" value: 0 color: divergingCol4 ;
 				}
 			}
 		}/**/
@@ -541,12 +553,12 @@ experiment 'Every output' type: gui {
 					}
 				}
 				if(sr!=nil){
-					data "Number of FC choosing Antwerp" value: sr.nbAntwerp color: rgb('green') ;
-					data "Number of FC choosing Le Havre" value: sr.nbHavre color: rgb('red') ;
+					data "Number of FC choosing Antwerp" value: sr.nbAntwerp color: divergingCol2 ;
+					data "Number of FC choosing Le Havre" value: sr.nbHavre color: divergingCol4 ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
-					data "Number of FC choosing Antwerp" value: 0 color: rgb('green') ;
-					data "Number of FC choosing Le Havre" value: 0 color: rgb('red') ;
+					data "Number of FC choosing Antwerp" value: 0 color: divergingCol2 ;
+					data "Number of FC choosing Le Havre" value: 0 color: divergingCol4 ;
 				}
 			}
 		}/**/
@@ -560,31 +572,31 @@ experiment 'Every output' type: gui {
 					}
 				}
 				if(sr!=nil){
-					data "Number of FC choosing Antwerp" value: sr.nbAntwerp color: rgb('green') ;
-					data "Number of FC choosing Le Havre" value: sr.nbHavre color: rgb('red') ;
+					data "Number of FC choosing Antwerp" value: sr.nbAntwerp color: divergingCol2 ;
+					data "Number of FC choosing Le Havre" value: sr.nbHavre color: divergingCol4 ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
-					data "Number of FC choosing Antwerp" value: 0 color: rgb('green') ;
-					data "Number of FC choosing Le Havre" value: 0 color: rgb('red') ;
+					data "Number of FC choosing Antwerp" value: 0 color: divergingCol2 ;
+					data "Number of FC choosing Le Havre" value: 0 color: divergingCol4 ;
 				}
 			}
 		}/**/
 
 		display 'Share of the different strategies adopted' refresh:every(1) {
 			chart  "Share of the different strategies adopted" type: series {
-				data "Strategy 1 (closest/largest warehouse according to a probability)" value: nbLPStrat1 color: rgb('green') ;
-				data "Strategy 2 (closest/largest warehouse according to its accessibility)" value: nbLPStrat2 color: rgb('red') ;
-				data "Strategy 3 (closest/largest warehouse)" value: nbLPStrat3 color: rgb('blue') ;
-				data "Strategy 4 (pure random)" value: nbLPStrat4 color: rgb('orange') ;
+				data "Strategy 1 (closest/largest warehouse according to a probability)" value: nbLPStrat1 color: divergingCol1 ;
+				data "Strategy 2 (closest/largest warehouse according to its accessibility)" value: nbLPStrat2 color: divergingCol2 ;
+				data "Strategy 3 (closest/largest warehouse)" value: nbLPStrat3 color: divergingCol3 ;
+				data "Strategy 4 (pure random)" value: nbLPStrat4 color: divergingCol4 ;
 			}
 		}/**/
 
 		display 'Share of the different strategies adopted (smoothed)' refresh:every(1) {
 			chart  "Share of the different strategies adopted" type: series {
-				data "Strategy 1 (closest/largest warehouse according to a probability)" value: averageStrat1 color: rgb('green') ;
-				data "Strategy 2 (closest/largest warehouse according to its accessibility)" value: averageStrat2 color: rgb('red') ;
-				data "Strategy 3 (closest/largest warehouse)" value: averageStrat3 color: rgb('blue') ;
-				data "Strategy 4 (pure random)" value: averageStrat4 color: rgb('orange') ;
+				data "Strategy 1 (closest/largest warehouse according to a probability)" value: averageStrat1 color: divergingCol1 ;
+				data "Strategy 2 (closest/largest warehouse according to its accessibility)" value: averageStrat2 color: divergingCol2 ;
+				data "Strategy 3 (closest/largest warehouse)" value: averageStrat3 color: divergingCol3 ;
+				data "Strategy 4 (pure random)" value: averageStrat4 color: divergingCol4 ;
 			}
 		}/**/
 
@@ -615,34 +627,34 @@ experiment 'Every output' type: gui {
 
 		display 'Average threshold' refresh:every(1) {
 			chart  "Average threshold" type: series {
-				data "Average threshold (in percentage)" value: averageThreshold*100 color: rgb('blue') ;
+				data "Average threshold (in percentage)" value: averageThreshold*100 color: divergingCol4 ;
 			}
 		}/**/
 
 		display 'Stocks awating to leave providers and warehouses' refresh:every(1) {
 			chart "Blocking level to make goods leave buildings" type: series {
-				data "Number of stocks awaiting to leave warehouses" value: nbStocksAwaitingToLeaveWarehouse color: rgb('blue') ;
-				data "Number of stocks awaiting to leave providers" value: nbStocksAwaitingToLeaveProvider color: rgb('violet') ;
+				data "Number of stocks awaiting to leave warehouses" value: nbStocksAwaitingToLeaveWarehouse color: divergingCol2 ;
+				data "Number of stocks awaiting to leave providers" value: nbStocksAwaitingToLeaveProvider color: divergingCol4 ;
 			}
 		}/**/
 
 		display "Stocks awating to enter warehouses or final destination's building" refresh:every(1) {
 			chart "Blocking level to make goods enter buildings" type: series {
-				data "Number of stocks awaiting to enter buildings" value: nbStocksAwaitingToEnterBuilding color: rgb('green') ;
-				data "Number of stocks awaiting to enter warehouses" value: nbStocksAwaitingToEnterWarehouse color: rgb('red') ;
+				data "Number of stocks awaiting to enter buildings" value: nbStocksAwaitingToEnterBuilding color: divergingCol2 ;
+				data "Number of stocks awaiting to enter warehouses" value: nbStocksAwaitingToEnterWarehouse color: divergingCol4 ;
 			}
 		}/**/
 
 		display 'Average costs' refresh:every(1) {
 			chart "Average Costs" type: series {
-				data "average costs" value: averageCosts color: rgb('green') ;
+				data "average costs" value: averageCosts color: divergingCol2 ;
 			}
 		}/**/
 
 		display 'Competition between Le Havre and Antwerp' refresh:every(1) {
 			chart "Competition between the ports of Le Havre and Antwerp" type: series {
-				data "Number of LP using Le Havre" value: nbHavre color: rgb('green') ;
-				data "Number of LP using Antwerp" value: nbAntwerp color: rgb('red') ;
+				data "Number of LP using Le Havre" value: nbHavre color: divergingCol2 ;
+				data "Number of LP using Antwerp" value: nbAntwerp color: divergingCol4 ;
 			}
 		}/**/
 	}
