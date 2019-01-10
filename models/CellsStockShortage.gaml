@@ -3,7 +3,7 @@ model CellsStockShortage
 import "Stock.gaml"
 
 grid cell_stock_shortage width:50 height:50  {
-	rgb color <- rgb(rgb(255,255,255),0.0);
+	rgb color <- rgb(255,255,255,0.0);
 	float nb_stock_shortage;
 	float nb_stock;
 	list<float> ratios <- [];
@@ -44,19 +44,19 @@ grid cell_stock_shortage width:50 height:50  {
 		ratio <- sum / length(ratios);
 
 		if(ratio = 0){
-			color <- rgb(rgb(255,255,255),0.1);
+			color <- rgb(255,255,255,0.1);
 		}
 		else if(ratio < 0.025){
-			color <- rgb(rgb(102,194,164),0.5);
+			color <- rgb(102,194,164,0.5);
 		}
 		else if(ratio < 0.07){
-			color <- rgb(rgb(65,174,118),0.8);
+			color <- rgb(65,174,118,0.8);
 		}
 		else if(ratio < 0.15){
-			color <- rgb(rgb(35,139,69),0.8);
+			color <- rgb(35,139,69,0.8);
 		}
 		else{
-			color <- rgb(rgb(0,88,36),0.8);
+			color <- rgb(0,88,36,0.8);
 		}
 	}
 }
