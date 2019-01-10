@@ -94,7 +94,7 @@ global {
 			// River
 		create RiverLine from: river_shapefile with: [speed::read("speed") as float, length::read("length") as float, is_new::read("is_new") as int];
 		river_network <- as_edge_graph(RiverLine);
-		
+
 		// Region observers
 		create RegionObserver from: regions_shapefile with: [name::read("nom") as string];
 		create RegionObserver from: antwerp_shapefile with: [name::read("Name") as string];
@@ -141,6 +141,20 @@ global {
 
 		// Warehouses
 		create Warehouse from: warehouse_shapefile returns: lw with: [totalSurface::read("surface") as float];
+		/*
+		 * The following code can be commented or not, depending if the user want to execute the simulation with every Warehouse 
+		 * It is mainly used for tests to avoid CPU overload.
+		 */
+		int i <- 100;
+		list<Warehouse> llsp <- shuffle(Warehouse);
+		loop while: i < length(llsp) {
+			Warehouse s <- llsp[i];
+			remove index: i from: llsp;
+			ask s {
+				do die;
+			}
+		}
+		/**/
 
 		//  Logistic Service providers
 		create LogisticsServiceProvider from: logistic_provider_shapefile;
@@ -150,9 +164,9 @@ global {
 		 * It is mainly used for tests to avoid CPU overload.
 		 */
 		/*int i <- 100;
-		list<LogisticProvider> llsp <- shuffle(LogisticProvider);
+		list<LogisticsServiceProvider> llsp <- shuffle(LogisticsServiceProvider);
 		loop while: i < length(llsp) {
-			LogisticProvider s <- llsp[i];
+			LogisticsServiceProvider s <- llsp[i];
 			remove index: i from: llsp;
 			ask s {
 				do die;
