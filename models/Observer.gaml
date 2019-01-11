@@ -547,6 +547,26 @@ global {
 		}
 	}
 
+	list<int> distributionNbFCPerLSPY;
+	list<int> distributionNbFCPerLSPX;
+	reflex distributionNbFCPerLSP {
+		distributionNbFCPerLSPY <- [];
+		ask LogisticsServiceProvider {
+			int nbCustomers <- length(self.customers);
+			loop while: length(distributionNbFCPerLSPY) <= nbCustomers{
+				 distributionNbFCPerLSPY <- distributionNbFCPerLSPY + 0;
+			}
+			distributionNbFCPerLSPY[nbCustomers] <- distributionNbFCPerLSPY[nbCustomers] + 1;
+		}
+
+		distributionNbFCPerLSPX <- [];
+		int i <- 0;
+		loop while: i < length(distributionNbFCPerLSP) {
+			distributionNbFCPerLSPX <- distributionNbFCPerLSPX + i;
+			i <- i + 1;
+		}
+	}
+
 	string CSVFolderPath <- "../results/CSV/";
 	reflex saveObservations when: saveObservations {
 		if(date_simu_starts = nil) {

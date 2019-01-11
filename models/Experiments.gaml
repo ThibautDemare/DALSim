@@ -657,5 +657,18 @@ experiment 'Every output' type: gui {
 				data "Number of LP using Antwerp" value: nbAntwerp color: divergingCol4 ;
 			}
 		}/**/
+
+		display "Distribution of number of FC per LSP" type: java2D {
+			chart "Distribution of number of FC per LSP"
+				type: series
+				x_label: 'Nb of FC'
+				y_label: 'Nb of LSP'
+				x_tick_unit: 1
+				y_tick_unit: 1
+				x_serie_labels: distributionNbFCPerLSPX
+			{
+				data "Distribution of number of FC per LSP" value: distributionNbFCPerLSPY color: divergingCol2;
+			}
+		}/**/
 	}
 }
