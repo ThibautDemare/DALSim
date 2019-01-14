@@ -658,16 +658,14 @@ experiment 'Every output' type: gui {
 			}
 		}/**/
 
-		display "Distribution of number of FC per LSP" type: java2D {
+		display "Distribution of number of FC per LSP" type: java2D synchronized: true {
 			chart "Distribution of number of FC per LSP"
-				type: series
+				type: histogram
 				x_label: 'Nb of FC'
 				y_label: 'Nb of LSP'
-				x_tick_unit: 1
-				y_tick_unit: 1
 				x_serie_labels: distributionNbFCPerLSPX
 			{
-				data "Distribution of number of FC per LSP" value: distributionNbFCPerLSPY color: divergingCol2;
+				datalist distributionNbFCPerLSPX value: distributionNbFCPerLSPY;
 			}
 		}/**/
 	}
