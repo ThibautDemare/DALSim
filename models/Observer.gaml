@@ -625,6 +625,19 @@ global {
 		do saveSharePortOriginRegion(params, "Ile-de-France");
 		do saveSharePortOriginRegion(params, "Picardie");
 		do saveSharePortOriginRegion(params, "Antwerpen");
+
+		do saveDistribution(params, distributionNbFCPerLSPY);
+	}
+
+	action saveDistribution(string params, list<int> values) {
+		string s <- "";
+		int i <- 0;
+		loop while: i < length(values) {
+			s <- s + ";" +values[i];
+			i <- i + 1;
+		}
+		save "" + ((time/3600.0) as int) + s
+			to: CSVFolderPath + date_simu_starts + "_distribution_nb_FC_per_LSP_" + params  + ".csv" type: text rewrite: false;
 	}
 
 	action saveShareTransportModeRegion(string params, string n){
