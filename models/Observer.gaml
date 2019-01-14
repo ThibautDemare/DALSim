@@ -561,7 +561,7 @@ global {
 
 		distributionNbFCPerLSPX <- [];
 		int i <- 0;
-		loop while: i < length(distributionNbFCPerLSP) {
+		loop while: i < length(distributionNbFCPerLSPY) {
 			distributionNbFCPerLSPX <- distributionNbFCPerLSPX + i;
 			i <- i + 1;
 		}
