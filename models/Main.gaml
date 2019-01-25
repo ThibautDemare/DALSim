@@ -34,6 +34,7 @@ global {
 	// And also we updated it in order to have the Canal Seine Nord navigable.
 	//file river_shapefile <- file(pathBD+"River/river_network_length_in_km.shp"); Only the Seine and Oise => not the part to Antwerp with Canal Seine Nord
 	file river_shapefile <- file(pathBD+"River/IWW_Axe_Seine_Antwerp_CLASS-40-50-60_lambert93.shp");
+	list<RiverLine> canalSeineNord <- [];
 
 	// Logistic provider
 	// The list of logistics service provider. The data comes from the list of "commissionaire de transport" build by Devport
@@ -237,6 +238,7 @@ global {
 		// We block the canal Seine Nord at the beginning of the simulation
 		ask RiverLine {
 			if(is_new = 1){
+				canalSeineNord <+ self;
 				ask forwardingAgent {
 					do block_edge edge:myself;
 				}

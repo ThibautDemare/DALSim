@@ -567,6 +567,16 @@ global {
 		}
 	}
 
+	float trafficValueCSN;
+	reflex trafficEvolutionOnCanalSeineNord {
+		trafficValueCSN <- 0.0;
+		int i <- 0;
+		loop while: i < length(canalSeineNord) {
+			trafficValueCSN <- trafficValueCSN + canalSeineNord[i].current_volume;
+			i <- i + 1;
+		}
+	}
+
 	string CSVFolderPath <- "../results/CSV/";
 	reflex saveObservations when: saveObservations {
 		if(date_simu_starts = nil) {
@@ -627,6 +637,9 @@ global {
 		do saveSharePortOriginRegion(params, "Antwerpen");
 
 		do saveDistribution(params, distributionNbFCPerLSPY);
+
+		save "" + ((time/3600.0) as int) + ";" + trafficValueCSN
+			to: CSVFolderPath + date_simu_starts + "_traffic_evolution_CSN" + params  + ".csv" type: text rewrite: false;
 	}
 
 	action saveDistribution(string params, list<int> values) {

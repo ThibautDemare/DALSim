@@ -668,5 +668,11 @@ experiment 'Every output' type: gui {
 				datalist distributionNbFCPerLSPX value: distributionNbFCPerLSPY;
 			}
 		}/**/
+
+		display 'Traffic evolution on the Canal Seine Nord' refresh:every(1) {
+			chart "Traffic evolution on the Canal Seine Nord" type: series {
+				data "Traffic evolution on the Canal Seine Nord" value: trafficValueCSN color: divergingCol2 ;
+			}
+		}/**/
 	}
 }

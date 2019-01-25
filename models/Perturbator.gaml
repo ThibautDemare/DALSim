@@ -156,11 +156,9 @@ global {
 
 	reflex scenario_canal_seine_nord when: allowScenarionCanalSeineNord {
 		if(cycle = 500){
-			ask RiverLine {
-				if(is_new = 1){
-					ask forwardingAgent {
-						do unblock_edge edge:myself;
-					}
+			ask canalSeineNord {
+				ask forwardingAgent {
+					do unblock_edge edge:myself;
 				}
 			}
 		}
