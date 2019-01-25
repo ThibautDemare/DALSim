@@ -23,7 +23,7 @@ global {
 	bool localThreshold <- true;
 	float minlocalThreshold <- 0.05;
 	float maxlocalThreshold <- 0.2;
-	float globalThreshold <- 0.3;
+	float globalThreshold <- 0.15;
 
 	// Parameters relative to the ability of the final consignee to switch of LSP
 	bool isLocalLSPSwitcStrat <- false;
