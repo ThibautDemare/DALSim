@@ -133,8 +133,10 @@ global {
 		];
 			// Terminals of Antwerp (they are maritime and river terminals if we have the Canal Seine Nord, otherwise, they are MaritimeTerminal agents)
 		create MaritimeRiverTerminal from: terminal_A_shapefile with: [handling_time_to_road::read("TO_ROAD") as float,
+			handling_time_to_river::read("TO_RIVER") as float,
 			handling_time_to_maritime::read("TO_MARITIM") as float,
 			handling_time_from_road::read("FROM_ROAD") as float,
+			handling_time_from_river::read("FROM_RIVER") as float,
 			handling_time_from_maritime::read("FROM_MARIT") as float
 		];
 
