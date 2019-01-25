@@ -26,32 +26,35 @@ species Vehicle skills:[MovingOnNetwork] {
 	}
 	
 	reflex authorizeDeparture when: departureDate != nil and 
-		(departureDate = current_date or (departureDate < current_date and departureDate > current_date-1#hour))
+		(departureDate <= current_date)
 		and !readyToMove {
-		currentTransportedVolume <- 0;
+
+		if(length(transportedCommodities) = 0){
+			currentTransportedVolume <- 0.0;
+		}
+
 		// We check if the shceduled commodities are really in the building before we leave it
 		int j <- 0;
 		loop while: j < length(scheduledCommodities) {
 			int i <- 0;
-			loop while: i < length(source.leavingCommodities) {
+			bool notfound <- true;
+			loop while: i < length(source.leavingCommodities) and notfound{
 				if(scheduledCommodities[j] = source.leavingCommodities[i]){
 					transportedCommodities <+ scheduledCommodities[j];
-					currentTransportedVolume <- currentTransportedVolume + scheduledCommodities[j].volume;
 					scheduledCommodities[j].currentNetwork <- networkType;
+					currentTransportedVolume <- currentTransportedVolume + scheduledCommodities[j].volume;
+					remove index: j from: scheduledCommodities;
+					notfound <- false;
 				}
 				i <- i + 1;
 			}
-			j <- j + 1;
+			if(notfound){
+				j <- j + 1;
+			}
 		}
-		if(length(transportedCommodities) = 0){
-			write "There is nothing to carry";
-			write "\tDeparture date : "+departureDate;
-			write "\tcurrent_date : "+current_date;
-			write "\tscheduledCommodities[0] : "+scheduledCommodities[0];
-			write "\tnetworkType : "+networkType;
-			do die;// There are no commodities to transport. No need to move, the scheduled commodities will have to register another vehicle 
+		if(length(scheduledCommodities) = 0){
+			readyToMove <- true;
 		}
-		readyToMove <- true;
 	}
 
 	reflex move when: readyToMove and destination != nil {
