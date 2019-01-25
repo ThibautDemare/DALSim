@@ -15,8 +15,10 @@ species Network {
 	int sizeShape <- 1;
 	bool blocked <- false;
 	float current_marks;
+	float current_volume;
 	float cumulative_marks;
 	float cumulative_nb_agents;
+	float current_nb_agents;
 
 	aspect geom {
 		if(blocked){
