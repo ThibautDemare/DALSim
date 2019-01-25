@@ -12,7 +12,7 @@ global {
 	bool isLocalSelectingWarehouseStrategies <- true;
 	int globalSelectingWarehouseStrategies <- 1;
 	list<int> possibleSelectingWarehouseStrategies <- [1, 2, 3, 4]; //[1];//[1, 4];// [1, 2, 3, 4] // 1 : biased random selection - 2 : accessibility - 3 : closest/largest - 4 : pure random selection
-	int numberWarehouseSelected <- 50;
+	int numberWarehouseSelected <- 10;
 
 	// Cost path strategies
 	bool isLocalCostPathStrategy <- true;
