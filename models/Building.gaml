@@ -12,7 +12,9 @@ species Building {
 	int maxProcessEnteringGoodsCapacity <- 5;
 	int timeShifting <- rnd(23);
 
-	list<Vehicle> leavingVehicles <- []; // Liste des véhicules au départ
+	list<Vehicle> leavingVehicles_road <- []; // Liste des véhicules au départ pour le mode routier
+	list<Vehicle> leavingVehicles_river <- []; // Liste des véhicules au départ pour le mode fluvial
+	list<Vehicle> leavingVehicles_maritime <- []; // Liste des véhicules au départ pour le mode maritime
 	list<Commodity> leavingCommodities <- [];
 	list<Commodity> comingCommodities <- [];
 
