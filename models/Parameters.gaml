@@ -93,7 +93,7 @@ global {
 		int ld <- length(lw);
 		loop while: i < ld {
 			Warehouse w <- lw[i];
-			w.cost <- round(((valForMaxCost-valForMinCost) / (length(lw)-1)) * (i) + valForMinCost);
+			w.cost <- rnd(valForMaxCost - valForMinCost) + valForMinCost;// round(((valForMaxCost-valForMinCost) / (length(lw)-1)) * (i) + valForMinCost);
 			i <- i + 1;
 		}
 	}
