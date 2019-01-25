@@ -41,6 +41,7 @@ global {
 	bool allowScenarioAttractiveness <- false;
 	bool allowScenarioBlockRoads <- false;
 	bool allowScenarionCanalSeineNord <- false;
+	int cycleWhenOpenCanalSeineNord <- 1000;
 
 	/*
 	 * Some variables and functions to call some reflex

@@ -155,7 +155,7 @@ global {
 	////////////////////////////////////////////////////////////////////////////////////////////
 
 	reflex scenario_canal_seine_nord when: allowScenarionCanalSeineNord {
-		if(cycle = 500){
+		if(cycle = cycleWhenOpenCanalSeineNord){
 			ask canalSeineNord {
 				ask forwardingAgent {
 					do unblock_edge edge:myself;
