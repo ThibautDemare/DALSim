@@ -327,9 +327,13 @@ species FinalConsignee { // Used to be called FinalDestinationManager with assoc
 	}
 
 	action buildNeighborsList {
-		neighbors <- at_distance(FinalConsignee, neighborsDistance);
-		if(length(neighbors) = 0){
-			write "Error : not enough neighbor";
+		int i <- 1;
+		loop while: length(neighbors) = 0 {
+			neighbors <- at_distance(FinalConsignee, neighborsDistance * i);
+			i <- i + 1;
+		}
+		if(i > 2 ){
+			write "Error: not enough neighbors. i = "+i;
 		}
 	}
 }
