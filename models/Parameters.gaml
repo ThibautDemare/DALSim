@@ -18,6 +18,8 @@ global {
 	bool isLocalCostPathStrategy <- true;
 	list<string> possibleCostPathStrategies <- ['financial_costs','travel_time'];
 	string globalCostPathStrategy <- 'financial_costs';
+	int costsMemory <- 50; // size of the arrays used to compute costs of LSP by FC (=> equal to the number of deliveries made)
+	int neighborsDistance <- 10°km;
 
 	// Parameters relative to the threshold used by LSPs to decide when to restock
 	bool localThreshold <- true;

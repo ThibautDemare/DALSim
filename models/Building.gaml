@@ -214,6 +214,7 @@ species RestockingBuilding parent: Building {
 			commodity.paths <- compute_shortest_path(myself, order.building, order.strategy, commodity);//'financial_costs'//travel_time
 		}
 		order.fdm.localTransportationCosts <- order.fdm.localTransportationCosts + commodity.costs;
+		order.fdm.transportedVolumes <- order.fdm.transportedVolumes + commodity.volume;
 		leavingCommodities <- leavingCommodities + commodity;
 	}
 }

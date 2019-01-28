@@ -27,6 +27,10 @@ species FinalDestinationManager {
 	list<float> localTransportationCosts <- [];
 	float localWarehousingCosts <- 0.0;
 	float localAverageCosts <- 0.0;
+	list<float> transportedVolumes <- [];
+	float localVolumeNormalizedAverageCosts <- 0.0;
+	float averageCostsOfNeighbors <- 0.0;
+	list<FinalDestinationManager> neighbors <- [];
 
 	init {
 
@@ -164,7 +168,7 @@ species FinalDestinationManager {
 			}
 		}
 		else if(stratMeasureLSPEfficiency = 3){
-			if(localAverageCosts > averageCosts){
+			if(localVolumeNormalizedAverageCosts > averageCostsOfNeighbors){
 				return true;
 			}
 		}
@@ -320,5 +324,12 @@ species FinalDestinationManager {
 			ls <- ls + s;
 		}
 		building.stocks <- ls;
+	}
+
+	action buildNeighborsList {
+		neighbors <- at_distance(FinalDestinationManager, neighborsDistance);
+		if(length(neighbors) = 0){
+			write "Error : not enough neighbor";
+		}
 	}
 }

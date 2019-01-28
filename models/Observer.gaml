@@ -193,23 +193,44 @@ global {
 		// Update the average costs
 		int i <- 0;
 		float sum <- 0;
+		// First we update the costs for each FC
 		ask FinalDestinationManager {
 			if(length(localTransportationCosts) > 0){
 				int j <- 0;
-				float localSum <- 0;
+				float localCostsSum <- 0;
+				float localVolumeSum <- 0.0;
 
-				loop while: 50 < length(localTransportationCosts) {
+				loop while: costsMemory < length(localTransportationCosts) {
+					// both arrays have the same size
 					remove index: 0 from: localTransportationCosts;
+					remove index: 0 from: transportedVolumes;
 				}
 
 				loop while: j<length(localTransportationCosts) {
-					localSum <- localSum + localTransportationCosts[j];
+					// again, both arrays have the same size
+					localCostsSum <- localCostsSum + localTransportationCosts[j];
+					localVolumeSum <- localVolumeSum + transportedVolumes[j];
 					j <- j + 1;
 				}
-				localAverageCosts <- localWarehousingCosts + localSum / length(localTransportationCosts);
+				localAverageCosts <- localWarehousingCosts + localCostsSum / length(localTransportationCosts);
+				localVolumeNormalizedAverageCosts <- localAverageCosts / localVolumeSum;
 				sum <- sum + localAverageCosts;
 				i <- i + 1;
 			}
+		}
+		// Then we compute the average costs of the neighbors of each FC
+		ask FinalDestinationManager {
+			averageCostsOfNeighbors <- 0.0;
+			if(length(neighbors) = 0) {
+				do buildNeighborsList;
+			}
+			int j <- 0;
+			loop while: j<length(neighbors) {
+				// again, both arrays have the same size
+				averageCostsOfNeighbors <- averageCostsOfNeighbors + neighbors[j].localVolumeNormalizedAverageCosts;
+				j <- j + 1;
+			}
+			averageCostsOfNeighbors <- averageCostsOfNeighbors / length(neighbors);
 		}
 		if(i > 0){
 			averageCosts <- (sum/i);
