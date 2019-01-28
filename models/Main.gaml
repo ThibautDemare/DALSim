@@ -184,15 +184,15 @@ global {
 		/**/
 
 		// Final destinations
-		create FinalDestinationManager from: destination_shapefile with: [huffValue::float(read("huff")), surface::float(read("surface"))];
+		create FinalConsignee from: destination_shapefile with: [huffValue::float(read("huff")), surface::float(read("surface"))];
 		/* 
 		 * The following code can be commented or not, depending if the user want to execute the simulation with every FDM 
 		 * It is mainly used for tests to avoid CPU overload.
 		 */
 		int i <- 50;
-		list<FinalDestinationManager> lfdm <- shuffle(FinalDestinationManager);
+		list<FinalConsignee> lfdm <- shuffle(FinalConsignee);
 		loop while: i < length(lfdm) {
-			FinalDestinationManager s <- lfdm[i];
+			FinalConsignee s <- lfdm[i];
 			remove index: i from: lfdm;
 			ask s {
 				do die;
@@ -215,7 +215,7 @@ global {
 
 		// We initialyse stocks and associate the buildings  to their FDM
 		list<Building> buildingOfFDM <- [];
-		ask FinalDestinationManager sort_by (-1*each.surface){
+		ask FinalConsignee sort_by (-1*each.surface){
 			do second_init;
 			buildingOfFDM <+ self.building;
 		}
@@ -249,7 +249,7 @@ global {
 			ask ((Building as list) + (Warehouse as list) + (MaritimeTerminal as list) + (RiverTerminal as list) + (MaritimeRiverTerminal as list)) inside self {
 				myself.buildings <+ self;
 			}
-			ask ((FinalDestinationManager as list)) inside self {
+			ask ((FinalConsignee as list)) inside self {
 				myself.fcs <+ self;
 			}
 		}

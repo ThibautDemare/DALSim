@@ -12,7 +12,7 @@ global {
 	/**
 	 * Return a small warehouse according to the position of the final destination : the more the warehouse is close to the final destination, the more he has a chance to be selected.
 	 */
-	Warehouse findWarehouseLvl1Strat1(FinalDestinationManager fdm, int sizeOfStock, list<Warehouse> lvl2Warehouses){
+	Warehouse findWarehouseLvl1Strat1(FinalConsignee fdm, int sizeOfStock, list<Warehouse> lvl2Warehouses){
 		list<Warehouse> lw <- copy(Warehouse) sort_by (fdm distance_to each);
 
 		// Remove the ones which cannot welcome the stocks of the customer because they are already a warehouse of level 2
@@ -40,7 +40,7 @@ global {
 	/**
 	 * Return a large warehouse : the more the warehouse has a big free surface, the more he has a chance to be selected.
 	 */
-	Warehouse findWarehouseLvl2Strat1(FinalDestinationManager fdm, int sizeOfStock, list<Warehouse> lvl1Warehouses){
+	Warehouse findWarehouseLvl2Strat1(FinalConsignee fdm, int sizeOfStock, list<Warehouse> lvl1Warehouses){
 		list<Warehouse> lw <- copy(Warehouse) sort_by (each.totalSurface-each.occupiedSurface);
 
 		// Remove the ones which cannot welcome the stocks of the customer because they are already a warehouse of level 1
@@ -79,7 +79,7 @@ global {
 	 * On sélectionne les 10/20/50/100 (paramétre à définir) plus proches
 	 * on choisit celui qui a la plus grande valeur d'accessibilité
 	 */
-	Warehouse findWarehouseLvl1Strat2(FinalDestinationManager fdm, int sizeOfStock, list<Warehouse> lvl1Warehouses, list<Warehouse> lvl2Warehouses){
+	Warehouse findWarehouseLvl1Strat2(FinalConsignee fdm, int sizeOfStock, list<Warehouse> lvl1Warehouses, list<Warehouse> lvl2Warehouses){
 		// We inform GAMA that each warehouse must be consider connected to the network in order to compute the Shimbel index
 		bool success <- connect_to(list(Warehouse), road_network, "length", "speed", 70°m/°s);
 		if(first(Warehouse).accessibility < 0){
@@ -158,7 +158,7 @@ global {
 	 * On sélectionne les 10/20/50/100 (paramétre à définir) ayant la plus grande valeur d'accessibilité (ou plutot les plus grand?)
 	 * On choisit le plus proche?/le plus large/celui ayant la plus grande valeur d'accessibilité? => à tester
 	 */
-	Warehouse findWarehouseLvl2Strat2(FinalDestinationManager fdm, int sizeOfStock, list<Warehouse> lvl1Warehouses, list<Warehouse> lvl2Warehouses){
+	Warehouse findWarehouseLvl2Strat2(FinalConsignee fdm, int sizeOfStock, list<Warehouse> lvl1Warehouses, list<Warehouse> lvl2Warehouses){
 		// We inform GAMA that each warehouse must be consider connected to the network in order to compute the Shimbel index
 		bool success <- connect_to(list(Warehouse), road_network, "length", "speed", 70°m/°s);
 		if(first(Warehouse).accessibility < 0){
@@ -245,7 +245,7 @@ global {
 	 * On supprime ceux qui n'ont pas la capacité d'entreposer la marchandise
 	 * On sélectionne le plus proche
 	 */
-	Warehouse findWarehouseLvl1Strat3(FinalDestinationManager fdm, int sizeOfStock, list<Warehouse> lvl2Warehouses){
+	Warehouse findWarehouseLvl1Strat3(FinalConsignee fdm, int sizeOfStock, list<Warehouse> lvl2Warehouses){
 		list<Warehouse> lw <- copy(list(Warehouse));
 		
 		// Remove the ones that cannot welcome the stocks of the customer
@@ -281,7 +281,7 @@ global {
 	 * On supprime ceux qui n'ont pas la capacité d'entreposer la marchandise
 	 * On choisit le plus large
 	 */
-	Warehouse findWarehouseLvl2Strat3(FinalDestinationManager fdm, int sizeOfStock, list<Warehouse> lvl1Warehouses){
+	Warehouse findWarehouseLvl2Strat3(FinalConsignee fdm, int sizeOfStock, list<Warehouse> lvl1Warehouses){
 		list<Warehouse> lw <- copy(list(Warehouse));
 		
 		// Remove the ones which cannot welcome the stocks of the customer because they are already a warehouse of level 1
@@ -318,18 +318,18 @@ global {
 	/**
 	 * Select randomly a warehouse
 	 */
-	Warehouse findWarehouseLvl1Strat4(FinalDestinationManager fdm, int sizeOfStock, list<Warehouse> lvl2Warehouses){
+	Warehouse findWarehouseLvl1Strat4(FinalConsignee fdm, int sizeOfStock, list<Warehouse> lvl2Warehouses){
 		return pureRandom(fdm, sizeOfStock, lvl2Warehouses);
 	}
 
 	/**
 	 * Select randomly a warehouse
 	 */
-	Warehouse findWarehouseLvl2Strat4(FinalDestinationManager fdm, int sizeOfStock, list<Warehouse> lvl1Warehouses){
+	Warehouse findWarehouseLvl2Strat4(FinalConsignee fdm, int sizeOfStock, list<Warehouse> lvl1Warehouses){
 		return pureRandom(fdm, sizeOfStock, lvl1Warehouses);
 	}
 
-	Warehouse pureRandom(FinalDestinationManager fdm, int sizeOfStock, list<Warehouse> otherLvlWarehouses){
+	Warehouse pureRandom(FinalConsignee fdm, int sizeOfStock, list<Warehouse> otherLvlWarehouses){
 		list<Warehouse> lw <- copy(list(Warehouse));
 
 		// Remove the ones that cannot welcome the stocks of the customer

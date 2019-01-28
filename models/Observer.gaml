@@ -1,6 +1,6 @@
 model Observer
 
-import "FinalDestinationManager.gaml"
+import "FinalConsignee.gaml"
 
 global {
 	string date_simu_starts <- nil;
@@ -51,7 +51,7 @@ global {
 		freeSurfaceInFinalDest <- 0.0;
 		numberofEmptyStockInFinalDests <- 0;
 		float totalNumberOfStock <- 0.0;
-		ask FinalDestinationManager {
+		ask FinalConsignee {
 			float tempStock <- 0.0;
 			float nbStockShortages <- 0.0;
 			ask self.building.stocks {
@@ -94,7 +94,7 @@ global {
 	 */
 	reflex updateAverageLPEfficiency {
 		float currentNbStockShortages <- 0;
-		ask FinalDestinationManager {
+		ask FinalConsignee {
 			int i <- 0;
 			self.localAverageNbStockShortagesLastSteps <- 0;
 			loop while: i < length(localNbStockShortagesLastSteps) {
@@ -104,7 +104,7 @@ global {
 			self.localAverageNbStockShortagesLastSteps <- self.localAverageNbStockShortagesLastSteps / length(localNbStockShortagesLastSteps);
 			currentNbStockShortages <- currentNbStockShortages + self.localAverageNbStockShortagesLastSteps;
 		}
-		currentNbStockShortages <- currentNbStockShortages / length(FinalDestinationManager);
+		currentNbStockShortages <- currentNbStockShortages / length(FinalConsignee);
 		averagesNbStockShortages <- averagesNbStockShortages + 0.0;
 		if(length(averagesNbStockShortages) > nbStepsConsideredForLPEfficiency){
 			remove index: 0 from: averagesNbStockShortages;
@@ -166,7 +166,7 @@ global {
 		// Update the average time to be delivered (at the FDMs level)
 		i <- 0;
 		sum <- 0;
-		ask FinalDestinationManager {
+		ask FinalConsignee {
 			int j <- 0;
 			int localSum <- 0;
 
@@ -194,7 +194,7 @@ global {
 		int i <- 0;
 		float sum <- 0;
 		// First we update the costs for each FC
-		ask FinalDestinationManager {
+		ask FinalConsignee {
 			if(length(localTransportationCosts) > 0){
 				int j <- 0;
 				float localCostsSum <- 0;
@@ -219,7 +219,7 @@ global {
 			}
 		}
 		// Then we compute the average costs of the neighbors of each FC
-		ask FinalDestinationManager {
+		ask FinalConsignee {
 			averageCostsOfNeighbors <- 0.0;
 			if(length(neighbors) = 0) {
 				do buildNeighborsList;
@@ -424,7 +424,7 @@ global {
 		nbLPStrat4HighThreshold <- 0;
 
 		float inter <- (maxlocalThreshold - minlocalThreshold)/4.0;
-		ask FinalDestinationManager {
+		ask FinalConsignee {
 			if(logisticsServiceProvider.adoptedSelectingWarehouseStrategy = 1){
 				nbLPStrat1 <- nbLPStrat1 + 1;
 				if(logisticsServiceProvider.threshold < (minlocalThreshold + inter)){

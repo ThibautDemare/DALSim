@@ -1,9 +1,9 @@
-model FinalDestinationManager
+model FinalConsignee
 
 import "Building.gaml"
 import "Observer.gaml"
 
-species FinalDestinationManager {
+species FinalConsignee { // Used to be called FinalDestinationManager with associated genereric varaibles mostly called fdm
 	// Basic characteristics
 	float surface;
 	int decreasingRateOfStocks;
@@ -30,7 +30,7 @@ species FinalDestinationManager {
 	list<float> transportedVolumes <- [];
 	float localVolumeNormalizedAverageCosts <- 0.0;
 	float averageCostsOfNeighbors <- 0.0;
-	list<FinalDestinationManager> neighbors <- [];
+	list<FinalConsignee> neighbors <- [];
 
 	init {
 
@@ -327,7 +327,7 @@ species FinalDestinationManager {
 	}
 
 	action buildNeighborsList {
-		neighbors <- at_distance(FinalDestinationManager, neighborsDistance);
+		neighbors <- at_distance(FinalConsignee, neighborsDistance);
 		if(length(neighbors) = 0){
 			write "Error : not enough neighbor";
 		}

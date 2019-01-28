@@ -6,7 +6,7 @@ import "Building.gaml"
 species RegionObserver {
 	string name;
 	list<Building> buildings <- [];
-	list<FinalDestinationManager> fcs <- [];
+	list<FinalConsignee> fcs <- [];
 
 	// Share by number of vehicle
 	float sumRoadVehicleRO <- 0.0;

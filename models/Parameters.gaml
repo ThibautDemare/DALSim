@@ -1,6 +1,6 @@
 model Parameters
 
-import "FinalDestinationManager.gaml"
+import "FinalConsignee.gaml"
 import "Warehouse.gaml" 
 import "LogisticsServiceProvider.gaml"
 
@@ -9,20 +9,20 @@ global {
 	date starting_date <- date([2018,6,5,11,0,0]);// 5 Juin 2018 11h00
 
 	// Selecting Warehouse Strategies
-	bool isLocalSelectingWarehouseStrategies <- true;
+	bool isLocalSelectingWarehouseStrategies <- false;
 	int globalSelectingWarehouseStrategies <- 1;
 	list<int> possibleSelectingWarehouseStrategies <- [1, 2, 3, 4]; //[1];//[1, 4];// [1, 2, 3, 4] // 1 : biased random selection - 2 : accessibility - 3 : closest/largest - 4 : pure random selection
 	int numberWarehouseSelected <- 10;
 
 	// Cost path strategies
-	bool isLocalCostPathStrategy <- true;
+	bool isLocalCostPathStrategy <- false;
 	list<string> possibleCostPathStrategies <- ['financial_costs','travel_time'];
 	string globalCostPathStrategy <- 'financial_costs';
 	int costsMemory <- 50; // size of the arrays used to compute costs of LSP by FC (=> equal to the number of deliveries made)
 	int neighborsDistance <- 10°km;
 
 	// Parameters relative to the threshold used by LSPs to decide when to restock
-	bool localThreshold <- true;
+	bool localThreshold <- false;
 	float minlocalThreshold <- 0.05;
 	float maxlocalThreshold <- 0.2;
 	float globalThreshold <- 0.15;
@@ -75,11 +75,11 @@ global {
 	float valForMinHuff <- 6.0;
 	float valForMaxHuff <- 2.0;
 	action init_decreasingRateOfStocks {
-		list<FinalDestinationManager> dests <- FinalDestinationManager sort_by each.huffValue;
+		list<FinalConsignee> dests <- FinalConsignee sort_by each.huffValue;
 		int i <- 0;
 		int ld <- length(dests);
 		loop while: i < ld {
-			FinalDestinationManager fdm <- dests[i];
+			FinalConsignee fdm <- dests[i];
 			fdm.decreasingRateOfStocks <- round(((valForMaxHuff-valForMinHuff) / (length(dests)-1)) * (i) + valForMinHuff);
 			i <- i + 1;
 		}

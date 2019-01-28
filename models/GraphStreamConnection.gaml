@@ -131,7 +131,7 @@ global {
 					gs_add_edge gs_sender_id:"neighborhood_all" gs_edge_id:(myself.name + self.name) gs_node_id_from:myself.name gs_node_id_to:self.name gs_is_directed:false;
 				}		
 			}
-			ask (FinalDestinationManager at_distance(neighborhood_dist)) {
+			ask (FinalConsignee at_distance(neighborhood_dist)) {
 				if(self != myself){
 					gs_add_edge gs_sender_id:"neighborhood_all" gs_edge_id:(myself.name + self.name) gs_node_id_from:myself.name gs_node_id_to:self.name gs_is_directed:false;
 				}		
@@ -143,14 +143,14 @@ global {
 			}
 		}
 		
-		ask FinalDestinationManager {
+		ask FinalConsignee {
 			ask LogisticsServiceProvider at_distance(neighborhood_dist) {
 				if(self != myself){
 					gs_add_edge gs_sender_id:"neighborhood_all" gs_edge_id:(myself.name + self.name) gs_node_id_from:myself.name gs_node_id_to:self.name gs_is_directed:false;
 				}		
 			}
 			
-			ask (FinalDestinationManager at_distance(neighborhood_dist)) {
+			ask (FinalConsignee at_distance(neighborhood_dist)) {
 				if(self != myself){
 					gs_add_edge gs_sender_id:"neighborhood_all" gs_edge_id:(myself.name + self.name) gs_node_id_from:myself.name gs_node_id_to:self.name gs_is_directed:false;
 				}		
@@ -181,8 +181,8 @@ global {
 	}
 	
 	action init_neighborhood_final_destination {
-		ask FinalDestinationManager {
-			ask FinalDestinationManager at_distance(neighborhood_dist) {
+		ask FinalConsignee {
+			ask FinalConsignee at_distance(neighborhood_dist) {
 				if(self != myself){
 					gs_add_edge gs_sender_id:"neighborhood_final_destination" gs_edge_id:(myself.name + self.name) gs_node_id_from:myself.name gs_node_id_to:self.name gs_is_directed:false;
 				}		
@@ -211,14 +211,14 @@ global {
 					gs_add_edge gs_sender_id:"neighborhood_warehouse_final" gs_edge_id:(myself.name + self.name) gs_node_id_from:myself.name gs_node_id_to:self.name gs_is_directed:false;
 				}
 			}
-			ask (FinalDestinationManager at_distance(neighborhood_dist)) {
+			ask (FinalConsignee at_distance(neighborhood_dist)) {
 				if(self != myself){
 					gs_add_edge gs_sender_id:"neighborhood_warehouse_final" gs_edge_id:(myself.name + self.name) gs_node_id_from:myself.name gs_node_id_to:self.name gs_is_directed:false;
 				}		
 			}
 		}
-		ask FinalDestinationManager {
-			ask (FinalDestinationManager at_distance(neighborhood_dist)) {
+		ask FinalConsignee {
+			ask (FinalConsignee at_distance(neighborhood_dist)) {
 				if(self != myself){
 					gs_add_edge gs_sender_id:"neighborhood_warehouse_final" gs_edge_id:(myself.name + self.name) gs_node_id_from:myself.name gs_node_id_to:self.name gs_is_directed:false;
 				}		
@@ -229,8 +229,8 @@ global {
 	}
 	
 	action init_neighborhood_logistic_final {
-		ask FinalDestinationManager {
-			ask (FinalDestinationManager at_distance(neighborhood_dist)) {
+		ask FinalConsignee {
+			ask (FinalConsignee at_distance(neighborhood_dist)) {
 				if(self != myself){
 					gs_add_edge gs_sender_id:"neighborhood_logistic_final" gs_edge_id:(myself.name + self.name) gs_node_id_from:myself.name gs_node_id_to:self.name gs_is_directed:false;
 				}

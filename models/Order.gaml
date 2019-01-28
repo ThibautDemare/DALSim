@@ -8,7 +8,7 @@ species Order schedules: [] {
 	Building building; // which building has made the order
 	LogisticsServiceProvider logisticsServiceProvider; // the LSP who manages the ordered goods
 	int position;// The position in the supply chain
-	FinalDestinationManager fdm; // The FDM who posseses these goods
+	FinalConsignee fdm; // The FDM who posseses these goods
 	Stock reference; // a reference to the stock which suffer of stock shortage
 	int stepOrderMade; // when does the order has been made
 	string strategy;

@@ -12,7 +12,7 @@ species LogisticsServiceProvider {
 	list<int> timeToDeliver <- [];
 	list<Warehouse> lvl1Warehouses <- []; // close warehouse
 	list<Warehouse> lvl2Warehouses <- []; // large warehouse
-	list<FinalDestinationManager> customers <- [];
+	list<FinalConsignee> customers <- [];
 	Provider provider;
 	float cumulateCosts <- 0;
 	float averageCosts <- 0;
@@ -178,9 +178,9 @@ species LogisticsServiceProvider {
 	 */
 
 	/**
-	 * When a logistic provider loose a customer (a FinalDestinationManager) he must update the stock on its warehouses
+	 * When a logistic provider loose a customer (a FinalConsignee) he must update the stock on its warehouses
 	 */
-	TransferredStocks lostCustomer(FinalDestinationManager fdm){
+	TransferredStocks lostCustomer(FinalConsignee fdm){
 		int k <- 0;
 		bool notfound <- true;
 		loop while: k < length(customers) and notfound {
@@ -286,7 +286,7 @@ species LogisticsServiceProvider {
 	/*
 	 * A recursive method which browse the supply chain and delete the useless supply chain elements from the leafs to the root
 	 */
-	list<SupplyChainElement> deleteUselessSCE(SupplyChainElement sce, FinalDestinationManager fdm, list<Warehouse> uselessWarehouses){
+	list<SupplyChainElement> deleteUselessSCE(SupplyChainElement sce, FinalConsignee fdm, list<Warehouse> uselessWarehouses){
 		int i <- 0;
 		list<SupplyChainElement> uselessSCE <- [];
 		loop while: i < length(sce.sons) {
@@ -336,7 +336,7 @@ species LogisticsServiceProvider {
 		}
 	}
 
-	SupplyChainElement connectCustomer(FinalDestinationManager fdm) {
+	SupplyChainElement connectCustomer(FinalConsignee fdm) {
 		create SupplyChainElement number:1 returns:fdmLeaf {
 			self.building <- fdm.building;
 			self.sons <- [];
@@ -352,7 +352,7 @@ species LogisticsServiceProvider {
 		return fdmLeaf[0];
 	}
 
-	SupplyChainElement connectLvl1Warehouse(FinalDestinationManager fdm, SupplyChainElement fdmLeaf, list<Stock> stocksLvl1) {
+	SupplyChainElement connectLvl1Warehouse(FinalConsignee fdm, SupplyChainElement fdmLeaf, list<Stock> stocksLvl1) {
 		// First we find an appropriate local warehouse
 		Warehouse closeWarehouse <- findWarehouseLvl1(fdm, sizeOfStockLocalWarehouse);
 		do initStock(closeWarehouse, fdm, stocksLvl1, sizeOfStockLocalWarehouse);
@@ -416,7 +416,7 @@ species LogisticsServiceProvider {
 		return sceCloseWarehouse;
 	}
 
-	action connectLvl2Warehouse(FinalDestinationManager fdm, SupplyChainElement sceCloseWarehouse, list<Stock> stocksLvl2){
+	action connectLvl2Warehouse(FinalConsignee fdm, SupplyChainElement sceCloseWarehouse, list<Stock> stocksLvl2){
 		// We try to find a father who has an appropriate surface
 		SupplyChainElement sceLarge <- nil;
 		bool found <- false;
@@ -509,7 +509,7 @@ species LogisticsServiceProvider {
 	/**
 	 * When a logistic provider has a new customer, he needs to find a new supply chain. This method build it.
 	 */
-	action getNewCustomer(FinalDestinationManager fdm, list<Stock> stocksLvl1, list<Stock> stocksLvl2){
+	action getNewCustomer(FinalConsignee fdm, list<Stock> stocksLvl1, list<Stock> stocksLvl2){
 
 		/*
 		 * Initiate the supply chain with just the provider as root
@@ -539,7 +539,7 @@ species LogisticsServiceProvider {
 	/**
 	 * We assume that the warehouse have already a stock when we initialize a new supply chain
 	 */
-	action initStock(Warehouse warehouse, FinalDestinationManager f, list<Stock> stocks, int sizeOfStock){
+	action initStock(Warehouse warehouse, FinalConsignee f, list<Stock> stocks, int sizeOfStock){
 		if(stocks = nil or length(stocks) = 0){
 			loop stockFdm over: (f.building as Building).stocks {
 				// We create the stock agent
@@ -575,7 +575,7 @@ species LogisticsServiceProvider {
 	/**
 	 * Return a warehouse of first level in the supply chain
 	 */
-	Warehouse findWarehouseLvl1(FinalDestinationManager fdm, int sizeOfStock){
+	Warehouse findWarehouseLvl1(FinalConsignee fdm, int sizeOfStock){
 		Warehouse w <- nil;
 		if(adoptedSelectingWarehouseStrategy = 1){
 			w <- world.findWarehouseLvl1Strat1(fdm, sizeOfStock, lvl2Warehouses);
@@ -595,7 +595,7 @@ species LogisticsServiceProvider {
 	/**
 	 * Return a warehouse of third level in the supply chain
 	 */
-	Warehouse findWarehouseLvl2(FinalDestinationManager fdm, int sizeOfStock){
+	Warehouse findWarehouseLvl2(FinalConsignee fdm, int sizeOfStock){
 		Warehouse w <- nil;
 		if(adoptedSelectingWarehouseStrategy = 1){
 			w <- world.findWarehouseLvl2Strat1(fdm, sizeOfStock, lvl1Warehouses);

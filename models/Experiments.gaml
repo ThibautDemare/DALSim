@@ -87,7 +87,7 @@ experiment 'Every output' type: gui {
 			species MaritimeLine aspect: geom;
 			species RiverLine aspect: geom;
 			species Warehouse aspect: base;
-			species FinalDestinationManager aspect: base;
+			species FinalConsignee aspect: base;
 			species Provider aspect: base;
 			species LogisticsServiceProvider aspect: simple_base;
 			species Vehicle aspect: base;
@@ -99,7 +99,7 @@ experiment 'Every output' type: gui {
 			species MaritimeLine aspect: lightGeom;
 			species RiverLine aspect: lightGeom;
 			species Warehouse aspect: base;
-			species FinalDestinationManager aspect: base;
+			species FinalConsignee aspect: base;
 			species Provider aspect: base;
 		}
 
@@ -108,7 +108,7 @@ experiment 'Every output' type: gui {
 			species Road aspect: lightGeom;
 			species MaritimeLine aspect: lightGeom;
 			species RiverLine aspect: lightGeom;
-			species FinalDestinationManager aspect: aspectPortChoice;
+			species FinalConsignee aspect: aspectPortChoice;
 			species Provider aspect: base;
 		}
 
@@ -126,7 +126,7 @@ experiment 'Every output' type: gui {
 			species MaritimeLine aspect: lightGeom;
 			species RiverLine aspect: lightGeom;
 			species Warehouse aspect: base_condition;
-			species FinalDestinationManager aspect: base;
+			species FinalConsignee aspect: base;
 			species Provider aspect: base;
 			grid cell_stock_shortage;
 			species Vehicle aspect: base;
