@@ -252,6 +252,9 @@ global {
 			ask ((FinalConsignee as list)) inside self {
 				myself.fcs <+ self;
 			}
+			ask ((MaritimeRiverTerminal as list) + ((MaritimeRiverTerminal as list) as list) + (MaritimeTerminal as list)) inside self {
+				myself.terminals <+ self;
+			}
 		}
 		// We associate a provider to each LSPs according to the distance and the attractiveness
 //		LHAttractiveness <- 1.0;
