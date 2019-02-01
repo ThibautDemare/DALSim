@@ -32,6 +32,28 @@ species Building {
 	list<float> nbRiverQuantitiesLastSteps <- [0.0];
 	list<float> nbMaritimeQuantitiesLastSteps <- [0.0];
 
+	action removeVehicleFromList(Vehicle vehicle, string networkType) {
+		list<Vehicle> leavingVehicles;
+		if(networkType = "road"){
+			leavingVehicles <- leavingVehicles_road;
+		}
+		else if(networkType = "river"){
+			leavingVehicles <- leavingVehicles_river;
+		}
+		else {
+			leavingVehicles <- leavingVehicles_maritime;
+		}
+		int i <- 0;
+		bool notfound <- true;
+		loop while: i < length(leavingVehicles) and notfound {
+			if(leavingVehicles[i] = vehicle){
+				remove index: i from: leavingVehicles;
+				notfound <- false;
+			}
+			i <- i + 1;
+		}
+	}
+
 	reflex manageRoadComingCommodities {
 		int i <- 0;
 		loop while:i<length(comingCommodities) {
