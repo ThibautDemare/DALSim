@@ -14,6 +14,7 @@ species Vehicle skills:[MovingOnNetwork] {
 	Building source; // where the vehicle comes from
 	list<Commodity> scheduledCommodities; // marchandises qui devraient être transportées
 	list<Commodity> transportedCommodities; // commodities really transported
+	float scheduledTransportedVolume <- 0;
 	float currentTransportedVolume; // quantité de marchandise actuellement transportees
 	bool readyToMove <- false;
 	string networkType;

@@ -400,20 +400,19 @@ global {
 				sumLeavingMaritimeVehicleRO <- sumLeavingMaritimeVehicleRO + length(t.leavingVehicles_maritime);
 
 				ask t.leavingVehicles_maritime {
-					myself.sumLeavingQuantitiesRO <- myself.sumLeavingQuantitiesRO + self.currentTransportedVolume;
-					myself.sumLeavingMaritimeQuantitiesRO <- myself.sumLeavingMaritimeQuantitiesRO + self.currentTransportedVolume;
+					myself.sumLeavingQuantitiesRO <- myself.sumLeavingQuantitiesRO + self.scheduledTransportedVolume;
+					myself.sumLeavingMaritimeQuantitiesRO <- myself.sumLeavingMaritimeQuantitiesRO + self.scheduledTransportedVolume;
 				}
 
 				ask t.leavingVehicles_road {
-					myself.sumLeavingQuantitiesRO <- myself.sumLeavingQuantitiesRO + self.currentTransportedVolume;
-					myself.sumLeavingRoadQuantitiesRO <- myself.sumLeavingRoadQuantitiesRO + self.currentTransportedVolume;
+					myself.sumLeavingQuantitiesRO <- myself.sumLeavingQuantitiesRO + self.scheduledTransportedVolume;
+					myself.sumLeavingRoadQuantitiesRO <- myself.sumLeavingRoadQuantitiesRO + self.scheduledTransportedVolume;
 				}
 
 				ask t.leavingVehicles_river {
-					myself.sumLeavingQuantitiesRO <- myself.sumLeavingQuantitiesRO + self.currentTransportedVolume;
-					myself.sumLeavingRiverQuantitiesRO <- myself.sumLeavingRiverQuantitiesRO + self.currentTransportedVolume;
+					myself.sumLeavingQuantitiesRO <- myself.sumLeavingQuantitiesRO + self.scheduledTransportedVolume;
+					myself.sumLeavingRiverQuantitiesRO <- myself.sumLeavingRiverQuantitiesRO + self.scheduledTransportedVolume;
 				}
-
 				j <- j + 1;
 			}
 
