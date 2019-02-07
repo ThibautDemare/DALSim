@@ -52,9 +52,8 @@ species RiverTerminal parent:Terminal{
 			else{
 				i <- i + 1;
 			}
-		} 
+		}
 	}
-
 }
 
 species MaritimeRiverTerminal parent:Terminal {
