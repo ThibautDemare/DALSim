@@ -762,7 +762,7 @@ global {
 				save "" + ((time/3600.0) as int) + ";" + sr.sumLeavingRoadVehicleRO + ";" +  sr.sumLeavingRiverVehicleRO + ";" +  sr.sumLeavingMaritimeVehicleRO
 					to: CSVFolderPath + date_simu_starts + "_share_leaving_vehicles_per_transport_mode_" + n + params  + ".csv" type: text rewrite: false;
 				save "" + ((time/3600.0) as int) + ";" + sr.sumLeavingRoadQuantitiesRO + ";" +  sr.sumLeavingRiverQuantitiesRO + ";" +  sr.sumLeavingMaritimeQuantitiesRO
-					to: CSVFolderPath + date_simu_starts + "_share_leaving_quantities_pet_transport_mode_" + n + params  + ".csv" type: text rewrite: false;
+					to: CSVFolderPath + date_simu_starts + "_share_leaving_quantities_per_transport_mode_" + n + params  + ".csv" type: text rewrite: false;
 				notfound <- false;
 			}
 			i <- i + 1;
