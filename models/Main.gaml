@@ -73,6 +73,8 @@ global {
 	// Data come from :
 	// Atlas de Belgique - divisions communes (consulted the 06/21/2018) -> http://www.atlas-belgique.be/cms2/index.php?page=cartodata_fr
 	file antwerp_shapefile <- file(pathBD+"Regions/antwerpen_limits.shp");
+	// And Le Havre limits
+	file lh_shapefile <- file(pathBD+"Regions/lh_limits.shp");
 
 	//Define the border of the environnement according to the road network
 	geometry shape <- envelope(roads_shapefile);
@@ -105,6 +107,7 @@ global {
 		// Region observers
 		create RegionObserver from: regions_shapefile with: [name::read("nom") as string];
 		create RegionObserver from: antwerp_shapefile with: [name::read("Name") as string];
+		create RegionObserver from: lh_shapefile with: [name::read("nom") as string];
 
 		// Providers
 		create Provider from: provider_shapefile with: [port::read("Port") as string];

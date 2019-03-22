@@ -721,6 +721,7 @@ global {
 		do saveShareTransportModeRegion(params, "Ile-de-France");
 		do saveShareTransportModeRegion(params, "Picardie");
 		do saveShareTransportModeRegion(params, "Antwerpen");
+		do saveShareTransportModeRegion(params, "Le Havre");
 
 		do saveSharePortOriginRegion(params, "Basse-Normandie");
 		do saveSharePortOriginRegion(params, "Haute-Normandie");
@@ -728,6 +729,7 @@ global {
 		do saveSharePortOriginRegion(params, "Ile-de-France");
 		do saveSharePortOriginRegion(params, "Picardie");
 		do saveSharePortOriginRegion(params, "Antwerpen");
+		do saveSharePortOriginRegion(params, "Le Havre");
 
 		do saveDistribution(params, distributionNbFCPerLSPY);
 

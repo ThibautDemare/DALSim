@@ -334,6 +334,27 @@ experiment 'Every output' type: gui {
 			}
 		}/**/
 
+		display 'Share of mode of transport (number of vehicles) - Region Le Havre' refresh:every(1) {
+			chart  "Share of mode of transport (number of vehicles) - Region Le Havre" type: series {
+				RegionObserver sr <- nil;
+				ask RegionObserver {
+					if(self.name = "Le Havre"){
+						sr <- self;
+					}
+				}
+				if(sr!=nil){
+					data "Share of road" value: sr.shareRoadVehicleRO * 100.0 color: divergingCol5 ;
+					data "Share of river" value: sr.shareRiverVehicleRO * 100.0 color: divergingCol6 ;
+					data "Share of maritime" value: sr.shareMaritimeVehicleRO * 100.0 color: divergingCol7 ;
+				}
+				else { // At step 0, RegionObserver are not initialized, so, sr = nil
+					data "Share of road" value: 0 color: divergingCol5 ;
+					data "Share of river" value: 0 color: divergingCol6 ;
+					data "Share of maritime" value: 0 color: divergingCol7 ;
+				}
+			}
+		}/**/
+
 		display 'Share of mode of transport (quantities of goods)' refresh:every(1) {
 			chart  "Share of mode of transport (quantities of goods)" type: series {
 				data "Share of road" value: shareRoadQuantities * 100 color: divergingCol5 ;
@@ -468,6 +489,27 @@ experiment 'Every output' type: gui {
 			}
 		}/**/
 
+		display 'Share of mode of transport (quantities of goods) - Region Le Havre' refresh:every(1) {
+			chart  "Share of mode of transport - Region Le Havre" type: series {
+				RegionObserver sr <- nil;
+				ask RegionObserver {
+					if(self.name = "Le Havre"){
+						sr <- self;
+					}
+				}
+				if(sr!=nil){
+					data "Share of road" value: sr.shareRoadQuantitiesRO * 100.0 color: divergingCol5 ;
+					data "Share of river" value: sr.shareRiverQuantitiesRO * 100.0 color: divergingCol6 ;
+					data "Share of maritime" value: sr.shareMaritimeQuantitiesRO * 100.0 color: divergingCol7 ;
+				}
+				else { // At step 0, RegionObserver are not initialized, so, sr = nil
+					data "Share of road" value: 0 color: divergingCol5 ;
+					data "Share of river" value: 0 color: divergingCol6 ;
+					data "Share of maritime" value: 0 color: divergingCol7 ;
+				}
+			}
+		}/**/
+
 		display 'Share of port origin - Region Basse-Normandie' refresh:every(1) {
 			chart  "Share of port origin - Region Basse-Normandie" type: series {
 				RegionObserver sr <- nil;
@@ -568,6 +610,25 @@ experiment 'Every output' type: gui {
 				RegionObserver sr <- nil;
 				ask RegionObserver {
 					if(self.name = "Antwerpen"){
+						sr <- self;
+					}
+				}
+				if(sr!=nil){
+					data "Number of FC choosing Antwerp" value: sr.nbAntwerp color: divergingCol2 ;
+					data "Number of FC choosing Le Havre" value: sr.nbHavre color: divergingCol4 ;
+				}
+				else { // At step 0, RegionObserver are not initialized, so, sr = nil
+					data "Number of FC choosing Antwerp" value: 0 color: divergingCol2 ;
+					data "Number of FC choosing Le Havre" value: 0 color: divergingCol4 ;
+				}
+			}
+		}/**/
+
+		display 'Share of port origin - Region Le Havre' refresh:every(1) {
+			chart  "Share of port origin - Region Le Havre" type: series {
+				RegionObserver sr <- nil;
+				ask RegionObserver {
+					if(self.name = "Le Havre"){
 						sr <- self;
 					}
 				}
@@ -801,6 +862,27 @@ experiment 'Every output' type: gui {
 			}
 		}/**/
 
+		display 'Share of vehicles leaving terminals per mode of transport - Region Le Havre' refresh:every(1) {
+			chart  "Share of vehicles leaving terminals per mode of transport - Region Le Havre" type: series {
+				RegionObserver sr <- nil;
+				ask RegionObserver {
+					if(self.name = "Le Havre"){
+						sr <- self;
+					}
+				}
+				if(sr!=nil){
+					data "Share of road" value: sr.shareLeavingRoadVehicleRO * 100.0 color: divergingCol5 ;
+					data "Share of river" value: sr.shareLeavingRiverVehicleRO * 100.0 color: divergingCol6 ;
+					data "Share of maritime" value: sr.shareLeavingMaritimeVehicleRO * 100.0 color: divergingCol7 ;
+				}
+				else { // At step 0, RegionObserver are not initialized, so, sr = nil
+					data "Share of road" value: 0 color: divergingCol5 ;
+					data "Share of river" value: 0 color: divergingCol6 ;
+					data "Share of maritime" value: 0 color: divergingCol7 ;
+				}
+			}
+		}/**/
+
 		display 'Share of volume leaving terminals per mode of transport - Region Basse-Normandie' refresh:every(1) {
 			chart  "Share of volume leaving terminals per mode of transport - Region Basse-Normandie" type: series {
 				RegionObserver sr <- nil;
@@ -918,6 +1000,69 @@ experiment 'Every output' type: gui {
 					data "Share of road" value: sr.shareLeavingRoadQuantitiesRO * 100.0 color: divergingCol5 ;
 					data "Share of river" value: sr.shareLeavingRiverQuantitiesRO * 100.0 color: divergingCol6 ;
 					data "Share of maritime" value: sr.shareLeavingMaritimeQuantitiesRO * 100.0 color: divergingCol7 ;
+				}
+				else { // At step 0, RegionObserver are not initialized, so, sr = nil
+					data "Share of road" value: 0 color: divergingCol5 ;
+					data "Share of river" value: 0 color: divergingCol6 ;
+					data "Share of maritime" value: 0 color: divergingCol7 ;
+				}
+			}
+		}/**/
+
+		display 'Share of volume leaving terminals per mode of transport - Region Le Havre' refresh:every(1) {
+			chart  "Share of volume leaving terminals per mode of transport - Region Le Havre" type: series {
+				RegionObserver sr <- nil;
+				ask RegionObserver {
+					if(self.name = "Le Havre"){
+						sr <- self;
+					}
+				}
+				if(sr!=nil){
+					data "Share of road" value: sr.shareLeavingRoadQuantitiesRO * 100.0 color: divergingCol5 ;
+					data "Share of river" value: sr.shareLeavingRiverQuantitiesRO * 100.0 color: divergingCol6 ;
+					data "Share of maritime" value: sr.shareLeavingMaritimeQuantitiesRO * 100.0 color: divergingCol7 ;
+				}
+				else { // At step 0, RegionObserver are not initialized, so, sr = nil
+					data "Share of road" value: 0 color: divergingCol5 ;
+					data "Share of river" value: 0 color: divergingCol6 ;
+					data "Share of maritime" value: 0 color: divergingCol7 ;
+				}
+			}
+		}/**/
+
+		display 'Share of volume leaving terminals per mode of transport - Region Antwerp' refresh:every(1) {
+			chart  "Volume leaving terminals per mode of transport - Region Antwerp" type: series {
+				RegionObserver sr <- nil;
+				ask RegionObserver {
+					if(self.name = "Antwerpen"){
+						sr <- self;
+					}
+				}
+				if(sr!=nil){
+					data "Volume on road" value: sr.sumLeavingRoadQuantitiesRO color: divergingCol5 ;
+					data "Volume on river" value: sr.sumLeavingRiverQuantitiesRO color: divergingCol6 ;
+					data "Volume on maritime" value: sr.sumLeavingMaritimeQuantitiesRO color: divergingCol7 ;
+				}
+				else { // At step 0, RegionObserver are not initialized, so, sr = nil
+					data "Share of road" value: 0 color: divergingCol5 ;
+					data "Share of river" value: 0 color: divergingCol6 ;
+					data "Share of maritime" value: 0 color: divergingCol7 ;
+				}
+			}
+		}/**/
+
+		display 'Share of volume leaving terminals per mode of transport - Region le Havre' refresh:every(1) {
+			chart  "Volume leaving terminals per mode of transport - Region Le Havre" type: series {
+				RegionObserver sr <- nil;
+				ask RegionObserver {
+					if(self.name = "Le Havre"){
+						sr <- self;
+					}
+				}
+				if(sr!=nil){
+					data "Volume on road" value: sr.sumLeavingRoadQuantitiesRO color: divergingCol5 ;
+					data "Volume on river" value: sr.sumLeavingRiverQuantitiesRO color: divergingCol6 ;
+					data "Volume on maritime" value: sr.sumLeavingMaritimeQuantitiesRO color: divergingCol7 ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
 					data "Share of road" value: 0 color: divergingCol5 ;
