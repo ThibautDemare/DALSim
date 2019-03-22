@@ -138,10 +138,10 @@ global {
 		}
 	}
 
-	reflex update_average_time_to_deliver {
+	reflex updateAverageTimeToDeliver {
 		// Update the average time to deliver (at the LPs level)
 		int i <- 0;
-		int sum <- 0;
+		float sum <- 0;
 		ask LogisticsServiceProvider {
 			if(length(customers) > 0){
 				int j <- 0;
@@ -162,10 +162,12 @@ global {
 		if(i > 0){
 			averageTimeToDeliver <- (sum/i);
 		}
+	}
 
+	reflex updateAverageTimeToBeDelivered {
 		// Update the average time to be delivered (at the FDMs level)
-		i <- 0;
-		sum <- 0;
+		int i <- 0;
+		float sum <- 0;
 		ask FinalConsignee {
 			int j <- 0;
 			int localSum <- 0;
