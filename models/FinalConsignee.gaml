@@ -11,7 +11,7 @@ species FinalConsignee { // Used to be called FinalDestinationManager with assoc
 	Building building;
 
 	// Relative to contract with LSP
-	LogisticsServiceProvider logisticsServiceProvider;
+	LogisticsServiceProvider logisticsServiceProvider <- nil;
 	int timeShifting <- rnd(23);
 	int numberOfHoursOfContract <- rnd(minimalNumberOfHoursOfContract - 100);
 
@@ -84,7 +84,7 @@ species FinalConsignee { // Used to be called FinalDestinationManager with assoc
 		//do buildOneStock;
 		//do buildFourStock;
 		do buildTwoToSixStock;
-		logisticsServiceProvider <- chooseLogisticProvider();
+		logisticsServiceProvider <- chooseLogisticProvider(nil);
 		ask logisticsServiceProvider {
 			do getNewCustomer(myself, nil, nil);
 		}
@@ -125,7 +125,7 @@ species FinalConsignee { // Used to be called FinalDestinationManager with assoc
 				}
 
 				// Choose a new one
-				logisticsServiceProvider <- chooseLogisticProvider();
+				logisticsServiceProvider <- chooseLogisticProvider(logisticsServiceProvider);
 				// Inform him that he gets a new customer
 				ask logisticsServiceProvider {
 					do getNewCustomer(myself, stocksRemoved.stocksLvl1, stocksRemoved.stocksLvl2);
@@ -178,28 +178,14 @@ species FinalConsignee { // Used to be called FinalDestinationManager with assoc
 	/**
 	 * The more the logistic provider is close, the more he has a chance to be selected.
 	 */
-	LogisticsServiceProvider chooseLogisticProvider {
+	LogisticsServiceProvider chooseLogisticProvider(LogisticsServiceProvider currentLp) {
 		list<LogisticsServiceProvider> llp <- LogisticsServiceProvider sort_by (self distance_to each);
-//		int i <- 0;
-//		bool notfound <- true;
-//		loop while: notfound {
-//			if(flip(0.5) and llp[i] != logisticProvider){
-//				notfound <- false;
-//			}
-//			else {
-//				i <- i + 1;
-//				if(i >= length(llp)){
-//					i <- length(llp)-1;
-//					notfound <- false;
-//				}
-//			}
-//		}
-//		return llp[i];
-
-		int f <- ((rnd(10000)/10000)^4)*(length(llp)-1);
-		return llp[f];
-
-//		return one_of(LogisticProvider);
+		LogisticsServiceProvider lp <- logisticsServiceProvider;
+		loop while: lp = currentLp {
+			int f <- ((rnd(10000)/10000)^4)*(length(llp)-1);
+			lp <- llp[f];
+		}
+		return lp;
 	}
 
 	action manageLostStock(AwaitingStock aws) {
