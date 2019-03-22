@@ -27,11 +27,13 @@ global {
 	float maxlocalThreshold <- 0.2;
 	float globalThreshold <- 0.15;
 
-	// Parameters relative to the ability of the final consignee to switch of LSP
+	// Parameters relative to contracts between final consignees and LSP
+	bool allowLSPSwitch <- true;
+	int minimalNumberOfHoursOfContract <- 336; // number of steps for two weeks // The minimal number of days a final consignee must wait before he can decide if he wants to change of LSP
 	bool isLocalLSPSwitcStrat <- false;
 	list<int> possibleLSPSwitcStrats <- [1, 2, 3]; // 1 : NbStockShortages - 2 : TimeToBeDelivered - 3 : Costs
 	int globalLSPSwitchStrat <- 3;
-	bool allowLSPSwitch <- true;
+	int nbStepsConsideredForLPEfficiency <- 96; // 4 days // The number of steps considered to compute the logistic provider efficiency
 
 	// Attractiveness parameters
 	float LHAttractiveness;
@@ -48,11 +50,7 @@ global {
 	/*
 	 * Some variables and functions to call some reflex
 	 */
-	 
-	// The minimal number of days a final destination manager must wait before he can decide if he wants to change of logistic provider
-	int minimalNumberOfHoursOfContract <- 336; // number of steps for two weeks
-	// The number of steps considered to compute the logistic provider efficiency
-	int nbStepsConsideredForLPEfficiency <- 96; // 4 days
+
 	// The numbers of steps between each calls to the reflex "decreasingStocks"
 	int nbStepsbetweenDS <- 24;
 	// The numbers of steps between each calls to the reflex "testRestockNeeded"
