@@ -17,7 +17,7 @@ global {
 	// Cost path strategies
 	bool isLocalCostPathStrategy <- false;
 	list<string> possibleCostPathStrategies <- ['financial_costs','travel_time'];
-	string globalCostPathStrategy <- 'financial_costs';
+	string globalCostPathStrategy <- 'financial_costs';//'travel_time';//
 	int costsMemory <- 50; // size of the arrays used to compute costs of LSP by FC (=> equal to the number of deliveries made)
 	int neighborsDistance <- 10°km;
 
