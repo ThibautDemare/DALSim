@@ -34,6 +34,7 @@ global {
 	list<int> possibleLSPSwitcStrats <- [1, 2, 3]; // 1 : NbStockShortages - 2 : TimeToBeDelivered - 3 : Costs
 	int globalLSPSwitchStrat <- 3;
 	int nbStepsConsideredForLPEfficiency <- 96; // 4 days // The number of steps considered to compute the logistic provider efficiency
+	int nbDeliveriesConsideredForTimeToDelivered <- 50;
 
 	// Attractiveness parameters
 	float LHAttractiveness;

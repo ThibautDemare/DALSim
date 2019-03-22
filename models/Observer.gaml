@@ -146,7 +146,7 @@ global {
 			if(length(customers) > 0){
 				int j <- 0;
 
-				loop while: 50 < length(timeToDeliver) {
+				loop while: nbDeliveriesConsideredForTimeToDelivered < length(timeToDeliver) {
 					remove index: 0 from: timeToDeliver;
 				}
 
@@ -172,7 +172,7 @@ global {
 			int j <- 0;
 			int localSum <- 0;
 
-			loop while: 50 < length(localTimeToBeDeliveredLastDeliveries) {
+			loop while: nbDeliveriesConsideredForTimeToDelivered < length(localTimeToBeDeliveredLastDeliveries) {
 				remove index: 0 from: localTimeToBeDeliveredLastDeliveries;
 			}
 
