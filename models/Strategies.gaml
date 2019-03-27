@@ -73,7 +73,7 @@ global {
 	}
 
 	/*
-	 * Strategy 2 : more or less smart strategy : select the closest/largest according to the accessibility of the warehouse
+	 * Strategy 2 : select the closest/largest according to the accessibility of the warehouse
 	 */
 	 
 	/**
