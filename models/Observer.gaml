@@ -214,7 +214,9 @@ global {
 					localVolumeSum <- localVolumeSum + transportedVolumes[j];
 					j <- j + 1;
 				}
-				localAverageCosts <- localWarehousingCosts + localCostsSum / length(localTransportationCosts);
+				localAverageCosts <-
+					// localWarehousingCosts + // If this should be used, we first need to justify how warehousing costs are computed. For now, have higher costs for larger surface is not necessarily realistic.
+					localCostsSum / length(localTransportationCosts);
 				localVolumeNormalizedAverageCosts <- localAverageCosts / localVolumeSum;
 				sum <- sum + localAverageCosts;
 				i <- i + 1;
