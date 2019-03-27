@@ -28,13 +28,13 @@ global {
 
 		lw <- lw sort_by (fdm distance_to each);
 
-		int f <- ((rnd(10000)/10000)^32)*(length(lw)-1);
+		int f <- ((rnd(10000)/10000)^6)*(length(lw)-1);
 		// I assume that there is always at least one warehouse which has a free space greater than the occupied surface of the stock to outsource.
 		// According to results, it doesn't seem foolish.
 		loop while:
 				( (lw[f] as Building).totalSurface - (lw[f] as Building).occupiedSurface) <= 0 or
 				( (lw[f] as Building).totalSurface - (lw[f] as Building).occupiedSurface - (fdm.building as Building).occupiedSurface * sizeOfStock)	< 0 {
-			f <- ((rnd(10000)/10000)^32)*(length(lw)-1);
+			f <- ((rnd(10000)/10000)^6)*(length(lw)-1);
 		}
 		return lw[f];/**/
 	}
