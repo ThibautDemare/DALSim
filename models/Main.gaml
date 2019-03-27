@@ -111,9 +111,6 @@ global {
 
 		// Providers
 		create Provider from: provider_shapefile with: [port::read("Port") as string];
-		
-		// Warehouses
-		create Warehouse from: warehouse_shapefile returns: lw with: [totalSurface::read("surface") as float];
 
 		// Transporters
 		create RoadTransporter number:1;
