@@ -13,7 +13,7 @@ global {
 	 * Return a small warehouse according to the position of the final destination : the more the warehouse is close to the final destination, the more he has a chance to be selected.
 	 */
 	Warehouse findWarehouseLvl1Strat1(FinalConsignee fdm, int sizeOfStock, list<Warehouse> lvl2Warehouses){
-		list<Warehouse> lw <- copy(Warehouse) sort_by (fdm distance_to each);
+		list<Warehouse> lw <- copy(Warehouse);
 
 		// Remove the ones which cannot welcome the stocks of the customer because they are already a warehouse of level 2
 		int i <- 0;
@@ -25,6 +25,8 @@ global {
 				i <- i + 1;
 			}
 		}
+
+		lw <- lw sort_by (fdm distance_to each);
 
 		int f <- ((rnd(10000)/10000)^32)*(length(lw)-1);
 		// I assume that there is always at least one warehouse which has a free space greater than the occupied surface of the stock to outsource.
@@ -41,7 +43,7 @@ global {
 	 * Return a large warehouse : the more the warehouse has a big free surface, the more he has a chance to be selected.
 	 */
 	Warehouse findWarehouseLvl2Strat1(FinalConsignee fdm, int sizeOfStock, list<Warehouse> lvl1Warehouses){
-		list<Warehouse> lw <- copy(Warehouse) sort_by (each.totalSurface-each.occupiedSurface);
+		list<Warehouse> lw <- copy(Warehouse);
 
 		// Remove the ones which cannot welcome the stocks of the customer because they are already a warehouse of level 1
 		int i <- 0;
@@ -53,6 +55,8 @@ global {
 				i <- i + 1;
 			}
 		}
+
+		lw <- lw sort_by (each.totalSurface-each.occupiedSurface);
 
 		int f <- ((rnd(10000)/10000)^6)*(length(lw)-1);
 		// I assume that there is always at least one warehouse which has a free space greater than the occupied surface of the stock to outsource.
@@ -192,6 +196,7 @@ global {
 		}
 
 		// Delete the smallest ones
+		lw <- lw sort_by (each.totalSurface - each.occupiedSurface);
 		i <- 0;
 		loop while: i < length(lw) {
 			if( length(lw) - i < numberWarehouseSelected) {
