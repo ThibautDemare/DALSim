@@ -7,4 +7,6 @@ species AwaitingStock schedules:[] {
 	int stepOrderMade;
 	int position;
 	Building building;
+	date incomingDate;
+	string networkType;
 }

@@ -33,6 +33,14 @@ species MaritimeTerminal parent:Terminal{
 			}
 		} 
 	}
+
+	float getHandlingTimeFrom(string nt){
+		if(nt = "road"){
+			return handling_time_from_road;
+		}
+		// else : nt = "maritime"
+		return handling_time_from_maritime;
+	}
 }
 
 species RiverTerminal parent:Terminal{
@@ -53,6 +61,14 @@ species RiverTerminal parent:Terminal{
 				i <- i + 1;
 			}
 		}
+	}
+
+	float getHandlingTimeFrom(string nt){
+		if(nt = "road"){
+			return handling_time_from_road;
+		}
+		// else : nt = "river"
+		return handling_time_from_river;
 	}
 }
 
@@ -91,5 +107,16 @@ species MaritimeRiverTerminal parent:Terminal {
 				i <- i + 1;
 			}
 		} 
+	}
+
+	float getHandlingTimeFrom(string nt){
+		if(nt = "road"){
+			return handling_time_from_road;
+		}
+		if(nt = "maritime"){
+			return handling_time_from_maritime;
+		}
+		// else : nt = "river"
+		return handling_time_from_river;
 	}
 }

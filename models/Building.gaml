@@ -9,7 +9,6 @@ species Building {
 	float occupiedSurface;
 	float outflow <- 0.0;// This data is sended to Graphstream for the supplying network
 	bool outflow_updated <- false;
-	int maxProcessEnteringGoodsCapacity <- 5;
 	int timeShifting <- rnd(23);
 
 	list<Vehicle> leavingVehicles_road <- []; // Liste des véhicules au départ pour le mode routier
@@ -69,16 +68,16 @@ species Building {
 		} 
 	}
 
-	action receiveCommodity(Commodity c, string networkType){
-		if(networkType = "road"){
+	action receiveCommodity(Commodity c, string nt){
+		if(nt = "road"){
 			nbRoadVehiclesLastSteps[length(nbRoadVehiclesLastSteps)-1] <- nbRoadVehiclesLastSteps[length(nbRoadVehiclesLastSteps)-1] + 1.0;
 			nbRoadQuantitiesLastSteps[length(nbRoadQuantitiesLastSteps)-1] <- nbRoadQuantitiesLastSteps[length(nbRoadQuantitiesLastSteps)-1] + c.volume;
 		}
-		if(networkType = "river"){
+		if(nt = "river"){
 			nbRiverVehiclesLastSteps[length(nbRiverVehiclesLastSteps)-1] <- nbRiverVehiclesLastSteps[length(nbRiverVehiclesLastSteps)-1] + 1.0;
 			nbRiverQuantitiesLastSteps[length(nbRiverQuantitiesLastSteps)-1] <- nbRiverQuantitiesLastSteps[length(nbRiverQuantitiesLastSteps)-1] + c.volume;
 		}
-		if(networkType = "maritime"){
+		if(nt = "maritime"){
 			nbMaritimeVehiclesLastSteps[length(nbMaritimeVehiclesLastSteps)-1] <- nbMaritimeVehiclesLastSteps[length(nbMaritimeVehiclesLastSteps)-1] + 1.0;
 			nbMaritimeQuantitiesLastSteps[length(nbMaritimeQuantitiesLastSteps)-1] <- nbMaritimeQuantitiesLastSteps[length(nbMaritimeQuantitiesLastSteps)-1] + c.volume;
 		}
@@ -88,6 +87,8 @@ species Building {
 				self.stock <- c.stock;
 				self.location <- myself.location;
 				self.building <- myself;
+				self.networkType <- nt;
+				self.incomingDate <- c.incomingDate;
 			}
 			entering_stocks <- entering_stocks + ast[0];
 			ask c {
@@ -99,10 +100,23 @@ species Building {
 		}
 	}
 
+	float getHandlingTimeFrom(string nt){
+		return handling_time_from_road;
+	}
+
 	reflex processEnteringGoods when: length(entering_stocks) > 0 {
-		int i <- 0;
-		loop while: i < maxProcessEnteringGoodsCapacity and length(entering_stocks) > 0 {
-			AwaitingStock entering_stock <- entering_stocks[0];
+		list<AwaitingStock> toBeIncluded <- [];
+		int k <- 0;
+		loop while: k < length(entering_stocks) {
+			float handling_time <- getHandlingTimeFrom(entering_stocks[k].networkType);
+			if(entering_stocks[k].incomingDate + handling_time°h >= current_date){
+				toBeIncluded <- toBeIncluded + entering_stocks[k];
+			}
+			k <- k + 1;
+		}
+
+		loop while:length(toBeIncluded) > 0 {
+			AwaitingStock entering_stock <- toBeIncluded[0];
 			int j <- 0;
 			bool notfound <- true;
 			loop while: j < length(stocks) and notfound {
@@ -122,8 +136,7 @@ species Building {
 				j <- j + 1;
 			}
 
-			i <- i + 1;
-			remove index:0 from: entering_stocks;
+			remove index:0 from: toBeIncluded;
 
 			if(notfound){
 				// this stock probably came after a changement of LP
