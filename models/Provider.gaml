@@ -51,11 +51,6 @@ species Provider parent: RestockingBuilding {
 		}
 	}
 
-	reflex receive_batch {
-		// override reflex from RestockingBuilding
-		// It is useless for providers since they are never restocked
-	}
-
 	/*
 	 * Receive a request from a logistic provider to restock another building
 	 */
