@@ -62,12 +62,7 @@ global {
 			j <- 0;
 			loop while: j < lw {
 				float dist;
-				ask forwardingAgent {
-					create Commodity number:1 returns:returnedAgent;
-					Commodity commodity <- returnedAgent[0];
-					commodity.volume <- 1;
-					dist <- Provider[i] distance_to LogisticsServiceProvider[j];
-				}
+				dist <- Provider[i] distance_to LogisticsServiceProvider[j];
 				p[i, j] <- (  (Provider[i] as Provider).attractiveness ) / (dist*dist) ;
 				sum[j, 0] <- sum[j, 0] + p[i, j];
 				j <- j + 1;
