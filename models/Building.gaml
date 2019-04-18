@@ -12,8 +12,11 @@ species Building {
 	int timeShifting <- rnd(23);
 
 	list<Vehicle> leavingVehicles_road <- []; // Liste des véhicules au départ pour le mode routier
+	date lastVehicleDeparture_road;
 	list<Vehicle> leavingVehicles_river <- []; // Liste des véhicules au départ pour le mode fluvial
+	date lastVehicleDeparture_river;
 	list<Vehicle> leavingVehicles_maritime <- []; // Liste des véhicules au départ pour le mode maritime
+	date lastVehicleDeparture_maritime;
 	list<Commodity> leavingCommodities <- [];
 	list<Commodity> comingCommodities <- [];
 
@@ -35,12 +38,21 @@ species Building {
 		list<Vehicle> leavingVehicles;
 		if(networkType = "road"){
 			leavingVehicles <- leavingVehicles_road;
+			if(lastVehicleDeparture_road < vehicle.departureDate){
+				lastVehicleDeparture_road <- vehicle.departureDate;
+			}
 		}
 		else if(networkType = "river"){
 			leavingVehicles <- leavingVehicles_river;
+			if(lastVehicleDeparture_river < vehicle.departureDate){
+				lastVehicleDeparture_river <- vehicle.departureDate;
+			}
 		}
 		else {
 			leavingVehicles <- leavingVehicles_maritime;
+			if(lastVehicleDeparture_maritime < vehicle.departureDate){
+				lastVehicleDeparture_maritime <- vehicle.departureDate;
+			}
 		}
 		int i <- 0;
 		bool notfound <- true;
