@@ -38,19 +38,19 @@ species Building {
 		list<Vehicle> leavingVehicles;
 		if(networkType = "road"){
 			leavingVehicles <- leavingVehicles_road;
-			if(lastVehicleDeparture_road < vehicle.departureDate){
+			if(lastVehicleDeparture_road != nil and lastVehicleDeparture_road < vehicle.departureDate){
 				lastVehicleDeparture_road <- vehicle.departureDate;
 			}
 		}
 		else if(networkType = "river"){
 			leavingVehicles <- leavingVehicles_river;
-			if(lastVehicleDeparture_river < vehicle.departureDate){
+			if(lastVehicleDeparture_river != nil and lastVehicleDeparture_river < vehicle.departureDate){
 				lastVehicleDeparture_river <- vehicle.departureDate;
 			}
 		}
 		else {
 			leavingVehicles <- leavingVehicles_maritime;
-			if(lastVehicleDeparture_maritime < vehicle.departureDate){
+			if(lastVehicleDeparture_maritime != nil and lastVehicleDeparture_maritime < vehicle.departureDate){
 				lastVehicleDeparture_maritime <- vehicle.departureDate;
 			}
 		}
