@@ -30,6 +30,7 @@ experiment 'No ouput' type: gui {
 experiment 'traffic' type: gui {
 	output {
 		display 'traffic' autosave: false refresh:every(1) {
+			species Country aspect: geom;
 			species Road aspect: geom;
 			species MaritimeLine aspect: geom;
 			species RiverLine aspect: geom;
@@ -48,6 +49,7 @@ experiment 'Scenario: block roads' type: gui {
 
 	output {
 		display display_warehouse autosave: true refresh:every(1) {
+			species Country aspect: geom;
 			species Road aspect: geom;
 			species MaritimeLine aspect: geom;
 			species RiverLine aspect: geom;
@@ -65,6 +67,7 @@ experiment 'Scenario: update attractiveness' type: gui {
 
 	output {
 		display display_lp autosave: true refresh:every(1) {
+			species Country aspect: geom;
 			species Road aspect: geom;
 			species MaritimeLine aspect: geom;
 			species RiverLine aspect: geom;
