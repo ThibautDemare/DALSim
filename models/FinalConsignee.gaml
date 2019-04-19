@@ -319,7 +319,7 @@ species FinalConsignee { // Used to be called FinalDestinationManager with assoc
 			i <- i + 1;
 		}
 		if(i > 2 ){
-			write "Error: not enough neighbors. i = "+i;
+			write "Warning: not enough neighbors. Multiply distance per "+i+" to find neighbor(s)";
 		}
 	}
 }
