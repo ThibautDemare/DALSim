@@ -123,8 +123,11 @@ species Building {
 			float handling_time <- getHandlingTimeFrom(entering_stocks[k].networkType);
 			if(entering_stocks[k].incomingDate + handling_time°h >= current_date){
 				toBeIncluded <- toBeIncluded + entering_stocks[k];
+				remove index:k from:entering_stocks;
 			}
-			k <- k + 1;
+			else {
+				k <- k + 1;
+			}
 		}
 
 		loop while:length(toBeIncluded) > 0 {
