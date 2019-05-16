@@ -23,6 +23,27 @@ experiment 'Docker' type: gui {
 	parameter "CSVFolderPath" var: CSVFolderPath <- "/CSV/";
 }
 
+experiment 'Docker with traffic screenshots' type: gui {
+	parameter "saver" var: saveObservations <- true;
+	parameter "pathBD" var: pathBD <- "/bd/Used/";
+	parameter "CSVFolderPath" var: CSVFolderPath <- "/CSV/";
+	output {
+		// The size of these two displays is due to the size of the calc I apply on the snapshots when I generate a video
+		display 'Road traffic' autosave:{1061,988} refresh:every(1) {
+			species Country aspect: geom;
+			species Road aspect: geom;
+		}
+		display 'Maritime and River traffic' autosave:{1061,988} refresh:every(1) {
+			species Country aspect: geom;
+			species MaritimeLine aspect: geom;
+			species RiverLine aspect: geom;
+			species MaritimeTerminal aspect:geom;
+			species RiverTerminal aspect:geom;
+			species MaritimeRiverTerminal aspect:geom;
+		}
+	}
+}
+
 experiment 'No ouput' type: gui {
 
 }
@@ -1033,7 +1054,7 @@ experiment 'Every output' type: gui {
 			}
 		}/**/
 
-		display 'Share of volume leaving terminals per mode of transport - Region Antwerp' refresh:every(1) {
+		display 'Volume leaving terminals per mode of transport - Region Antwerp' refresh:every(1) {
 			chart  "Volume leaving terminals per mode of transport - Region Antwerp" type: series {
 				RegionObserver sr <- nil;
 				ask RegionObserver {
@@ -1054,7 +1075,7 @@ experiment 'Every output' type: gui {
 			}
 		}/**/
 
-		display 'Share of volume leaving terminals per mode of transport - Region le Havre' refresh:every(1) {
+		display 'Volume leaving terminals per mode of transport - Region le Havre' refresh:every(1) {
 			chart  "Volume leaving terminals per mode of transport - Region Le Havre" type: series {
 				RegionObserver sr <- nil;
 				ask RegionObserver {
