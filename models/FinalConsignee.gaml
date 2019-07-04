@@ -34,14 +34,6 @@ species FinalConsignee { // Used to be called FinalDestinationManager with assoc
 
 	init {
 
-		// Associate a building to this manager
-		create Building number: 1 returns: buildings {
-			location <- myself.location;
-			totalSurface <- myself.surface;
-			occupiedSurface <- 0.0;
-			myself.building <- self;
-		}
-
 		if(isLocalLSPSwitcStrat){
 			stratMeasureLSPEfficiency <- one_of(possibleLSPSwitcStrats);
 		}
@@ -79,6 +71,16 @@ species FinalConsignee { // Used to be called FinalDestinationManager with assoc
 		}
 	}
 	
+	action createBuilding {
+		// Associate a building to this manager
+		create Building number: 1 returns: buildings {
+			location <- myself.location;
+			totalSurface <- myself.surface;
+			occupiedSurface <- 0.0;
+			myself.building <- self;
+		}
+	}
+
 	action second_init{
 		//do buildRandStock;
 		//do buildOneStock;

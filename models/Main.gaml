@@ -199,12 +199,16 @@ global {
 			}
 		}
 		/**/
+		ask FinalConsignee {
+			do createBuilding;
+		}
 
 		create Commodity number:1; // create an empty commodity here, because, otherwise, I don't have access to the list of commodities while the simulation is running, in GUI mode
 
 		// Init other parameters
 		do init_decreasingRateOfStocks;
 		do init_cost;
+
 	}
 	
 	/*
