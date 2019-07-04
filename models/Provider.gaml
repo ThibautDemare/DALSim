@@ -18,7 +18,7 @@ species Provider parent: RestockingBuilding {
 			cost <- 200;
 		}
 		else {
-			cost <- 400;
+			cost <- 200;//400
 		}
 		maxProcessOrdersCapacity <- 100;
 		if(use_gs){
