@@ -80,17 +80,26 @@ species Building {
 		} 
 	}
 
+	action welcomeVehicle(Vehicle v){
+		if(v.networkType = "road"){
+			nbRoadVehiclesLastSteps[length(nbRoadVehiclesLastSteps)-1] <- nbRoadVehiclesLastSteps[length(nbRoadVehiclesLastSteps)-1] + 1.0;
+		}
+		else if(v.networkType = "river"){
+			nbRiverVehiclesLastSteps[length(nbRiverVehiclesLastSteps)-1] <- nbRiverVehiclesLastSteps[length(nbRiverVehiclesLastSteps)-1] + 1.0;
+		}
+		else { // if(v.networkType = "maritime")
+			nbMaritimeVehiclesLastSteps[length(nbMaritimeVehiclesLastSteps)-1] <- nbMaritimeVehiclesLastSteps[length(nbMaritimeVehiclesLastSteps)-1] + 1.0;
+		}
+	}
+
 	action receiveCommodity(Commodity c, string nt){
 		if(nt = "road"){
-			nbRoadVehiclesLastSteps[length(nbRoadVehiclesLastSteps)-1] <- nbRoadVehiclesLastSteps[length(nbRoadVehiclesLastSteps)-1] + 1.0;
 			nbRoadQuantitiesLastSteps[length(nbRoadQuantitiesLastSteps)-1] <- nbRoadQuantitiesLastSteps[length(nbRoadQuantitiesLastSteps)-1] + c.volume;
 		}
 		else if(nt = "river"){
-			nbRiverVehiclesLastSteps[length(nbRiverVehiclesLastSteps)-1] <- nbRiverVehiclesLastSteps[length(nbRiverVehiclesLastSteps)-1] + 1.0;
 			nbRiverQuantitiesLastSteps[length(nbRiverQuantitiesLastSteps)-1] <- nbRiverQuantitiesLastSteps[length(nbRiverQuantitiesLastSteps)-1] + c.volume;
 		}
 		else { // if(nt = "maritime")
-			nbMaritimeVehiclesLastSteps[length(nbMaritimeVehiclesLastSteps)-1] <- nbMaritimeVehiclesLastSteps[length(nbMaritimeVehiclesLastSteps)-1] + 1.0;
 			nbMaritimeQuantitiesLastSteps[length(nbMaritimeQuantitiesLastSteps)-1] <- nbMaritimeQuantitiesLastSteps[length(nbMaritimeQuantitiesLastSteps)-1] + c.volume;
 		}
 		if(c.finalDestination = self){

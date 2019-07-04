@@ -45,6 +45,7 @@ species Vehicle skills:[MovingOnNetwork] {
 					scheduledCommodities[j].currentNetwork <- networkType;
 					currentTransportedVolume <- currentTransportedVolume + scheduledCommodities[j].volume;
 					remove index: j from: scheduledCommodities;
+					remove index: i from: source.leavingCommodities;
 					notfound <- false;
 				}
 				i <- i + 1;
@@ -67,6 +68,7 @@ species Vehicle skills:[MovingOnNetwork] {
 		if(location = destination.location){
 			int j <- 0;
 			loop while: j < length(transportedCommodities) {
+				
 				transportedCommodities[j].location <- location;
 				transportedCommodities[j].incomingDate <- current_date;
 				ask destination {
@@ -74,7 +76,9 @@ species Vehicle skills:[MovingOnNetwork] {
 				}
 				j <- j + 1;
 			}
-			
+			ask destination {
+				do welcomeVehicle(myself);
+			}
 			destination <- nil;
 			do die;
 		}
