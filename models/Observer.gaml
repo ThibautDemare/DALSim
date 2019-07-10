@@ -142,16 +142,16 @@ global {
 		// Update the average time to deliver (at the LPs level)
 		int i <- 0;
 		float sum <- 0;
-		ask LogisticsServiceProvider {
-			if(length(customers) > 0){
+		ask ((Building as list) + (Warehouse as list)) {
+			if(length(stocks) > 0){
 				int j <- 0;
 
-				loop while: nbDeliveriesConsideredForTimeToDelivered < length(timeToDeliver) {
-					remove index: 0 from: timeToDeliver;
+				loop while: nbDeliveriesConsideredForTimeToDelivered < length(localTimeToBeDeliveredLastDeliveries) {
+					remove index: 0 from: localTimeToBeDeliveredLastDeliveries;
 				}
 
-				loop while: j<length(timeToDeliver) {
-					sum <- sum + timeToDeliver[j];
+				loop while: j<length(localTimeToBeDeliveredLastDeliveries) {
+					sum <- sum + localTimeToBeDeliveredLastDeliveries[j];
 					j <- j + 1;
 					i <- i + 1;
 				}
@@ -168,22 +168,24 @@ global {
 		// Update the average time to be delivered (at the FDMs level)
 		int i <- 0;
 		float sum <- 0;
-		ask FinalConsignee {
-			int j <- 0;
-			int localSum <- 0;
+		ask ((Building as list)) {
+			if(length(stocks) > 0){
+				int j <- 0;
+				int localSum <- 0;
 
-			loop while: nbDeliveriesConsideredForTimeToDelivered < length(localTimeToBeDeliveredLastDeliveries) {
-				remove index: 0 from: localTimeToBeDeliveredLastDeliveries;
-			}
+				loop while: nbDeliveriesConsideredForTimeToDelivered < length(localTimeToBeDeliveredLastDeliveries) {
+					remove index: 0 from: localTimeToBeDeliveredLastDeliveries;
+				}
 
-			loop while: j<length(localTimeToBeDeliveredLastDeliveries) {
-				sum <- sum + localTimeToBeDeliveredLastDeliveries[j];
-				localSum <- localSum + localTimeToBeDeliveredLastDeliveries[j];
-				j <- j + 1;
-				i <- i + 1;
-			}
-			if( length(localTimeToBeDeliveredLastDeliveries) > 0){
-				localTimeToBeDelivered <- localSum / length(localTimeToBeDeliveredLastDeliveries);
+				loop while: j<length(localTimeToBeDeliveredLastDeliveries) {
+					sum <- sum + localTimeToBeDeliveredLastDeliveries[j];
+					localSum <- localSum + localTimeToBeDeliveredLastDeliveries[j];
+					j <- j + 1;
+					i <- i + 1;
+				}
+				if( length(localTimeToBeDeliveredLastDeliveries) > 0){
+					localTimeToBeDelivered <- localSum / length(localTimeToBeDeliveredLastDeliveries);
+				}
 			}
 		}
 		if(i > 0){

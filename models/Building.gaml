@@ -34,6 +34,11 @@ species Building {
 	list<float> nbRiverQuantitiesLastSteps <- [0.0];
 	list<float> nbMaritimeQuantitiesLastSteps <- [0.0];
 
+	// Measures of efficiency
+	// based on time to deliver some goods (originally in the FinalConsignee agent)
+	list<int> localTimeToBeDeliveredLastDeliveries <- []; // This variable is used to have an idea of the efficicency of the LP to deliver quickly the goods
+	float localTimeToBeDelivered <- 0.0;
+
 	action removeVehicleFromList(Vehicle vehicle, string networkType) {
 		list<Vehicle> leavingVehicles;
 		if(networkType = "road"){
@@ -152,9 +157,7 @@ species Building {
 					if(entering_stock.stepOrderMade >= 0){
 						// Update lists containing the time to deliver some goods in order to measure the efficiency of the actors
 						(entering_stock.stock.lp as LogisticsServiceProvider).timeToDeliver <- (entering_stock.stock.lp as LogisticsServiceProvider).timeToDeliver + ((int(time/3600)) - entering_stock.stepOrderMade);
-						if(stockBuilding.fdm.building = self){ // The average time to be delivered is only useful with the building of the FDM and not for every building of the supply chain
-							stockBuilding.fdm.localTimeToBeDeliveredLastDeliveries <- stockBuilding.fdm.localTimeToBeDeliveredLastDeliveries + ((int(time/3600)) - entering_stock.stepOrderMade);
-						}
+						localTimeToBeDeliveredLastDeliveries <- localTimeToBeDeliveredLastDeliveries + ((int(time/3600)) - entering_stock.stepOrderMade);
 					}
 				}
 				j <- j + 1;

@@ -21,8 +21,9 @@ species FinalConsignee { // Used to be called FinalDestinationManager with assoc
 	list<float> localNbStockShortagesLastSteps <- [];
 	float localAverageNbStockShortagesLastSteps <- 0.0;
 		// based on time to deliver some goods to the final consignee
-	list<int> localTimeToBeDeliveredLastDeliveries <- []; // This variable is used to have an idea of the efficicency of the LP to deliver quickly the goods
-	float localTimeToBeDelivered <- 0.0;
+		// These two following variables have moved in the Building agent
+//	list<int> localTimeToBeDeliveredLastDeliveries <- []; // This variable is used to have an idea of the efficicency of the LP to deliver quickly the goods
+//	float localTimeToBeDelivered <- 0.0;
 		// based on costs of deliveries and warehousing
 	list<float> localTransportationCosts <- [];
 	float localWarehousingCosts <- 0.0;
@@ -149,8 +150,8 @@ species FinalConsignee { // Used to be called FinalDestinationManager with assoc
 				numberOfHoursOfContract <- 0;
 				localNbStockShortagesLastSteps <- [];
 				localAverageNbStockShortagesLastSteps <- 0.0;
-				localTimeToBeDeliveredLastDeliveries <- [];
-				localTimeToBeDelivered <- 0.0;
+				building.localTimeToBeDeliveredLastDeliveries <- [];
+				building.localTimeToBeDelivered <- 0.0;
 				localTransportationCosts <- [];
 				localWarehousingCosts <- 0.0;
 				localAverageCosts <- 0.0;
@@ -165,7 +166,7 @@ species FinalConsignee { // Used to be called FinalDestinationManager with assoc
 			}
 		}
 		else if(stratMeasureLSPEfficiency = 2){
-			if(localTimeToBeDelivered > averageTimeToBeDelivered ){
+			if(building.localTimeToBeDelivered > averageTimeToBeDelivered ){
 				return true;
 			}
 		}

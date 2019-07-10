@@ -68,7 +68,6 @@ species Vehicle skills:[MovingOnNetwork] {
 		if(location = destination.location){
 			int j <- 0;
 			loop while: j < length(transportedCommodities) {
-				
 				transportedCommodities[j].location <- location;
 				transportedCommodities[j].incomingDate <- current_date;
 				ask destination {
