@@ -24,9 +24,11 @@ global {
 	// Each road has an attribute giving the speed in km/h
 	file roads_shapefile <- file(pathBD+"Roads/Road_Network_LH-A/Road_Network_LH-A_lambert93_filtered_attributes.shp");
 
-	// The maritime network
+	// The maritime network betweeen Providers and Le Havre and Antwerp
 	file maritime_shapefile <- file(pathBD+"Maritime/maritime_lambert93_filtered_attributes.shp");
-
+	// The maritime network between Normand ports
+	file secondary_maritime_shapefile <- file(pathBD+"Maritime/Reseau_maritime_manche_mer_du_nord.shp");
+	
 	// The river  network
 	// This Shapefile comes from the database made by the ETIS Project. However, we updated it according to this website :
 	// - http://maps.grade.de/index.htm
@@ -64,7 +66,8 @@ global {
 	file terminal_LH_shapefile <- file(pathBD+"Terminals/maritime_terminals_LH.shp");
 	file terminal_A_shapefile <- file(pathBD+"Terminals/maritime_terminals_A_lambert93.shp");
 	file river_terminals <- file(pathBD+"Terminals/river_terminals.shp");
-	
+	file normand_terminals <- file(pathBD+"Terminals/terminaux_normands_secondaires.shp");
+
 	// The french regions
 	// Data comes from :
 	// Contours des régions françaises sur OpenStreetMap (consulted the 30/11/2018) -> https://www.data.gouv.fr/fr/datasets/contours-des-regions-francaises-sur-openstreetmap/
@@ -97,6 +100,9 @@ global {
 			// Maritime
 		create MaritimeLine from: maritime_shapefile with: [speed::read("speed") as float, length::read("length") as float];
 		maritime_network <- as_edge_graph(MaritimeLine);
+			// Secondary Maritime
+		create SecondaryMaritimeLine from: secondary_maritime_shapefile with: [speed::read("speed") as float, length::read("length") as float];
+		secondary_network <- as_edge_graph(SecondaryMaritimeLine);
 			// River
 		create RiverLine from: river_shapefile with: [speed::read("speed") as float, length::read("length") as float, is_new::read("is_new") as int];
 		river_network <- as_edge_graph(RiverLine);
@@ -116,14 +122,17 @@ global {
 		create RoadTransporter number:1;
 		create RiverTransporter number:1;
 		create MaritimeTransporter number:1;
+		create SecondaryMaritimeTransporter number:1;
 		
 		// Terminals
 			// Terminals of LH (they are maritime and river terminals)
 		create MaritimeRiverTerminal from: terminal_LH_shapefile with: [handling_time_to_road::read("TO_ROAD") as float,
 			handling_time_to_river::read("TO_RIVER") as float,
+			handling_time_to_secondary::read("TO_MARITIM") as float,
 			handling_time_to_maritime::read("TO_MARITIM") as float,
 			handling_time_from_road::read("FROM_ROAD") as float,
 			handling_time_from_river::read("FROM_RIVER") as float,
+			handling_time_from_secondary::read("FROM_MARIT") as float,
 			handling_time_from_maritime::read("FROM_MARIT") as float
 		];
 			// Terminals inside  the Seine axis (they are river terminals)
@@ -140,7 +149,12 @@ global {
 			handling_time_from_river::read("FROM_RIVER") as float,
 			handling_time_from_maritime::read("FROM_MARIT") as float
 		];
-
+			// Terminals of Antwerp (they are maritime and river terminals if we have the Canal Seine Nord, otherwise, they are MaritimeTerminal agents)
+		create SecondaryTerminal from: normand_terminals with: [handling_time_to_road::read("TO_ROAD") as float,
+			handling_time_to_secondary::read("TO_MARITIM") as float,
+			handling_time_from_road::read("FROM_ROAD") as float,
+			handling_time_from_secondary::read("FROM_MARIT") as float
+		];
 		// Forwarding agent
 		create ForwardingAgent number:1 returns:fas;
 		forwardingAgent <- fas[0];
@@ -154,7 +168,7 @@ global {
 		 * The following code can be commented or not, depending if the user want to execute the simulation with every Warehouse 
 		 * It is mainly used for tests to avoid CPU overload.
 		 */
-		int i <- 100;
+		/*int i <- 100;
 		list<Warehouse> llsp <- shuffle(Warehouse);
 		loop while: i < length(llsp) {
 			Warehouse s <- llsp[i];
@@ -172,7 +186,7 @@ global {
 		 * The following code can be commented or not, depending if the user want to execute the simulation with every LSP 
 		 * It is mainly used for tests to avoid CPU overload.
 		 */
-		int i <- 50;
+		/*int i <- 50;
 		list<LogisticsServiceProvider> llsp <- shuffle(LogisticsServiceProvider);
 		loop while: i < length(llsp) {
 			LogisticsServiceProvider s <- llsp[i];
@@ -189,7 +203,7 @@ global {
 		 * The following code can be commented or not, depending if the user want to execute the simulation with every FDM 
 		 * It is mainly used for tests to avoid CPU overload.
 		 */
-		int i <- 50;
+		int i <- 500;
 		list<FinalConsignee> lfdm <- shuffle(FinalConsignee);
 		loop while: i < length(lfdm) {
 			FinalConsignee s <- lfdm[i];
@@ -232,9 +246,11 @@ global {
 		// We initialyse the networks but this time for the forwarding agent so he can compute multi-modal shortest paths
 		ask forwardingAgent {
 			do add_mode network:road_network mode:'road' nodes:
-				buildingOfFDM + (Warehouse as list) + (MaritimeTerminal as list) + (RiverTerminal as list) + (MaritimeRiverTerminal as list);
+				buildingOfFDM + (Warehouse as list) + (SecondaryTerminal as list) + (RiverTerminal as list) + (MaritimeRiverTerminal as list);
 			do add_mode network:maritime_network mode:'maritime' nodes:
-				(Provider as list) + (MaritimeTerminal as list) + (MaritimeRiverTerminal as list);
+				(Provider as list) + (MaritimeRiverTerminal as list);
+			do add_mode network:secondary_network mode:'secondary' nodes:
+				(SecondaryTerminal as list) + (MaritimeRiverTerminal as list);
 			do add_mode network:river_network mode:'river' nodes:
 				(RiverTerminal as list) + (MaritimeRiverTerminal as list);
 		}
@@ -250,13 +266,13 @@ global {
 		}
 
 		ask RegionObserver{
-			ask ((Building as list) + (Warehouse as list) + (MaritimeTerminal as list) + (RiverTerminal as list) + (MaritimeRiverTerminal as list)) inside self {
+			ask ((Building as list) + (Warehouse as list) + (SecondaryTerminal as list) + (RiverTerminal as list) + (MaritimeRiverTerminal as list)) inside self {
 				myself.buildings <+ self;
 			}
 			ask ((FinalConsignee as list)) inside self {
 				myself.fcs <+ self;
 			}
-			ask ((MaritimeRiverTerminal as list) + ((RiverTerminal as list) as list) + (MaritimeTerminal as list)) inside self {
+			ask ((MaritimeRiverTerminal as list) + ((RiverTerminal as list) as list) + (SecondaryTerminal as list)) inside self {
 				myself.terminals <+ self;
 			}
 		}

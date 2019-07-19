@@ -9,6 +9,6 @@ species Commodity {
 	date incomingDate;
 	string currentNetwork;
 	Stock stock;
-	int stepOrderMade;
+	date stepOrderMade;
 	float costs;
 }

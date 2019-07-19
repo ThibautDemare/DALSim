@@ -24,6 +24,7 @@ species Vehicle skills:[MovingOnNetwork] {
 		do add_network name:"maritime" network:maritime_network length_attribute:"length" speed_attribute:"speed";
 		do add_network name:"river" network:river_network length_attribute:"length" speed_attribute:"speed";
 		do add_network name:"road" network:road_network length_attribute:"length" speed_attribute:"speed";
+		do add_network name:"secondary" network:secondary_network length_attribute:"length" speed_attribute:"speed";
 	}
 	
 	reflex authorizeDeparture when: departureDate != nil and 

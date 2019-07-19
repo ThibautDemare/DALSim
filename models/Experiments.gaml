@@ -12,9 +12,10 @@ global {
 	rgb divergingCol3 <- rgb("#b2df8a"); // light green
 	rgb divergingCol4 <- rgb("#33a02c"); // green
 
-	rgb divergingCol5 <- rgb(95, 130, 10); // green
-	rgb divergingCol6 <- rgb(49, 130, 189); // blue
-	rgb divergingCol7 <- rgb(160, 55, 100); // purple
+	rgb divergingCol5 <- rgb("#D81B60");// pink //rgb(95, 130, 10); // green
+	rgb divergingCol6 <- rgb("#1E88E5");// blue //rgb(49, 130, 189); // blue
+	rgb divergingCol7 <- rgb("#FFC107");// yellow //rgb(160, 55, 100); // purple
+	rgb divergingCol8 <- rgb("#004D40");// green 
 }
 
 experiment 'Docker' type: gui {
@@ -37,7 +38,7 @@ experiment 'Docker with traffic screenshots' type: gui {
 			species Country aspect: geom;
 			species MaritimeLine aspect: geom;
 			species RiverLine aspect: geom;
-			species MaritimeTerminal aspect:geom;
+			species SecondaryTerminal aspect:geom;
 			species RiverTerminal aspect:geom;
 			species MaritimeRiverTerminal aspect:geom;
 		}
@@ -109,6 +110,7 @@ experiment 'Every output' type: gui {
 			species RegionObserver aspect: geom;
 			species Road aspect: geom;
 			species MaritimeLine aspect: geom;
+			species SecondaryMaritimeLine aspect: geom;
 			species RiverLine aspect: geom;
 			species Warehouse aspect: base;
 			species FinalConsignee aspect: base;
@@ -121,6 +123,7 @@ experiment 'Every output' type: gui {
 			species Country aspect: geom;
 			species Road aspect: lightGeom;
 			species MaritimeLine aspect: lightGeom;
+			species SecondaryMaritimeLine aspect: lightGeom;
 			species RiverLine aspect: lightGeom;
 			species Warehouse aspect: base;
 			species FinalConsignee aspect: base;
@@ -131,6 +134,7 @@ experiment 'Every output' type: gui {
 			species Country aspect: geom;
 			species Road aspect: lightGeom;
 			species MaritimeLine aspect: lightGeom;
+			species SecondaryMaritimeLine aspect: geom;
 			species RiverLine aspect: lightGeom;
 			species FinalConsignee aspect: aspectPortChoice;
 			species Provider aspect: base;
@@ -140,6 +144,7 @@ experiment 'Every output' type: gui {
 			species Country aspect: geom;
 			species Road aspect: lightGeom;
 			species MaritimeLine aspect: lightGeom;
+			species SecondaryMaritimeLine aspect: geom;
 			species RiverLine aspect: lightGeom;
 			species LogisticsServiceProvider aspect: base;
 		}/**/
@@ -149,6 +154,7 @@ experiment 'Every output' type: gui {
 			species Road aspect: lightGeom;
 			species MaritimeLine aspect: lightGeom;
 			species RiverLine aspect: lightGeom;
+			species SecondaryMaritimeLine aspect: geom;
 			species Warehouse aspect: base_condition;
 			species FinalConsignee aspect: base;
 			species Provider aspect: base;
@@ -160,6 +166,7 @@ experiment 'Every output' type: gui {
 			species Country aspect: geom;
 			species Road aspect: geom;
 			species MaritimeLine aspect: geom;
+			species SecondaryMaritimeLine aspect: geom;
 			species RiverLine aspect: geom;
 			event [mouse_down] action: block_one_road;
 		}
@@ -174,7 +181,8 @@ experiment 'Every output' type: gui {
 			species Country aspect: geom;
 			species MaritimeLine aspect: geom;
 			species RiverLine aspect: geom;
-			species MaritimeTerminal aspect:geom;
+			species SecondaryMaritimeLine aspect: geom;
+			species SecondaryTerminal aspect:geom;
 			species RiverTerminal aspect:geom;
 			species MaritimeRiverTerminal aspect:geom;
 			event [mouse_down] action: block_one_road;
@@ -229,6 +237,7 @@ experiment 'Every output' type: gui {
 				data "Share of road" value: shareRoadVehicle color: divergingCol5 ;
 				data "Share of river" value: shareRiverVehicle color: divergingCol6 ;
 				data "Share of maritime" value: shareMaritimeVehicle color: divergingCol7 ;
+				data "Share of secondary maritime" value: shareSecondaryVehicle color: divergingCol8 ;
 			}
 		}/**/
 
@@ -244,11 +253,13 @@ experiment 'Every output' type: gui {
 					data "Share of road" value: sr.shareRoadVehicleRO * 100.0 color: divergingCol5 ;
 					data "Share of river" value: sr.shareRiverVehicleRO * 100.0 color: divergingCol6 ;
 					data "Share of maritime" value: sr.shareMaritimeVehicleRO * 100.0 color: divergingCol7 ;
+					data "Share of secondary maritime" value: sr.shareSecondaryVehicleRO * 100.0 color: divergingCol8 ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
 					data "Share of road" value: 0 color: divergingCol5 ;
 					data "Share of river" value: 0 color: divergingCol6 ;
 					data "Share of maritime" value: 0 color: divergingCol7 ;
+					data "Share of secondary maritime" value: 0 color: divergingCol8 ;
 				}
 			}
 		}/**/
@@ -265,11 +276,13 @@ experiment 'Every output' type: gui {
 					data "Share of road" value: sr.shareRoadVehicleRO * 100.0 color: divergingCol5 ;
 					data "Share of river" value: sr.shareRiverVehicleRO * 100.0 color: divergingCol6 ;
 					data "Share of maritime" value: sr.shareMaritimeVehicleRO * 100.0 color: divergingCol7 ;
+					data "Share of secondary maritime" value: sr.shareSecondaryVehicleRO * 100.0 color: divergingCol8 ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
 					data "Share of road" value: 0 color: divergingCol5 ;
 					data "Share of river" value: 0 color: divergingCol6 ;
 					data "Share of maritime" value: 0 color: divergingCol7 ;
+					data "Share of secondary maritime" value: 0 color: divergingCol8 ;
 				}
 			}
 		}/**/
@@ -286,11 +299,13 @@ experiment 'Every output' type: gui {
 					data "Share of road" value: sr.shareRoadVehicleRO * 100.0 color: divergingCol5 ;
 					data "Share of river" value: sr.shareRiverVehicleRO * 100.0 color: divergingCol6 ;
 					data "Share of maritime" value: sr.shareMaritimeVehicleRO * 100.0 color: divergingCol7 ;
+					data "Share of secondary maritime" value: sr.shareSecondaryVehicleRO * 100.0 color: divergingCol8 ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
 					data "Share of road" value: 0 color: divergingCol5 ;
 					data "Share of river" value: 0 color: divergingCol6 ;
 					data "Share of maritime" value: 0 color: divergingCol7 ;
+					data "Share of secondary maritime" value: 0 color: divergingCol8 ;
 				}
 			}
 		}/**/
@@ -307,11 +322,13 @@ experiment 'Every output' type: gui {
 					data "Share of road" value: sr.shareRoadVehicleRO * 100.0 color: divergingCol5 ;
 					data "Share of river" value: sr.shareRiverVehicleRO * 100.0 color: divergingCol6 ;
 					data "Share of maritime" value: sr.shareMaritimeVehicleRO * 100.0 color: divergingCol7 ;
+					data "Share of secondary maritime" value: sr.shareSecondaryVehicleRO * 100.0 color: divergingCol8 ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
 					data "Share of road" value: 0 color: divergingCol5 ;
 					data "Share of river" value: 0 color: divergingCol6 ;
 					data "Share of maritime" value: 0 color: divergingCol7 ;
+					data "Share of secondary maritime" value: 0 color: divergingCol8 ;
 				}
 			}
 		}/**/
@@ -328,11 +345,13 @@ experiment 'Every output' type: gui {
 					data "Share of road" value: sr.shareRoadVehicleRO * 100.0 color: divergingCol5 ;
 					data "Share of river" value: sr.shareRiverVehicleRO * 100.0 color: divergingCol6 ;
 					data "Share of maritime" value: sr.shareMaritimeVehicleRO * 100.0 color: divergingCol7 ;
+					data "Share of secondary maritime" value: sr.shareSecondaryVehicleRO * 100.0 color: divergingCol8 ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
 					data "Share of road" value: 0 color: divergingCol5 ;
 					data "Share of river" value: 0 color: divergingCol6 ;
 					data "Share of maritime" value: 0 color: divergingCol7 ;
+					data "Share of secondary maritime" value: 0 color: divergingCol8 ;
 				}
 			}
 		}/**/
@@ -349,11 +368,13 @@ experiment 'Every output' type: gui {
 					data "Share of road" value: sr.shareRoadVehicleRO * 100.0 color: divergingCol5 ;
 					data "Share of river" value: sr.shareRiverVehicleRO * 100.0 color: divergingCol6 ;
 					data "Share of maritime" value: sr.shareMaritimeVehicleRO * 100.0 color: divergingCol7 ;
+					data "Share of secondary maritime" value: sr.shareSecondaryVehicleRO * 100.0 color: divergingCol8 ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
 					data "Share of road" value: 0 color: divergingCol5 ;
 					data "Share of river" value: 0 color: divergingCol6 ;
 					data "Share of maritime" value: 0 color: divergingCol7 ;
+					data "Share of secondary maritime" value: 0 color: divergingCol8 ;
 				}
 			}
 		}/**/
@@ -370,11 +391,13 @@ experiment 'Every output' type: gui {
 					data "Share of road" value: sr.shareRoadVehicleRO * 100.0 color: divergingCol5 ;
 					data "Share of river" value: sr.shareRiverVehicleRO * 100.0 color: divergingCol6 ;
 					data "Share of maritime" value: sr.shareMaritimeVehicleRO * 100.0 color: divergingCol7 ;
+					data "Share of secondary maritime" value: sr.shareSecondaryVehicleRO * 100.0 color: divergingCol8 ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
 					data "Share of road" value: 0 color: divergingCol5 ;
 					data "Share of river" value: 0 color: divergingCol6 ;
 					data "Share of maritime" value: 0 color: divergingCol7 ;
+					data "Share of secondary maritime" value: 0 color: divergingCol8 ;
 				}
 			}
 		}/**/
@@ -384,6 +407,7 @@ experiment 'Every output' type: gui {
 				data "Share of road" value: shareRoadQuantities * 100 color: divergingCol5 ;
 				data "Share of river" value: shareRiverQuantities * 100 color: divergingCol6 ;
 				data "Share of maritime" value: shareMaritimeQuantities * 100 color: divergingCol7 ;
+				data "Share of secondary maritime" value: shareSecondaryQuantities * 100 color: divergingCol8 ;
 			}
 		}/**/
 
@@ -399,11 +423,13 @@ experiment 'Every output' type: gui {
 					data "Share of road" value: sr.shareRoadQuantitiesRO * 100.0 color: divergingCol5 ;
 					data "Share of river" value: sr.shareRiverQuantitiesRO * 100.0 color: divergingCol6 ;
 					data "Share of maritime" value: sr.shareMaritimeQuantitiesRO * 100.0 color: divergingCol7 ;
+					data "Share of secondary maritime" value: sr.shareSecondaryQuantitiesRO * 100.0 color: divergingCol8 ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
 					data "Share of road" value: 0 color: divergingCol5 ;
 					data "Share of river" value: 0 color: divergingCol6 ;
 					data "Share of maritime" value: 0 color: divergingCol7 ;
+					data "Share of secondary maritime" value: 0 color: divergingCol8 ;
 				}
 			}
 		}/**/
@@ -420,11 +446,13 @@ experiment 'Every output' type: gui {
 					data "Share of road" value: sr.shareRoadQuantitiesRO * 100.0 color: divergingCol5 ;
 					data "Share of river" value: sr.shareRiverQuantitiesRO * 100.0 color: divergingCol6 ;
 					data "Share of maritime" value: sr.shareMaritimeQuantitiesRO * 100.0 color: divergingCol7 ;
+					data "Share of secondary maritime" value: sr.shareSecondaryQuantitiesRO * 100.0 color: divergingCol8 ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
 					data "Share of road" value: 0 color: divergingCol5 ;
 					data "Share of river" value: 0 color: divergingCol6 ;
 					data "Share of maritime" value: 0 color: divergingCol7 ;
+					data "Share of secondary maritime" value: 0 color: divergingCol8 ;
 				}
 			}
 		}/**/
@@ -441,11 +469,13 @@ experiment 'Every output' type: gui {
 					data "Share of road" value: sr.shareRoadQuantitiesRO * 100.0 color: divergingCol5 ;
 					data "Share of river" value: sr.shareRiverQuantitiesRO * 100.0 color: divergingCol6 ;
 					data "Share of maritime" value: sr.shareMaritimeQuantitiesRO * 100.0 color: divergingCol7 ;
+					data "Share of secondary maritime" value: sr.shareSecondaryQuantitiesRO * 100.0 color: divergingCol8 ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
 					data "Share of road" value: 0 color: divergingCol5 ;
 					data "Share of river" value: 0 color: divergingCol6 ;
 					data "Share of maritime" value: 0 color: divergingCol7 ;
+					data "Share of secondary maritime" value: 0 color: divergingCol8 ;
 				}
 			}
 		}/**/
@@ -462,11 +492,13 @@ experiment 'Every output' type: gui {
 					data "Share of road" value: sr.shareRoadQuantitiesRO * 100.0 color: divergingCol5 ;
 					data "Share of river" value: sr.shareRiverQuantitiesRO * 100.0 color: divergingCol6 ;
 					data "Share of maritime" value: sr.shareMaritimeQuantitiesRO * 100.0 color: divergingCol7 ;
+					data "Share of secondary maritime" value: sr.shareSecondaryQuantitiesRO * 100.0 color: divergingCol8 ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
 					data "Share of road" value: 0 color: divergingCol5 ;
 					data "Share of river" value: 0 color: divergingCol6 ;
 					data "Share of maritime" value: 0 color: divergingCol7 ;
+					data "Share of secondary maritime" value: 0 color: divergingCol8 ;
 				}
 			}
 		}/**/
@@ -483,11 +515,13 @@ experiment 'Every output' type: gui {
 					data "Share of road" value: sr.shareRoadQuantitiesRO * 100.0 color: divergingCol5 ;
 					data "Share of river" value: sr.shareRiverQuantitiesRO * 100.0 color: divergingCol6 ;
 					data "Share of maritime" value: sr.shareMaritimeQuantitiesRO * 100.0 color: divergingCol7 ;
+					data "Share of secondary maritime" value: sr.shareSecondaryQuantitiesRO * 100.0 color: divergingCol8 ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
 					data "Share of road" value: 0 color: divergingCol5 ;
 					data "Share of river" value: 0 color: divergingCol6 ;
 					data "Share of maritime" value: 0 color: divergingCol7 ;
+					data "Share of secondary maritime" value: 0 color: divergingCol8 ;
 				}
 			}
 		}/**/
@@ -504,11 +538,13 @@ experiment 'Every output' type: gui {
 					data "Share of road" value: sr.shareRoadQuantitiesRO * 100.0 color: divergingCol5 ;
 					data "Share of river" value: sr.shareRiverQuantitiesRO * 100.0 color: divergingCol6 ;
 					data "Share of maritime" value: sr.shareMaritimeQuantitiesRO * 100.0 color: divergingCol7 ;
+					data "Share of secondary maritime" value: sr.shareSecondaryQuantitiesRO * 100.0 color: divergingCol8 ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
 					data "Share of road" value: 0 color: divergingCol5 ;
 					data "Share of river" value: 0 color: divergingCol6 ;
 					data "Share of maritime" value: 0 color: divergingCol7 ;
+					data "Share of secondary maritime" value: 0 color: divergingCol8 ;
 				}
 			}
 		}/**/
@@ -525,11 +561,13 @@ experiment 'Every output' type: gui {
 					data "Share of road" value: sr.shareRoadQuantitiesRO * 100.0 color: divergingCol5 ;
 					data "Share of river" value: sr.shareRiverQuantitiesRO * 100.0 color: divergingCol6 ;
 					data "Share of maritime" value: sr.shareMaritimeQuantitiesRO * 100.0 color: divergingCol7 ;
+					data "Share of secondary maritime" value: sr.shareSecondaryQuantitiesRO * 100.0 color: divergingCol8 ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
 					data "Share of road" value: 0 color: divergingCol5 ;
 					data "Share of river" value: 0 color: divergingCol6 ;
 					data "Share of maritime" value: 0 color: divergingCol7 ;
+					data "Share of secondary maritime" value: 0 color: divergingCol8 ;
 				}
 			}
 		}/**/
@@ -772,11 +810,13 @@ experiment 'Every output' type: gui {
 					data "Share of road" value: sr.shareLeavingRoadVehicleRO * 100.0 color: divergingCol5 ;
 					data "Share of river" value: sr.shareLeavingRiverVehicleRO * 100.0 color: divergingCol6 ;
 					data "Share of maritime" value: sr.shareLeavingMaritimeVehicleRO * 100.0 color: divergingCol7 ;
+					data "Share of secondary maritime" value: sr.shareLeavingSecondaryVehicleRO * 100.0 color: divergingCol8 ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
 					data "Share of road" value: 0 color: divergingCol5 ;
 					data "Share of river" value: 0 color: divergingCol6 ;
 					data "Share of maritime" value: 0 color: divergingCol7 ;
+					data "Share of secondary maritime" value: 0 color: divergingCol8 ;
 				}
 			}
 		}/**/
@@ -793,11 +833,13 @@ experiment 'Every output' type: gui {
 					data "Share of road" value: sr.shareLeavingRoadVehicleRO * 100.0 color: divergingCol5 ;
 					data "Share of river" value: sr.shareLeavingRiverVehicleRO * 100.0 color: divergingCol6 ;
 					data "Share of maritime" value: sr.shareLeavingMaritimeVehicleRO * 100.0 color: divergingCol7 ;
+					data "Share of secondary maritime" value: sr.shareLeavingSecondaryVehicleRO * 100.0 color: divergingCol8 ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
 					data "Share of road" value: 0 color: divergingCol5 ;
 					data "Share of river" value: 0 color: divergingCol6 ;
 					data "Share of maritime" value: 0 color: divergingCol7 ;
+					data "Share of secondary maritime" value: 0 color: divergingCol8 ;
 				}
 			}
 		}/**/
@@ -814,11 +856,13 @@ experiment 'Every output' type: gui {
 					data "Share of road" value: sr.shareLeavingRoadVehicleRO * 100.0 color: divergingCol5 ;
 					data "Share of river" value: sr.shareLeavingRiverVehicleRO * 100.0 color: divergingCol6 ;
 					data "Share of maritime" value: sr.shareLeavingMaritimeVehicleRO * 100.0 color: divergingCol7 ;
+					data "Share of secondary maritime" value: sr.shareLeavingSecondaryVehicleRO * 100.0 color: divergingCol8 ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
 					data "Share of road" value: 0 color: divergingCol5 ;
 					data "Share of river" value: 0 color: divergingCol6 ;
 					data "Share of maritime" value: 0 color: divergingCol7 ;
+					data "Share of secondary maritime" value: 0 color: divergingCol8 ;
 				}
 			}
 		}/**/
@@ -835,11 +879,13 @@ experiment 'Every output' type: gui {
 					data "Share of road" value: sr.shareLeavingRoadVehicleRO * 100.0 color: divergingCol5 ;
 					data "Share of river" value: sr.shareLeavingRiverVehicleRO * 100.0 color: divergingCol6 ;
 					data "Share of maritime" value: sr.shareLeavingMaritimeVehicleRO * 100.0 color: divergingCol7 ;
+					data "Share of secondary maritime" value: sr.shareLeavingSecondaryVehicleRO * 100.0 color: divergingCol8 ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
 					data "Share of road" value: 0 color: divergingCol5 ;
 					data "Share of river" value: 0 color: divergingCol6 ;
 					data "Share of maritime" value: 0 color: divergingCol7 ;
+					data "Share of secondary maritime" value: 0 color: divergingCol8 ;
 				}
 			}
 		}/**/
@@ -856,11 +902,13 @@ experiment 'Every output' type: gui {
 					data "Share of road" value: sr.shareLeavingRoadVehicleRO * 100.0 color: divergingCol5 ;
 					data "Share of river" value: sr.shareLeavingRiverVehicleRO * 100.0 color: divergingCol6 ;
 					data "Share of maritime" value: sr.shareLeavingMaritimeVehicleRO * 100.0 color: divergingCol7 ;
+					data "Share of secondary maritime" value: sr.shareLeavingSecondaryVehicleRO * 100.0 color: divergingCol8 ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
 					data "Share of road" value: 0 color: divergingCol5 ;
 					data "Share of river" value: 0 color: divergingCol6 ;
 					data "Share of maritime" value: 0 color: divergingCol7 ;
+					data "Share of secondary maritime" value: 0 color: divergingCol8 ;
 				}
 			}
 		}/**/
@@ -877,11 +925,13 @@ experiment 'Every output' type: gui {
 					data "Share of road" value: sr.shareLeavingRoadVehicleRO * 100.0 color: divergingCol5 ;
 					data "Share of river" value: sr.shareLeavingRiverVehicleRO * 100.0 color: divergingCol6 ;
 					data "Share of maritime" value: sr.shareLeavingMaritimeVehicleRO * 100.0 color: divergingCol7 ;
+					data "Share of secondary maritime" value: sr.shareLeavingSecondaryVehicleRO * 100.0 color: divergingCol8 ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
 					data "Share of road" value: 0 color: divergingCol5 ;
 					data "Share of river" value: 0 color: divergingCol6 ;
 					data "Share of maritime" value: 0 color: divergingCol7 ;
+					data "Share of secondary maritime" value: 0 color: divergingCol8 ;
 				}
 			}
 		}/**/
@@ -898,11 +948,13 @@ experiment 'Every output' type: gui {
 					data "Share of road" value: sr.shareLeavingRoadVehicleRO * 100.0 color: divergingCol5 ;
 					data "Share of river" value: sr.shareLeavingRiverVehicleRO * 100.0 color: divergingCol6 ;
 					data "Share of maritime" value: sr.shareLeavingMaritimeVehicleRO * 100.0 color: divergingCol7 ;
+					data "Share of secondary maritime" value: sr.shareLeavingSecondaryVehicleRO * 100.0 color: divergingCol8 ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
 					data "Share of road" value: 0 color: divergingCol5 ;
 					data "Share of river" value: 0 color: divergingCol6 ;
 					data "Share of maritime" value: 0 color: divergingCol7 ;
+					data "Share of secondary maritime" value: 0 color: divergingCol8 ;
 				}
 			}
 		}/**/
@@ -919,11 +971,13 @@ experiment 'Every output' type: gui {
 					data "Share of road" value: sr.shareLeavingRoadQuantitiesRO * 100.0 color: divergingCol5 ;
 					data "Share of river" value: sr.shareLeavingRiverQuantitiesRO * 100.0 color: divergingCol6 ;
 					data "Share of maritime" value: sr.shareLeavingMaritimeQuantitiesRO * 100.0 color: divergingCol7 ;
+					data "Share of secondary maritime" value: sr.shareLeavingSecondaryQuantitiesRO * 100.0 color: divergingCol8 ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
 					data "Share of road" value: 0 color: divergingCol5 ;
 					data "Share of river" value: 0 color: divergingCol6 ;
 					data "Share of maritime" value: 0 color: divergingCol7 ;
+					data "Share of secondary maritime" value: 0 color: divergingCol8 ;
 				}
 			}
 		}/**/
@@ -940,11 +994,13 @@ experiment 'Every output' type: gui {
 					data "Share of road" value: sr.shareLeavingRoadQuantitiesRO * 100.0 color: divergingCol5 ;
 					data "Share of river" value: sr.shareLeavingRiverQuantitiesRO * 100.0 color: divergingCol6 ;
 					data "Share of maritime" value: sr.shareLeavingMaritimeQuantitiesRO * 100.0 color: divergingCol7 ;
+					data "Share of secondary maritime" value: sr.shareLeavingSecondaryQuantitiesRO * 100.0 color: divergingCol8 ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
 					data "Share of road" value: 0 color: divergingCol5 ;
 					data "Share of river" value: 0 color: divergingCol6 ;
 					data "Share of maritime" value: 0 color: divergingCol7 ;
+					data "Share of secondary maritime" value: 0 color: divergingCol8 ;
 				}
 			}
 		}/**/
@@ -961,11 +1017,13 @@ experiment 'Every output' type: gui {
 					data "Share of road" value: sr.shareLeavingRoadQuantitiesRO * 100.0 color: divergingCol5 ;
 					data "Share of river" value: sr.shareLeavingRiverQuantitiesRO * 100.0 color: divergingCol6 ;
 					data "Share of maritime" value: sr.shareLeavingMaritimeQuantitiesRO * 100.0 color: divergingCol7 ;
+					data "Share of secondary maritime" value: sr.shareLeavingSecondaryQuantitiesRO * 100.0 color: divergingCol8 ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
 					data "Share of road" value: 0 color: divergingCol5 ;
 					data "Share of river" value: 0 color: divergingCol6 ;
 					data "Share of maritime" value: 0 color: divergingCol7 ;
+					data "Share of secondary maritime" value: 0 color: divergingCol8 ;
 				}
 			}
 		}/**/
@@ -982,11 +1040,13 @@ experiment 'Every output' type: gui {
 					data "Share of road" value: sr.shareLeavingRoadQuantitiesRO * 100.0 color: divergingCol5 ;
 					data "Share of river" value: sr.shareLeavingRiverQuantitiesRO * 100.0 color: divergingCol6 ;
 					data "Share of maritime" value: sr.shareLeavingMaritimeQuantitiesRO * 100.0 color: divergingCol7 ;
+					data "Share of secondary maritime" value: sr.shareLeavingSecondaryQuantitiesRO * 100.0 color: divergingCol8 ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
 					data "Share of road" value: 0 color: divergingCol5 ;
 					data "Share of river" value: 0 color: divergingCol6 ;
 					data "Share of maritime" value: 0 color: divergingCol7 ;
+					data "Share of secondary maritime" value: 0 color: divergingCol8 ;
 				}
 			}
 		}/**/
@@ -1003,11 +1063,13 @@ experiment 'Every output' type: gui {
 					data "Share of road" value: sr.shareLeavingRoadQuantitiesRO * 100.0 color: divergingCol5 ;
 					data "Share of river" value: sr.shareLeavingRiverQuantitiesRO * 100.0 color: divergingCol6 ;
 					data "Share of maritime" value: sr.shareLeavingMaritimeQuantitiesRO * 100.0 color: divergingCol7 ;
+					data "Share of secondary maritime" value: sr.shareLeavingSecondaryQuantitiesRO * 100.0 color: divergingCol8 ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
 					data "Share of road" value: 0 color: divergingCol5 ;
 					data "Share of river" value: 0 color: divergingCol6 ;
 					data "Share of maritime" value: 0 color: divergingCol7 ;
+					data "Share of secondary maritime" value: 0 color: divergingCol8 ;
 				}
 			}
 		}/**/
@@ -1024,11 +1086,13 @@ experiment 'Every output' type: gui {
 					data "Share of road" value: sr.shareLeavingRoadQuantitiesRO * 100.0 color: divergingCol5 ;
 					data "Share of river" value: sr.shareLeavingRiverQuantitiesRO * 100.0 color: divergingCol6 ;
 					data "Share of maritime" value: sr.shareLeavingMaritimeQuantitiesRO * 100.0 color: divergingCol7 ;
+					data "Share of secondary maritime" value: sr.shareLeavingSecondaryQuantitiesRO * 100.0 color: divergingCol8 ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
 					data "Share of road" value: 0 color: divergingCol5 ;
 					data "Share of river" value: 0 color: divergingCol6 ;
 					data "Share of maritime" value: 0 color: divergingCol7 ;
+					data "Share of secondary maritime" value: 0 color: divergingCol8 ;
 				}
 			}
 		}/**/
@@ -1045,11 +1109,13 @@ experiment 'Every output' type: gui {
 					data "Share of road" value: sr.shareLeavingRoadQuantitiesRO * 100.0 color: divergingCol5 ;
 					data "Share of river" value: sr.shareLeavingRiverQuantitiesRO * 100.0 color: divergingCol6 ;
 					data "Share of maritime" value: sr.shareLeavingMaritimeQuantitiesRO * 100.0 color: divergingCol7 ;
+					data "Share of secondary maritime" value: sr.shareLeavingSecondaryQuantitiesRO * 100.0 color: divergingCol8 ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
 					data "Share of road" value: 0 color: divergingCol5 ;
 					data "Share of river" value: 0 color: divergingCol6 ;
 					data "Share of maritime" value: 0 color: divergingCol7 ;
+					data "Share of secondary maritime" value: 0 color: divergingCol8 ;
 				}
 			}
 		}/**/
@@ -1066,11 +1132,13 @@ experiment 'Every output' type: gui {
 					data "Volume on road" value: sr.sumLeavingRoadQuantitiesRO color: divergingCol5 ;
 					data "Volume on river" value: sr.sumLeavingRiverQuantitiesRO color: divergingCol6 ;
 					data "Volume on maritime" value: sr.sumLeavingMaritimeQuantitiesRO color: divergingCol7 ;
+					data "Volume on secondary maritime" value: sr.sumLeavingSecondaryQuantitiesRO color: divergingCol8 ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
 					data "Share of road" value: 0 color: divergingCol5 ;
 					data "Share of river" value: 0 color: divergingCol6 ;
 					data "Share of maritime" value: 0 color: divergingCol7 ;
+					data "Share of secondary maritime" value: 0 color: divergingCol8 ;
 				}
 			}
 		}/**/
@@ -1087,11 +1155,13 @@ experiment 'Every output' type: gui {
 					data "Volume on road" value: sr.sumLeavingRoadQuantitiesRO color: divergingCol5 ;
 					data "Volume on river" value: sr.sumLeavingRiverQuantitiesRO color: divergingCol6 ;
 					data "Volume on maritime" value: sr.sumLeavingMaritimeQuantitiesRO color: divergingCol7 ;
+					data "Volume on secondary maritime" value: sr.sumLeavingSecondaryQuantitiesRO color: divergingCol8 ;
 				}
 				else { // At step 0, RegionObserver are not initialized, so, sr = nil
 					data "Share of road" value: 0 color: divergingCol5 ;
 					data "Share of river" value: 0 color: divergingCol6 ;
 					data "Share of maritime" value: 0 color: divergingCol7 ;
+					data "Share of secondary maritime" value: 0 color: divergingCol8 ;
 				}
 			}
 		}/**/

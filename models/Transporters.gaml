@@ -35,9 +35,17 @@ species RiverTransporter parent: Transporter {
 	float volumeKilometersCosts <- RoadTransporter[0].volumeKilometersCosts / 2.0;
 }
 
-species MaritimeTransporter parent: Transporter {
-	string networkType <- "maritime";
+
+species SecondaryMaritimeTransporter parent: Transporter {
+	string networkType <- "secondary";
 	float timeBetweenVehicles <- 12;
 	float maximalTransportedVolume <- 38346; // moyenne de 2 324 EVP par porte conteneur (source : Wikipedia). Soit 2324 * 16.5 = 38346 palettes par navires
 	float volumeKilometersCosts <- RoadTransporter[0].volumeKilometersCosts / 4.0; // We don't really *need* a volume kilometer cost for this mode, however, if we give a zero value, there are weird results when we compute shortest paths 
+}
+
+species MaritimeTransporter parent: Transporter {
+	string networkType <- "maritime";
+	float timeBetweenVehicles <- 24;
+	float maximalTransportedVolume <- 247500;// moyenne de 15 000 EVP par porte conteneur (source : Wikipedia). Soit 15000 * 16.5 = ‭247 500‬ palettes par navires
+	float volumeKilometersCosts <- RoadTransporter[0].volumeKilometersCosts / 8.0; // We don't really *need* a volume kilometer cost for this mode, however, if we give a zero value, there are weird results when we compute shortest paths 
 }

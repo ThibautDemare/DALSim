@@ -10,6 +10,6 @@ species Order schedules: [] {
 	int position;// The position in the supply chain
 	FinalConsignee fdm; // The FDM who posseses these goods
 	Stock reference; // a reference to the stock which suffer of stock shortage
-	int stepOrderMade; // when does the order has been made
+	date stepOrderMade; // when does the order has been made
 	string strategy;
 }

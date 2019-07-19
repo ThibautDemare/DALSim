@@ -16,6 +16,8 @@ species RegionObserver {
 	float shareRiverVehicleRO <- 0.0;
 	float sumMaritimeVehicleRO <- 0.0;
 	float shareMaritimeVehicleRO <- 0.0;
+	float sumSecondaryVehicleRO <- 0.0;
+	float shareSecondaryVehicleRO <- 0.0;
 	float sumVehicleRO;
 
 	// Share by quantity of goods
@@ -25,6 +27,8 @@ species RegionObserver {
 	float shareRiverQuantitiesRO <- 0.0;
 	float sumMaritimeQuantitiesRO <- 0.0;
 	float shareMaritimeQuantitiesRO <- 0.0;
+	float sumSecondaryQuantitiesRO <- 0.0;
+	float shareSecondaryQuantitiesRO <- 0.0;
 	float sumQuantitiesRO;
 
 	// Share by number of vehicle leaving terminals
@@ -34,6 +38,8 @@ species RegionObserver {
 	float shareLeavingRiverVehicleRO <- 0.0;
 	float sumLeavingMaritimeVehicleRO <- 0.0;
 	float shareLeavingMaritimeVehicleRO <- 0.0;
+	float sumLeavingSecondaryVehicleRO <- 0.0;
+	float shareLeavingSecondaryVehicleRO <- 0.0;
 	float sumLeavingVehicleRO;
 
 	// Share by quantity of goods leaving terminals
@@ -43,6 +49,8 @@ species RegionObserver {
 	float shareLeavingRiverQuantitiesRO <- 0.0;
 	float sumLeavingMaritimeQuantitiesRO <- 0.0;
 	float shareLeavingMaritimeQuantitiesRO <- 0.0;
+	float sumLeavingSecondaryQuantitiesRO <- 0.0;
+	float shareLeavingSecondaryQuantitiesRO <- 0.0;
 	float sumLeavingQuantitiesRO;
 
 	// Share of FC by origin port

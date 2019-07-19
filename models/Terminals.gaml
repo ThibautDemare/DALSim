@@ -14,16 +14,16 @@ species Terminal parent:Building{
 	}
 }
 
-species MaritimeTerminal parent:Terminal{
-	float handling_time_to_maritime;
-	float handling_time_from_maritime;
+species SecondaryTerminal parent:Terminal{
+	float handling_time_to_secondary;
+	float handling_time_from_secondary;
 	string col <- "red";
 
-	reflex manageMaritimeComingCommodities {
+	reflex manageSecondaryComingCommodities {
 		int i <- 0;
 		loop while:i<length(comingCommodities) {
-			if(comingCommodities[i].currentNetwork = 'maritime' and
-				comingCommodities[i].incomingDate + handling_time_from_maritime#hour >= current_date
+			if(comingCommodities[i].currentNetwork = 'secondary' and
+				comingCommodities[i].incomingDate + handling_time_from_secondary#hour >= current_date
 			){
 				leavingCommodities <+ comingCommodities[i];
 				remove index:i from:comingCommodities;
@@ -38,8 +38,7 @@ species MaritimeTerminal parent:Terminal{
 		if(nt = "road"){
 			return handling_time_from_road;
 		}
-		// else : nt = "maritime"
-		return handling_time_from_maritime;
+		return handling_time_from_secondary;
 	}
 }
 
@@ -75,6 +74,8 @@ species RiverTerminal parent:Terminal{
 species MaritimeRiverTerminal parent:Terminal {
 	float handling_time_to_maritime;
 	float handling_time_from_maritime;
+	float handling_time_to_secondary;
+	float handling_time_from_secondary;
 	float handling_time_to_river;
 	float handling_time_from_river;
 	string col <- "red";
@@ -93,7 +94,22 @@ species MaritimeRiverTerminal parent:Terminal {
 			}
 		} 
 	}
-	
+
+	reflex manageSecondaryComingCommodities {
+		int i <- 0;
+		loop while:i<length(comingCommodities) {
+			if(comingCommodities[i].currentNetwork = 'secondary' and
+				comingCommodities[i].incomingDate + handling_time_from_secondary#hour >= current_date
+			){
+				leavingCommodities <+ comingCommodities[i];
+				remove index:i from:comingCommodities;
+			}
+			else{
+				i <- i + 1;
+			}
+		} 
+	}
+
 	reflex manageRiverComingCommodities {
 		int i <- 0;
 		loop while:i<length(comingCommodities) {
@@ -115,6 +131,9 @@ species MaritimeRiverTerminal parent:Terminal {
 		}
 		if(nt = "maritime"){
 			return handling_time_from_maritime;
+		}
+		if(nt = "secondary"){
+			return handling_time_from_secondary;
 		}
 		// else : nt = "river"
 		return handling_time_from_river;

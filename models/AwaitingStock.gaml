@@ -4,7 +4,7 @@ import "Stock.gaml"
 
 species AwaitingStock schedules:[] {
 	Stock stock;
-	int stepOrderMade;
+	date stepOrderMade;
 	int position;
 	Building building;
 	date incomingDate;

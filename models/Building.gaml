@@ -17,6 +17,8 @@ species Building {
 	date lastVehicleDeparture_river;
 	list<Vehicle> leavingVehicles_maritime <- []; // Liste des véhicules au départ pour le mode maritime
 	date lastVehicleDeparture_maritime;
+	list<Vehicle> leavingVehicles_secondary <- []; // Liste des véhicules au départ pour le mode maritime secondaire
+	date lastVehicleDeparture_secondary;
 	list<Commodity> leavingCommodities <- [];
 	list<Commodity> comingCommodities <- [];
 
@@ -30,9 +32,11 @@ species Building {
 	list<float> nbRoadVehiclesLastSteps <- [0.0];
 	list<float> nbRiverVehiclesLastSteps <- [0.0];
 	list<float> nbMaritimeVehiclesLastSteps <- [0.0];
+	list<float> nbSecondaryVehiclesLastSteps <- [0.0];
 	list<float> nbRoadQuantitiesLastSteps <- [0.0];
 	list<float> nbRiverQuantitiesLastSteps <- [0.0];
 	list<float> nbMaritimeQuantitiesLastSteps <- [0.0];
+	list<float> nbSecondaryQuantitiesLastSteps <- [0.0];
 
 	// Measures of efficiency
 	// based on time to deliver some goods (originally in the FinalConsignee agent)
@@ -53,10 +57,16 @@ species Building {
 				lastVehicleDeparture_river <- vehicle.departureDate;
 			}
 		}
-		else {
+		else if(networkType = "maritime"){
 			leavingVehicles <- leavingVehicles_maritime;
 			if(lastVehicleDeparture_maritime = nil or lastVehicleDeparture_maritime < vehicle.departureDate){
 				lastVehicleDeparture_maritime <- vehicle.departureDate;
+			}
+		}
+		else {
+			leavingVehicles <- leavingVehicles_secondary;
+			if(lastVehicleDeparture_secondary = nil or lastVehicleDeparture_secondary < vehicle.departureDate){
+				lastVehicleDeparture_secondary <- vehicle.departureDate;
 			}
 		}
 		int i <- 0;
@@ -92,8 +102,11 @@ species Building {
 		else if(v.networkType = "river"){
 			nbRiverVehiclesLastSteps[length(nbRiverVehiclesLastSteps)-1] <- nbRiverVehiclesLastSteps[length(nbRiverVehiclesLastSteps)-1] + 1.0;
 		}
-		else { // if(v.networkType = "maritime")
+		else if(v.networkType = "maritime"){
 			nbMaritimeVehiclesLastSteps[length(nbMaritimeVehiclesLastSteps)-1] <- nbMaritimeVehiclesLastSteps[length(nbMaritimeVehiclesLastSteps)-1] + 1.0;
+		}
+		else {
+			nbSecondaryVehiclesLastSteps[length(nbSecondaryVehiclesLastSteps)-1] <- nbSecondaryVehiclesLastSteps[length(nbSecondaryVehiclesLastSteps)-1] + 1.0;
 		}
 	}
 
@@ -104,8 +117,11 @@ species Building {
 		else if(nt = "river"){
 			nbRiverQuantitiesLastSteps[length(nbRiverQuantitiesLastSteps)-1] <- nbRiverQuantitiesLastSteps[length(nbRiverQuantitiesLastSteps)-1] + c.volume;
 		}
-		else { // if(nt = "maritime")
+		else if(nt = "maritime") {
 			nbMaritimeQuantitiesLastSteps[length(nbMaritimeQuantitiesLastSteps)-1] <- nbMaritimeQuantitiesLastSteps[length(nbMaritimeQuantitiesLastSteps)-1] + c.volume;
+		}
+		else {
+			nbSecondaryQuantitiesLastSteps[length(nbSecondaryQuantitiesLastSteps)-1] <- nbSecondaryQuantitiesLastSteps[length(nbSecondaryQuantitiesLastSteps)-1] + c.volume;
 		}
 		if(c.finalDestination = self){
 			create AwaitingStock number: 1 returns: ast {
@@ -154,10 +170,10 @@ species Building {
 					notfound <- false;
 					stockBuilding.status <- 0;
 					stockBuilding.quantity <- stockBuilding.quantity + entering_stock.stock.quantity;
-					if(entering_stock.stepOrderMade >= 0){
+					if(entering_stock.stepOrderMade >= starting_date){
 						// Update lists containing the time to deliver some goods in order to measure the efficiency of the actors
-						(entering_stock.stock.lp as LogisticsServiceProvider).timeToDeliver <- (entering_stock.stock.lp as LogisticsServiceProvider).timeToDeliver + ((int(time/3600)) - entering_stock.stepOrderMade);
-						localTimeToBeDeliveredLastDeliveries <- localTimeToBeDeliveredLastDeliveries + ((int(time/3600)) - entering_stock.stepOrderMade);
+						(entering_stock.stock.lp as LogisticsServiceProvider).timeToDeliver <- (entering_stock.stock.lp as LogisticsServiceProvider).timeToDeliver + (date("now") - entering_stock.stepOrderMade);//((int(time/3600)) - entering_stock.stepOrderMade);
+						localTimeToBeDeliveredLastDeliveries <- localTimeToBeDeliveredLastDeliveries + (date("now") - entering_stock.stepOrderMade);//((int(time/3600)) - entering_stock.stepOrderMade);
 					}
 				}
 				j <- j + 1;

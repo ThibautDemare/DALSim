@@ -7,12 +7,14 @@ species ForwardingAgent skills:[TransportOrganizer]{
 	Transporter transporter_road;
 	Transporter transporter_maritime;
 	Transporter transporter_river;
+	Transporter transporter_secondary;
 	float colorValue <- -1;
 
 	init {
 		transporter_road <- RoadTransporter[0];
 		transporter_river <- RiverTransporter[0];
 		transporter_maritime <- MaritimeTransporter[0];
+		transporter_secondary <- SecondaryMaritimeTransporter[0];
 	}
 
 	aspect geom {

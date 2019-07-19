@@ -3,6 +3,7 @@ model Networks
 global {
 	graph road_network;
 	graph maritime_network;
+	graph secondary_network;
 	graph river_network;
 }
 
@@ -63,6 +64,10 @@ species Road parent:Network {
 }
 
 species MaritimeLine parent:Network {
+	string col <- "blue";
+}
+
+species SecondaryMaritimeLine parent:Network {
 	string col <- "blue";
 }
 
