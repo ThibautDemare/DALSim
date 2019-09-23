@@ -1,0 +1,383 @@
+{
+	"LE_HAVRE" : {
+		"Ouistreham" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Caen" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Honfleur" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Radicatel" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Cherbourg" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Fecamp" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Dieppe" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Le_Treport" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+	},
+
+	"ANVERS" : {
+		"Ouistreham" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Caen" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Honfleur" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Radicatel" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Cherbourg" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Fecamp" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Dieppe" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Le_Treport" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+	},
+
+	"Ouistreham" : {
+		"LE_HAVRE" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"ANVERS" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Caen" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Honfleur" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Radicatel" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Cherbourg" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Fecamp" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Dieppe" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Le_Treport" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+	},
+
+	"Caen" : {
+		"LE_HAVRE" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"ANVERS" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Ouistreham" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Honfleur" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Radicatel" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Cherbourg" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Fecamp" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Dieppe" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Le_Treport" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+	},
+
+	"Honfleur" : {
+		"LE_HAVRE" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"ANVERS" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Caen" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Ouistreham" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Radicatel" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Cherbourg" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Fecamp" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Dieppe" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Le_Treport" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+	},
+
+	"Radicatel" : {
+		"LE_HAVRE" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"ANVERS" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Caen" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Honfleur" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Ouistreham" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Cherbourg" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Fecamp" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Dieppe" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Le_Treport" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+	},
+
+	"Cherbourg" : {
+		"LE_HAVRE" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"ANVERS" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Caen" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Honfleur" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Radicatel" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Ouistreham" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Fecamp" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Dieppe" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Le_Treport" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+	},
+
+	"Fecamp" : {
+		"LE_HAVRE" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"ANVERS" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Caen" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Honfleur" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Radicatel" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Cherbourg" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Ouistreham" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Dieppe" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Le_Treport" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+	},
+
+	"Dieppe" : {
+		"LE_HAVRE" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"ANVERS" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Caen" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Honfleur" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Radicatel" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Cherbourg" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Fecamp" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Ouistreham" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Le_Treport" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+	},
+
+	"Le_Treport" : {
+		"LE_HAVRE" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"ANVERS" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Caen" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Honfleur" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Radicatel" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Cherbourg" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Fecamp" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Dieppe" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+		"Ouistreham" : {
+			"timeBetweenVehicles_maritime":48,
+			"timeBetweenVehicles_river":24,
+		},
+	}
+}
