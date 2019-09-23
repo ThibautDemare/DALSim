@@ -4,6 +4,7 @@ import "Building.gaml"
 
 species Terminal parent:Building{	
 	string col <- "grey";
+	string cityName;
 	aspect geom {
 		if(colorValue = -1){ 
 			draw shape + 2°px color: rgb(col) border: rgb(col);
