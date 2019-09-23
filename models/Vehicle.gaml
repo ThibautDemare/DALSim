@@ -57,6 +57,7 @@ species Vehicle skills:[MovingOnNetwork] {
 		}
 		if(length(scheduledCommodities) = 0){
 			readyToMove <- true;
+			do leave_building;
 			ask source {
 				do removeVehicleFromList(myself, myself.networkType);
 			}
