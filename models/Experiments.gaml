@@ -55,6 +55,7 @@ experiment 'traffic' type: gui {
 			species Country aspect: geom;
 			species Road aspect: geom;
 			species MaritimeLine aspect: geom;
+			species SecondaryMaritimeLine aspect: geom;
 			species RiverLine aspect: geom;
 			species Vehicle aspect: base;
 		}
@@ -74,6 +75,7 @@ experiment 'Scenario: block roads' type: gui {
 			species Country aspect: geom;
 			species Road aspect: geom;
 			species MaritimeLine aspect: geom;
+			species SecondaryMaritimeLine aspect: geom;
 			species RiverLine aspect: geom;
 			event [mouse_down] action: block_one_road;
 		}
@@ -92,6 +94,7 @@ experiment 'Scenario: update attractiveness' type: gui {
 			species Country aspect: geom;
 			species Road aspect: geom;
 			species MaritimeLine aspect: geom;
+			species SecondaryMaritimeLine aspect: geom;
 			species RiverLine aspect: geom;
 			species LogisticsServiceProvider aspect: base;
 		}
