@@ -68,6 +68,8 @@ global {
 	file river_terminals <- file(pathBD+"Terminals/river_terminals.shp");
 	file normand_terminals <- file(pathBD+"Terminals/terminaux_normands_secondaires.shp");
 
+	map<string, unknown> mapParameters;
+
 	// The french regions
 	// Data comes from :
 	// Contours des régions françaises sur OpenStreetMap (consulted the 30/11/2018) -> https://www.data.gouv.fr/fr/datasets/contours-des-regions-francaises-sur-openstreetmap/
@@ -133,13 +135,15 @@ global {
 			handling_time_from_road::read("FROM_ROAD") as float,
 			handling_time_from_river::read("FROM_RIVER") as float,
 			handling_time_from_secondary::read("FROM_MARIT") as float,
-			handling_time_from_maritime::read("FROM_MARIT") as float
+			handling_time_from_maritime::read("FROM_MARIT") as float,
+			cityName::read("CITY_NAME") as string
 		];
 			// Terminals inside  the Seine axis (they are river terminals)
 		create RiverTerminal from: river_terminals with: [handling_time_to_road::read("TO_ROAD") as float,
 			handling_time_to_river::read("TO_RIVER") as float,
 			handling_time_from_road::read("FROM_ROAD") as float,
-			handling_time_from_river::read("FROM_RIVER") as float
+			handling_time_from_river::read("FROM_RIVER") as float,
+			cityName::read("CITY_NAME") as string
 		];
 			// Terminals of Antwerp (they are maritime and river terminals if we have the Canal Seine Nord, otherwise, they are MaritimeTerminal agents)
 		create MaritimeRiverTerminal from: terminal_A_shapefile with: [handling_time_to_road::read("TO_ROAD") as float,
@@ -147,14 +151,20 @@ global {
 			handling_time_to_maritime::read("TO_MARITIM") as float,
 			handling_time_from_road::read("FROM_ROAD") as float,
 			handling_time_from_river::read("FROM_RIVER") as float,
-			handling_time_from_maritime::read("FROM_MARIT") as float
+			handling_time_from_maritime::read("FROM_MARIT") as float,
+			cityName::read("CITY_NAME") as string
 		];
 			// Terminals of Antwerp (they are maritime and river terminals if we have the Canal Seine Nord, otherwise, they are MaritimeTerminal agents)
 		create SecondaryTerminal from: normand_terminals with: [handling_time_to_road::read("TO_ROAD") as float,
 			handling_time_to_secondary::read("TO_MARITIM") as float,
 			handling_time_from_road::read("FROM_ROAD") as float,
-			handling_time_from_secondary::read("FROM_MARIT") as float
+			handling_time_from_secondary::read("FROM_MARIT") as float,
+			cityName::read("CITY_NAME") as string
 		];
+
+		file jsonFile <- json_file("timeBetweenVehicles.json");
+		map<string, unknown> mapParameters <- jsonFile.contents;
+
 		// Forwarding agent
 		create ForwardingAgent number:1 returns:fas;
 		forwardingAgent <- fas[0];
@@ -203,7 +213,7 @@ global {
 		 * The following code can be commented or not, depending if the user want to execute the simulation with every FDM 
 		 * It is mainly used for tests to avoid CPU overload.
 		 */
-		int i <- 500;
+		int i <- 50;
 		list<FinalConsignee> lfdm <- shuffle(FinalConsignee);
 		loop while: i < length(lfdm) {
 			FinalConsignee s <- lfdm[i];
