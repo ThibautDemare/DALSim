@@ -760,6 +760,63 @@ global {
 		}
 	}
 
+	float averageRoadVehicleOccupancy <- 0;
+	float averageRiverVehicleOccupancy <- 0;
+	float averageMaritimeVehicleOccupancy <- 0;
+	float averageSecondaryVehicleOccupancy <- 0;
+	reflex observeVehiclesOccupancy {
+		int sumRoad <- 0;
+		int sumRiver <- 0;
+		int sumMaritime <- 0;
+		int sumSecondary <- 0;
+		ask Vehicle {
+			if(networkType = "road"){
+				averageRoadVehicleOccupancy <- averageRoadVehicleOccupancy + currentTransportedVolume;
+				sumRoad <- sumRoad + 1;
+			}
+			else if(networkType = "river"){
+				averageRiverVehicleOccupancy <- averageRiverVehicleOccupancy + currentTransportedVolume;
+				sumRiver <- sumRiver + 1;
+			}
+			else if(networkType = "maritime"){
+				averageMaritimeVehicleOccupancy <- averageMaritimeVehicleOccupancy + currentTransportedVolume;
+				sumMaritime <- sumMaritime + 1;
+			}
+			else if(networkType = "secondary"){
+				averageSecondaryVehicleOccupancy <- averageSecondaryVehicleOccupancy + currentTransportedVolume;
+				sumSecondary <- sumSecondary + 1;
+			}
+		}
+
+		if(sumRoad > 0){
+			averageRoadVehicleOccupancy <- averageRoadVehicleOccupancy / sumRoad;
+		}
+		else {
+			averageRoadVehicleOccupancy <- 0;
+		}
+
+		if(sumRiver > 0){
+			averageRiverVehicleOccupancy <- averageRiverVehicleOccupancy / sumRiver;
+		}
+		else {
+			averageRiverVehicleOccupancy <- 0;
+		}
+
+		if(sumMaritime > 0){
+			averageMaritimeVehicleOccupancy <- averageMaritimeVehicleOccupancy / sumMaritime;
+		}
+		else {
+			averageMaritimeVehicleOccupancy <- 0;
+		}
+
+		if(sumSecondary > 0){
+			averageSecondaryVehicleOccupancy <- averageSecondaryVehicleOccupancy / sumSecondary;
+		}
+		else {
+			averageSecondaryVehicleOccupancy <- 0;
+		}
+	}
+
 	string CSVFolderPath <- "../results/CSV/";
 	string csvFilenameParams;
 
