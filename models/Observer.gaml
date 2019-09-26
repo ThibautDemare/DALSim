@@ -770,21 +770,23 @@ global {
 		int sumMaritime <- 0;
 		int sumSecondary <- 0;
 		ask Vehicle {
-			if(networkType = "road"){
-				averageRoadVehicleOccupancy <- averageRoadVehicleOccupancy + currentTransportedVolume;
-				sumRoad <- sumRoad + 1;
-			}
-			else if(networkType = "river"){
-				averageRiverVehicleOccupancy <- averageRiverVehicleOccupancy + currentTransportedVolume;
-				sumRiver <- sumRiver + 1;
-			}
-			else if(networkType = "maritime"){
-				averageMaritimeVehicleOccupancy <- averageMaritimeVehicleOccupancy + currentTransportedVolume;
-				sumMaritime <- sumMaritime + 1;
-			}
-			else if(networkType = "secondary"){
-				averageSecondaryVehicleOccupancy <- averageSecondaryVehicleOccupancy + currentTransportedVolume;
-				sumSecondary <- sumSecondary + 1;
+			if(readyToMove and destination != nil){
+				if(networkType = "road"){
+					averageRoadVehicleOccupancy <- averageRoadVehicleOccupancy + currentTransportedVolume;
+					sumRoad <- sumRoad + 1;
+				}
+				else if(networkType = "river"){
+					averageRiverVehicleOccupancy <- averageRiverVehicleOccupancy + currentTransportedVolume;
+					sumRiver <- sumRiver + 1;
+				}
+				else if(networkType = "maritime"){
+					averageMaritimeVehicleOccupancy <- averageMaritimeVehicleOccupancy + currentTransportedVolume;
+					sumMaritime <- sumMaritime + 1;
+				}
+				else if(networkType = "secondary"){
+					averageSecondaryVehicleOccupancy <- averageSecondaryVehicleOccupancy + currentTransportedVolume;
+					sumSecondary <- sumSecondary + 1;
+				}
 			}
 		}
 
