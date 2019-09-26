@@ -862,6 +862,8 @@ global {
 			to: CSVFolderPath + date_simu_starts + "_share_transport_mode_quantities" + csvFilenameParams  + ".csv" type: text rewrite: false;
 		save "step;trafficValueCSN;"
 			to: CSVFolderPath + date_simu_starts + "_traffic_evolution_CSN" + csvFilenameParams  + ".csv" type: text rewrite: false;
+		save "step;averageRoadVehicleOccupancy;averageRiverVehicleOccupancy;averageMaritimeVehicleOccupancy;averageSecondaryVehicleOccupancy;"
+			to: CSVFolderPath + date_simu_starts + "_vehicles_occupancy" + csvFilenameParams  + ".csv" type: text rewrite: false;
 
 		do initCSVFileShareTransportModeRegion(csvFilenameParams, "Basse-Normandie");
 		do initCSVFileShareTransportModeRegion(csvFilenameParams, "Haute-Normandie");
@@ -956,6 +958,8 @@ global {
 			to: CSVFolderPath + date_simu_starts + "_share_transport_mode" + csvFilenameParams  + ".csv" type: text rewrite: false;
 		save "" + ((time/3600.0) as int) + ";" + sumRoadQuantities + ";" +  sumRiverQuantities + ";" +  sumMaritimeQuantities + ";" +  sumSecondaryQuantities
 			to: CSVFolderPath + date_simu_starts + "_share_transport_mode_quantities" + csvFilenameParams  + ".csv" type: text rewrite: false;
+		save "" + ((time/3600.0) as int) + ";" + averageRoadVehicleOccupancy + ";" +  averageRiverVehicleOccupancy + ";" +  averageMaritimeVehicleOccupancy + ";" +  averageSecondaryVehicleOccupancy
+			to: CSVFolderPath + date_simu_starts + "_vehicles_occupancy" + csvFilenameParams  + ".csv" type: text rewrite: false;
 
 		do saveShareTransportModeRegion(csvFilenameParams, "Basse-Normandie");
 		do saveShareTransportModeRegion(csvFilenameParams, "Haute-Normandie");
