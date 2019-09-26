@@ -1168,5 +1168,29 @@ experiment 'Every output' type: gui {
 				}
 			}
 		}/**/
+
+		display 'Occupation moyenne des véhicles (mode routier)' refresh:every(1) {
+			chart  "Occupation moyenne des véhicles (mode routier)" type: series {
+				data "Occupation moyenne des véhicles (mode routier)" value: averageRoadVehicleOccupancy color: divergingCol1 ;
+			}
+		}/**/
+
+		display 'Occupation moyenne des véhicles (mode fluvial)' refresh:every(1) {
+			chart  "Occupation moyenne des véhicles (mode fluvial)" type: series {
+				data "Occupation moyenne des véhicles (mode fluvial)" value: averageRiverVehicleOccupancy color: divergingCol2 ;
+			}
+		}/**/
+
+		display 'Occupation moyenne des véhicles (mode maritime)' refresh:every(1) {
+			chart  "Occupation moyenne des véhicles (mode maritime)" type: series {
+				data "Occupation moyenne des véhicles (mode maritime)" value: averageMaritimeVehicleOccupancy color: divergingCol3 ;
+			}
+		}/**/
+
+		display 'Occupation moyenne des véhicles (mode secondaire)' refresh:every(1) {
+			chart  "Occupation moyenne des véhicles (mode secondaire)" type: series {
+				data "Occupation moyenne des véhicles (mode secondaire)" value: averageSecondaryVehicleOccupancy color: divergingCol4 ;
+			}
+		}/**/
 	}
 }
