@@ -163,7 +163,7 @@ global {
 		];
 
 		file jsonFile <- json_file("timeBetweenVehicles.json");
-		map<string, unknown> mapParameters <- jsonFile.contents;
+		mapParameters <- jsonFile.contents;
 
 		// Forwarding agent
 		create ForwardingAgent number:1 returns:fas;
