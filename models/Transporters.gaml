@@ -23,7 +23,7 @@ species RoadTransporter parent: Transporter {
 
 species RiverTransporter parent: Transporter {
 	string networkType <- "river";
-	float timeBetweenVehicles <- 6;
+	float timeBetweenVehicles <- 48;
 	float maximalTransportedVolume <- 5775; // 1 barge ~ 350 EVP donc ~ 350 *16.5 = 5775 palettes par barges
 
 	/* le fluvial coûte 2 à 4 fois moins que le routier. On va prendre la valeur basse dans notre simulation.
@@ -38,14 +38,14 @@ species RiverTransporter parent: Transporter {
 
 species SecondaryMaritimeTransporter parent: Transporter {
 	string networkType <- "secondary";
-	float timeBetweenVehicles <- 72;
+	float timeBetweenVehicles <- 48;
 	float maximalTransportedVolume <- 24750; // moyenne de 1 500 EVP par porte conteneur (source : taille des feeders d'après page "Container_ship" sur Wikipedia). Soit 1500 * 16.5 = 24750 palettes par navires
 	float volumeKilometersCosts <- RoadTransporter[0].volumeKilometersCosts / 3.0;
 }
 
 species MaritimeTransporter parent: Transporter {
 	string networkType <- "maritime";
-	float timeBetweenVehicles <- 48;
+	float timeBetweenVehicles <- 72;
 	float maximalTransportedVolume <- 247500;// moyenne de 15 000 EVP par porte conteneur (source : Wikipedia). Soit 15000 * 16.5 = ‭247 500‬ palettes par navires
 	float volumeKilometersCosts <- RoadTransporter[0].volumeKilometersCosts / 8.0; // We don't really *need* a volume kilometer cost for this mode, however, if we give a zero value, there are weird results when we compute shortest paths 
 }
