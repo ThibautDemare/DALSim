@@ -769,6 +769,10 @@ global {
 		int sumRiver <- 0;
 		int sumMaritime <- 0;
 		int sumSecondary <- 0;
+		averageRoadVehicleOccupancy <- 0;
+		averageRiverVehicleOccupancy <- 0;
+		averageMaritimeVehicleOccupancy <- 0;
+		averageSecondaryVehicleOccupancy <- 0;
 		ask Vehicle {
 			if(readyToMove and destination != nil){
 				if(networkType = "road"){
