@@ -827,8 +827,8 @@ global {
 	string csvFilenameParams;
 
 	reflex initCSVFile when: saveObservations and date_simu_starts = nil {
-		// TODO : when gama dev will have republish  as_system_date "%Y-%M-%D-%h-%m-%s", use it instead
-		date_simu_starts <- ""+gama.machine_time;// as_system_date "%Y-%M-%D-%h-%m-%s";
+		date n <- date("now");
+		date_simu_starts <- ""+ n.year + "-" + n.month + "-" + n.day + "-" + n.hour + "-" + n.minute + "-" + n.second;
 
 		csvFilenameParams <- setParams();
 
