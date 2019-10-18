@@ -71,7 +71,7 @@ species SupplyChainElement schedules: [] {
 			self.position <- myself.position;
 			self.reference <- stock;
 			self.logisticsServiceProvider <- myself.supplyChain.logisticsServiceProvider;
-			self.stepOrderMade <- date("now");//int(time/3600);
+			self.stepOrderMade <- current_date;//int(time/3600);
 			self.strategy <- myself.supplyChain.logisticsServiceProvider.costsPathStrategy;
 		}
 		return o[0];
