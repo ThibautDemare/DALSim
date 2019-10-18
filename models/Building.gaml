@@ -173,7 +173,7 @@ species Building {
 					if(entering_stock.stepOrderMade >= starting_date){
 						// Update lists containing the time to deliver some goods in order to measure the efficiency of the actors
 						(entering_stock.stock.lp as LogisticsServiceProvider).timeToDeliver <- (entering_stock.stock.lp as LogisticsServiceProvider).timeToDeliver + (date("now") - entering_stock.stepOrderMade);//((int(time/3600)) - entering_stock.stepOrderMade);
-						localTimeToBeDeliveredLastDeliveries <- localTimeToBeDeliveredLastDeliveries + (date("now") - entering_stock.stepOrderMade);//((int(time/3600)) - entering_stock.stepOrderMade);
+						localTimeToBeDeliveredLastDeliveries <- localTimeToBeDeliveredLastDeliveries + ((date("now") - entering_stock.stepOrderMade))/3600.0;//((int(time/3600)) - entering_stock.stepOrderMade);
 					}
 				}
 				j <- j + 1;
