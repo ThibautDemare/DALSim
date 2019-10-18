@@ -832,49 +832,49 @@ global {
 
 		csvFilenameParams <- setParams();
 
-		save "step;stockInWarehouse;freeSurfaceInWarehouse;"
+		save "step;stockInWarehouse;freeSurfaceInWarehouse"
 			to: CSVFolderPath + date_simu_starts + "_stocks_warehouses" + csvFilenameParams + ".csv" type: text rewrite: false;
-		save "step;stockInFinalDest;freeSurfaceInFinalDest;"
+		save "step;stockInFinalDest;freeSurfaceInFinalDest"
 			to: CSVFolderPath + date_simu_starts + "_stocks_final_dests" + csvFilenameParams  + ".csv" type: text rewrite: false;
-		save "step;numberofEmptyStockInFinalDests;"
+		save "step;numberofEmptyStockInFinalDests"
 			to: CSVFolderPath + date_simu_starts + "_number_empty_stock_final_dest" + csvFilenameParams  + ".csv" type: text rewrite: false;
-		save "step;numberOfEmptyStockInWarehouses;"
+		save "step;numberOfEmptyStockInWarehouses"
 			to: CSVFolderPath + date_simu_starts + "_number_empty_stock_warehouses" + csvFilenameParams + ".csv" type: text rewrite: false;
-		save "step;averageTimeToDeliver;"
+		save "step;averageTimeToDeliver"
 			to: CSVFolderPath + date_simu_starts + "_average_time_to_deliver" + csvFilenameParams  + ".csv" type: text rewrite: false;
-		save "step;averageTimeToBeDelivered;"
+		save "step;averageTimeToBeDelivered"
 			to: CSVFolderPath + date_simu_starts + "_average_time_to_be_delivered" + csvFilenameParams  + ".csv" type: text rewrite: false;
-		save "step;nbLPStrat1;nbLPStrat2;nbLPStrat3;nbLPStrat4;"
+		save "step;nbLPStrat1;nbLPStrat2;nbLPStrat3;nbLPStrat4"
 			to: CSVFolderPath + date_simu_starts + "_strategies_adoption_share" + csvFilenameParams  + ".csv" type: text rewrite: false;
-		save "step;nbStocksAwaitingToEnterBuilding;nbStocksAwaitingToEnterWarehouse;nbStocksAwaitingToLeaveWarehouse;nbStocksAwaitingToLeaveProvider;"
+		save "step;nbStocksAwaitingToEnterBuilding;nbStocksAwaitingToEnterWarehouse;nbStocksAwaitingToLeaveWarehouse;nbStocksAwaitingToLeaveProvider"
 			to: CSVFolderPath + date_simu_starts + "_nb_stocks_awaiting" + csvFilenameParams  + ".csv" type: text rewrite: false;
-		save "step;averageThreshold;"
+		save "step;averageThreshold"
 			to: CSVFolderPath + date_simu_starts + "_averageThreshold" + csvFilenameParams  + ".csv" type: text rewrite: false;
-		save "step;nbLPStrat1LowThreshold;nbLPStrat1LowMediumThreshold;nbLPStrat1HighMediumThreshold;nbLPStrat1HighThreshold;"
+		save "step;nbLPStrat1LowThreshold;nbLPStrat1LowMediumThreshold;nbLPStrat1HighMediumThreshold;nbLPStrat1HighThreshold"
 			to: CSVFolderPath + date_simu_starts + "_strat1_threshold_adoption_share" + csvFilenameParams  + ".csv" type: text rewrite: false;
-		save "step;nbLPStrat2LowThreshold;nbLPStrat2LowMediumThreshold;nbLPStrat2HighMediumThreshold;nbLPStrat2HighThreshold;"
+		save "step;nbLPStrat2LowThreshold;nbLPStrat2LowMediumThreshold;nbLPStrat2HighMediumThreshold;nbLPStrat2HighThreshold"
 			to: CSVFolderPath + date_simu_starts + "_strat2_threshold_adoption_share" + csvFilenameParams  + ".csv" type: text rewrite: false;
-		save "step;nbLPStrat3LowThreshold;nbLPStrat3LowMediumThreshold;nbLPStrat3HighMediumThreshold;nbLPStrat3HighThreshold;"
+		save "step;nbLPStrat3LowThreshold;nbLPStrat3LowMediumThreshold;nbLPStrat3HighMediumThreshold;nbLPStrat3HighThreshold"
 			to: CSVFolderPath + date_simu_starts + "_strat3_threshold_adoption_share" + csvFilenameParams  + ".csv" type: text rewrite: false;
-		save "step;nbLPStrat4LowThreshold;nbLPStrat4LowMediumThreshold;nbLPStrat4HighMediumThreshold;nbLPStrat4HighThreshold;"
+		save "step;nbLPStrat4LowThreshold;nbLPStrat4LowMediumThreshold;nbLPStrat4HighMediumThreshold;nbLPStrat4HighThreshold"
 			to: CSVFolderPath + date_simu_starts + "_strat4_threshold_adoption_share" + csvFilenameParams  + ".csv" type: text rewrite: false;
-		save "step;averageCosts;"
+		save "step;averageCosts"
 			to: CSVFolderPath + date_simu_starts + "_average_costs" + csvFilenameParams  + ".csv" type: text rewrite: false;
-		save "step;nbHavre;nbAntwerp;"
+		save "step;nbHavre;nbAntwerp"
 			to: CSVFolderPath + date_simu_starts + "_competition_between_LH_Antwerp" + csvFilenameParams  + ".csv" type: text rewrite: false;
-		save "step;sumRoadVehicle;sumRiverVehicle;sumMaritimeVehicle;sumSecondaryVehicle;"
+		save "step;sumRoadVehicle;sumRiverVehicle;sumMaritimeVehicle;sumSecondaryVehicle"
 			to: CSVFolderPath + date_simu_starts + "_share_transport_mode" + csvFilenameParams  + ".csv" type: text rewrite: false;
-		save "step;sumRoadQuantities;sumRiverQuantities;sumMaritimeQuantities;sumSecondaryQuantities;"
+		save "step;sumRoadQuantities;sumRiverQuantities;sumMaritimeQuantities;sumSecondaryQuantities"
 			to: CSVFolderPath + date_simu_starts + "_share_transport_mode_quantities" + csvFilenameParams  + ".csv" type: text rewrite: false;
-		save "step;trafficValueCSN;"
+		save "step;trafficValueCSN"
 			to: CSVFolderPath + date_simu_starts + "_traffic_evolution_CSN" + csvFilenameParams  + ".csv" type: text rewrite: false;
-		save "step;averageRoadVehicleOccupancy;"
+		save "step;averageRoadVehicleOccupancy"
 			to: CSVFolderPath + date_simu_starts + "_vehicles_occupancy_road" + csvFilenameParams  + ".csv" type: text rewrite: false;
-		save "step;averageRiverVehicleOccupancy;"
+		save "step;averageRiverVehicleOccupancy"
 			to: CSVFolderPath + date_simu_starts + "_vehicles_occupancy_river" + csvFilenameParams  + ".csv" type: text rewrite: false;
-		save "step;averageMaritimeVehicleOccupancy;"
-			to: CSVFolderPath + date_simu_starts + "_vehicles_occupancy_martime" + csvFilenameParams  + ".csv" type: text rewrite: false;
-		save "step;averageSecondaryVehicleOccupancy;"
+		save "step;averageMaritimeVehicleOccupancy"
+			to: CSVFolderPath + date_simu_starts + "_vehicles_occupancy_maritime" + csvFilenameParams  + ".csv" type: text rewrite: false;
+		save "step;averageSecondaryVehicleOccupancy"
 			to: CSVFolderPath + date_simu_starts + "_vehicles_occupancy_secondary" + csvFilenameParams  + ".csv" type: text rewrite: false;
 
 		do initCSVFileShareTransportModeRegion(csvFilenameParams, "Basse-Normandie");
@@ -902,15 +902,15 @@ global {
 		loop while: i < length(RegionObserver) and notfound {
 			if(RegionObserver[i].name = n){
 				sr <- RegionObserver[i];
-				save "step;" + n +" sumRoadVehicleRO;" + n +" sumRiverVehicleRO;" + n +" sumMaritimeVehicleRO;" + n +" sumSecondaryVehicleRO;"
+				save "step;" + n +" sumRoadVehicleRO;" + n +" sumRiverVehicleRO;" + n +" sumMaritimeVehicleRO;" + n +" sumSecondaryVehicleRO"
 					to: CSVFolderPath + date_simu_starts + "_share_transport_mode_" + n + params  + ".csv" type: text rewrite: false;
-				save "step;" + n +" sumRoadQuantitiesRO;" + n +" sumRiverQuantitiesRO;" + n +" sumMaritimeQuantitiesRO;" + n +" sumSecondaryQuantitiesRO;"
+				save "step;" + n +" sumRoadQuantitiesRO;" + n +" sumRiverQuantitiesRO;" + n +" sumMaritimeQuantitiesRO;" + n +" sumSecondaryQuantitiesRO"
 					to: CSVFolderPath + date_simu_starts + "_share_transport_mode_quantities_" + n + params  + ".csv" type: text rewrite: false;
 				notfound <- false;
 
-				save "step;" + n +" sumLeavingRoadVehicleRO;" + n +" sumLeavingRiverVehicleRO;" + n +" sumLeavingMaritimeVehicleRO;" + n +" sumLeavingSecondaryVehicleRO;"
+				save "step;" + n +" sumLeavingRoadVehicleRO;" + n +" sumLeavingRiverVehicleRO;" + n +" sumLeavingMaritimeVehicleRO;" + n +" sumLeavingSecondaryVehicleRO"
 					to: CSVFolderPath + date_simu_starts + "_share_leaving_vehicles_per_transport_mode_" + n + params  + ".csv" type: text rewrite: false;
-				save "step;" + n +" sumLeavingRoadQuantitiesRO;" + n +" sumLeavingRiverQuantitiesRO;" + n +" sumLeavingMaritimeQuantitiesRO;" + n +" sumLeavingSecondaryQuantitiesRO;"
+				save "step;" + n +" sumLeavingRoadQuantitiesRO;" + n +" sumLeavingRiverQuantitiesRO;" + n +" sumLeavingMaritimeQuantitiesRO;" + n +" sumLeavingSecondaryQuantitiesRO"
 					to: CSVFolderPath + date_simu_starts + "_share_leaving_quantities_per_transport_mode_" + n + params  + ".csv" type: text rewrite: false;
 				notfound <- false;
 			}
