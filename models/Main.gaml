@@ -190,7 +190,7 @@ global {
 		/**/
 
 		//  Logistic Service providers
-		create LogisticsServiceProvider from: logistic_provider_shapefile;
+		create LogisticsServiceProvider from: logistic_provider_shapefile with: [region::int(read("region")), department::float(read("department"))];
 
 		/*
 		 * The following code can be commented or not, depending if the user want to execute the simulation with every LSP 
@@ -208,7 +208,7 @@ global {
 		/**/
 
 		// Final destinations
-		create FinalConsignee from: destination_shapefile with: [huffValue::float(read("huff")), surface::float(read("surface"))];
+		create FinalConsignee from: destination_shapefile with: [huffValue::float(read("huff")), surface::float(read("surface")), region::int(read("region")), department::float(read("department"))];
 		/* 
 		 * The following code can be commented or not, depending if the user want to execute the simulation with every FDM 
 		 * It is mainly used for tests to avoid CPU overload.

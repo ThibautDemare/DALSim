@@ -10,6 +10,10 @@ species FinalConsignee { // Used to be called FinalDestinationManager with assoc
 	float huffValue;// number of customer according to huff model => this value cant be used like this because the Huff model does not take care of time.
 	Building building;
 
+	// Data from the Shapefile used for analysis purpose
+	int department;
+	int region;
+
 	// Relative to contract with LSP
 	LogisticsServiceProvider logisticsServiceProvider <- nil;
 	int timeShifting <- rnd(23);

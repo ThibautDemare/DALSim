@@ -40,13 +40,13 @@ global {
 		loop while: i < length(savedAgents) {//
 			if(cycle = savedAgents[i]){
 				write "================ START SAVE  - " + cycle;
-				save "costsPathStrategy; threshold; averageCosts; cumulateCosts; adoptedSelectingWarehouseStrategy; provider.port; length(customers)" to: "LogisticsServiceProvider.csv" type: "csv" rewrite:true;
+				save "costsPathStrategy; threshold; averageCosts; cumulateCosts; adoptedSelectingWarehouseStrategy; provider.port; nbCustomers; region; department" to: "LogisticsServiceProvider.csv" type: "csv" rewrite:true;
 				ask LogisticsServiceProvider{
-					save [costsPathStrategy, threshold, averageCosts, cumulateCosts, adoptedSelectingWarehouseStrategy, provider.port, length(customers)] to: "LogisticsServiceProvider.csv" type: "csv" rewrite:false;
+					save [costsPathStrategy, threshold, averageCosts, cumulateCosts, adoptedSelectingWarehouseStrategy, provider.port, length(customers), region, department] to: "LogisticsServiceProvider.csv" type: "csv" rewrite:false;
 				}
-				save "surface; localAverageCosts; localWarehousingCosts; averageCostsOfNeighbors; localVolumeNormalizedAverageCosts; localAverageNbStockShortagesLastSteps" to: "FinalConsignee.csv" type: "csv" rewrite:true;
+				save "surface; localAverageCosts; localWarehousingCosts; averageCostsOfNeighbors; localVolumeNormalizedAverageCosts; localAverageNbStockShortagesLastSteps; region; department" to: "FinalConsignee.csv" type: "csv" rewrite:true;
 				ask FinalConsignee {
-					save [surface, localAverageCosts, localWarehousingCosts, averageCostsOfNeighbors, localVolumeNormalizedAverageCosts, localAverageNbStockShortagesLastSteps] to: "FinalConsignee.csv" type: "csv" rewrite:false;
+					save [surface, localAverageCosts, localWarehousingCosts, averageCostsOfNeighbors, localVolumeNormalizedAverageCosts, localAverageNbStockShortagesLastSteps, region, department] to: "FinalConsignee.csv" type: "csv" rewrite:false;
 				}
 				write "================ END SAVE AGENTS - " + cycle;
 			}

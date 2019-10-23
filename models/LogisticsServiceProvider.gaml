@@ -20,6 +20,10 @@ species LogisticsServiceProvider {
 	float probaAnt <- 0.5;
 	string costsPathStrategy;
 	
+	// Data from the Shapefile used for analysis purpose
+	int department;
+	int region;
+
 	init {
 		if(isLocalSelectingWarehouseStrategies){
 			adoptedSelectingWarehouseStrategy <- one_of(possibleSelectingWarehouseStrategies);
