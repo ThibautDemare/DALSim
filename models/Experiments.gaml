@@ -16,18 +16,79 @@ global {
 	rgb divergingCol6 <- rgb("#1E88E5");// blue //rgb(49, 130, 189); // blue
 	rgb divergingCol7 <- rgb("#FFC107");// yellow //rgb(160, 55, 100); // purple
 	rgb divergingCol8 <- rgb("#004D40");// green 
+
+	string pathPreviousSim <- "/saveSimu.gsim";
+	bool saveSimulation <- false; // Use by some experiments. It indicates if we should save the state of the simulation at the end.
+	list<int> savedSteps <- [];// Use by some experiments, if saveSimulation = true. It indicates when we should save the state of the simulation.
+	bool saveAgents <- false; // Use by some experiments. It indicates if we should save the state of the agents.
+	list<int> savedAgents <- [];// Use by some experiments, if saveSimulation = true. It indicates when we should save the state of the agents.
+
+	reflex storeSimulation when: saveSimulation {
+		int i <- 0;
+		loop while: i < length(savedSteps) {
+			if(cycle = savedSteps[i]){
+				write "================ START SAVE SIMULATION - " + cycle;
+				write "Save of simulation : " + save_simulation("saveSimu_"+cycle+".gsim");
+				write "================ END SAVE SIMULATION - " + cycle;
+			}
+			i <- i + 1;
+		}
+	}
+
+	reflex storeAgent when: saveAgents {
+		int i <- 0;
+		loop while: i < length(savedAgents) {//
+			if(cycle = savedAgents[i]){
+				write "================ START SAVE  - " + cycle;
+				save "costsPathStrategy; threshold; averageCosts; cumulateCosts; adoptedSelectingWarehouseStrategy; provider.port; length(customers)" to: "LogisticsServiceProvider.csv" type: "csv" rewrite:true;
+				ask LogisticsServiceProvider{
+					save [costsPathStrategy, threshold, averageCosts, cumulateCosts, adoptedSelectingWarehouseStrategy, provider.port, length(customers)] to: "LogisticsServiceProvider.csv" type: "csv" rewrite:false;
+				}
+				save "surface; localAverageCosts; localWarehousingCosts; averageCostsOfNeighbors; localVolumeNormalizedAverageCosts; localAverageNbStockShortagesLastSteps" to: "FinalConsignee.csv" type: "csv" rewrite:true;
+				ask FinalConsignee {
+					save [surface, localAverageCosts, localWarehousingCosts, averageCostsOfNeighbors, localVolumeNormalizedAverageCosts, localAverageNbStockShortagesLastSteps] to: "FinalConsignee.csv" type: "csv" rewrite:false;
+				}
+				write "================ END SAVE AGENTS - " + cycle;
+			}
+			i <- i + 1;
+		}
+	}
 }
 
 experiment 'Docker' type: gui {
 	parameter "saver" var: saveObservations <- true;
 	parameter "pathBD" var: pathBD <- "/bd/Used/";
 	parameter "CSVFolderPath" var: CSVFolderPath <- "/CSV/";
+	parameter "saveSimulation" var: saveSimulation <- false;
+	parameter "savedSteps" var: savedSteps <- [];
+	parameter "saveAgents" var: saveAgents <- false;
+	parameter "savedAgents" var: savedAgents <- [];
+}
+
+experiment 'Docker from previous simulation' type: gui {
+	parameter "saver" var: saveObservations <- true;
+	parameter "pathBD" var: pathBD <- "/bd/Used/";
+	parameter "CSVFolderPath" var: CSVFolderPath <- "/CSV/";
+	parameter "saveSimulation" var: saveSimulation <- false;
+	parameter "savedSteps" var: savedSteps <- [];
+	parameter "saveAgents" var: saveAgents <- false;
+	parameter "savedAgents" var: savedAgents <- [];
+	parameter "pathPreviousSim" var: pathPreviousSim <-  "/saveSimu.gsim";
+
+	action _init_ {
+		create simulation from: saved_simulation_file(pathPreviousSim);
+	}
 }
 
 experiment 'Docker with traffic screenshots' type: gui {
 	parameter "saver" var: saveObservations <- true;
 	parameter "pathBD" var: pathBD <- "/bd/Used/";
 	parameter "CSVFolderPath" var: CSVFolderPath <- "/CSV/";
+	parameter "saveSimulation" var: saveSimulation <- false;
+	parameter "savedSteps" var: savedSteps <- [];
+	parameter "saveAgents" var: saveAgents <- false;
+	parameter "savedAgents" var: savedAgents <- [];
+
 	output {
 		// The size of these two displays is due to the size of the calc I apply on the snapshots when I generate a video
 		display 'Road traffic' autosave:{1061,988} refresh:every(1) {
