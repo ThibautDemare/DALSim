@@ -19,38 +19,30 @@ global {
 
 	string pathPreviousSim <- "/saveSimu.gsim";
 	bool saveSimulation <- false; // Use by some experiments. It indicates if we should save the state of the simulation at the end.
-	list<int> savedSteps <- [];// Use by some experiments, if saveSimulation = true. It indicates when we should save the state of the simulation.
+	int savedSteps <- -1;// Use by some experiments, if saveSimulation = true. It indicates when we should save the state of the simulation.
 	bool saveAgents <- false; // Use by some experiments. It indicates if we should save the state of the agents.
-	list<int> savedAgents <- [];// Use by some experiments, if saveSimulation = true. It indicates when we should save the state of the agents.
+	int savedAgents <- -1;// Use by some experiments, if saveSimulation = true. It indicates when we should save the state of the agents.
 
 	reflex storeSimulation when: saveSimulation {
-		int i <- 0;
-		loop while: i < length(savedSteps) {
-			if(cycle = savedSteps[i]){
-				write "================ START SAVE SIMULATION - " + cycle;
-				write "Save of simulation : " + save_simulation("saveSimu_"+cycle+".gsim");
-				write "================ END SAVE SIMULATION - " + cycle;
-			}
-			i <- i + 1;
+		if(savedSteps > 0 and cycle mod savedSteps){
+			write "================ START SAVE SIMULATION - " + cycle;
+			write "Save of simulation : " + save_simulation("saveSimu_"+cycle+".gsim");
+			write "================ END SAVE SIMULATION - " + cycle;
 		}
 	}
 
 	reflex storeAgent when: saveAgents {
-		int i <- 0;
-		loop while: i < length(savedAgents) {//
-			if(cycle = savedAgents[i]){
-				write "================ START SAVE  - " + cycle;
-				save "costsPathStrategy; threshold; averageCosts; cumulateCosts; adoptedSelectingWarehouseStrategy; provider.port; nbCustomers; region; department" to: "LogisticsServiceProvider.csv" type: "csv" rewrite:true;
-				ask LogisticsServiceProvider{
-					save [costsPathStrategy, threshold, averageCosts, cumulateCosts, adoptedSelectingWarehouseStrategy, provider.port, length(customers), region, department] to: "LogisticsServiceProvider.csv" type: "csv" rewrite:false;
-				}
-				save "surface; localAverageCosts; localWarehousingCosts; averageCostsOfNeighbors; localVolumeNormalizedAverageCosts; localAverageNbStockShortagesLastSteps; region; department" to: "FinalConsignee.csv" type: "csv" rewrite:true;
-				ask FinalConsignee {
-					save [surface, localAverageCosts, localWarehousingCosts, averageCostsOfNeighbors, localVolumeNormalizedAverageCosts, localAverageNbStockShortagesLastSteps, region, department] to: "FinalConsignee.csv" type: "csv" rewrite:false;
-				}
-				write "================ END SAVE AGENTS - " + cycle;
+		if(savedAgents > 0 and cycle mod savedAgents){
+			write "================ START SAVE  - " + cycle;
+			save "costsPathStrategy; threshold; averageCosts; cumulateCosts; adoptedSelectingWarehouseStrategy; provider.port; nbCustomers; region; department" to: "LogisticsServiceProvider.csv" type: "csv" rewrite:true;
+			ask LogisticsServiceProvider{
+				save [costsPathStrategy, threshold, averageCosts, cumulateCosts, adoptedSelectingWarehouseStrategy, provider.port, length(customers), region, department] to: "LogisticsServiceProvider.csv" type: "csv" rewrite:false;
 			}
-			i <- i + 1;
+			save "surface; localAverageCosts; localWarehousingCosts; averageCostsOfNeighbors; localVolumeNormalizedAverageCosts; localAverageNbStockShortagesLastSteps; region; department" to: "FinalConsignee.csv" type: "csv" rewrite:true;
+			ask FinalConsignee {
+				save [surface, localAverageCosts, localWarehousingCosts, averageCostsOfNeighbors, localVolumeNormalizedAverageCosts, localAverageNbStockShortagesLastSteps, region, department] to: "FinalConsignee.csv" type: "csv" rewrite:false;
+			}
+			write "================ END SAVE AGENTS - " + cycle;
 		}
 	}
 
