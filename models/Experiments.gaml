@@ -26,7 +26,7 @@ global {
 	reflex storeSimulation when: saveSimulation {
 		if(savedSteps > 0 and cycle mod savedSteps){
 			write "================ START SAVE SIMULATION - " + cycle;
-			write "Save of simulation : " + save_simulation("saveSimu_"+cycle+".gsim");
+			write "Save of simulation : " + save_simulation("/Backup/saveSimu_"+cycle+".gsim");
 			write "================ END SAVE SIMULATION - " + cycle;
 		}
 	}
@@ -34,13 +34,13 @@ global {
 	reflex storeAgent when: saveAgents {
 		if(savedAgents > 0 and cycle mod savedAgents){
 			write "================ START SAVE  - " + cycle;
-			save "costsPathStrategy; threshold; averageCosts; cumulateCosts; adoptedSelectingWarehouseStrategy; provider.port; nbCustomers; region; department" to: "LogisticsServiceProvider.csv" type: "csv" rewrite:true;
+			save "costsPathStrategy; threshold; averageCosts; cumulateCosts; adoptedSelectingWarehouseStrategy; provider.port; nbCustomers; region; department" to: "/Agents/LogisticsServiceProvider.csv" type: "csv" rewrite:true;
 			ask LogisticsServiceProvider{
-				save [costsPathStrategy, threshold, averageCosts, cumulateCosts, adoptedSelectingWarehouseStrategy, provider.port, length(customers), region, department] to: "LogisticsServiceProvider.csv" type: "csv" rewrite:false;
+				save [costsPathStrategy, threshold, averageCosts, cumulateCosts, adoptedSelectingWarehouseStrategy, provider.port, length(customers), region, department] to: "/Agents/LogisticsServiceProvider.csv" type: "csv" rewrite:false;
 			}
-			save "surface; localAverageCosts; localWarehousingCosts; averageCostsOfNeighbors; localVolumeNormalizedAverageCosts; localAverageNbStockShortagesLastSteps; region; department" to: "FinalConsignee.csv" type: "csv" rewrite:true;
+			save "surface; localAverageCosts; localWarehousingCosts; averageCostsOfNeighbors; localVolumeNormalizedAverageCosts; localAverageNbStockShortagesLastSteps; region; department" to: "/Agents/FinalConsignee.csv" type: "csv" rewrite:true;
 			ask FinalConsignee {
-				save [surface, localAverageCosts, localWarehousingCosts, averageCostsOfNeighbors, localVolumeNormalizedAverageCosts, localAverageNbStockShortagesLastSteps, region, department] to: "FinalConsignee.csv" type: "csv" rewrite:false;
+				save [surface, localAverageCosts, localWarehousingCosts, averageCostsOfNeighbors, localVolumeNormalizedAverageCosts, localAverageNbStockShortagesLastSteps, region, department] to: "/Agents/FinalConsignee.csv" type: "csv" rewrite:false;
 			}
 			write "================ END SAVE AGENTS - " + cycle;
 		}
@@ -49,7 +49,7 @@ global {
 	action backupSim {
 		if(cycle mod 100 = 0 ){
 			write "================ START SAVE SIMULATION - " + cycle;
-			write "Save of simulation : " + save_simulation("backup_simu_"+cycle+".gsim");
+			write "Save of simulation : " + save_simulation("/Backup/backup_simu_"+cycle+".gsim");
 			write "================ END SAVE SIMULATION - " + cycle;
 		}
 	}
