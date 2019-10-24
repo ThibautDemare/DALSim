@@ -34,13 +34,9 @@ global {
 	reflex storeAgent when: saveAgents {
 		if(savedAgents > 0 and cycle mod savedAgents){
 			write "================ START SAVE  - " + cycle;
-			save "costsPathStrategy; threshold; averageCosts; cumulateCosts; adoptedSelectingWarehouseStrategy; provider.port; nbCustomers; region; department" to: "/Agents/LogisticsServiceProvider.csv" type: "csv" rewrite:true;
-			ask LogisticsServiceProvider{
-				save [costsPathStrategy, threshold, averageCosts, cumulateCosts, adoptedSelectingWarehouseStrategy, provider.port, length(customers), region, department] to: "/Agents/LogisticsServiceProvider.csv" type: "csv" rewrite:false;
-			}
-			save "surface; localAverageCosts; localWarehousingCosts; averageCostsOfNeighbors; localVolumeNormalizedAverageCosts; localAverageNbStockShortagesLastSteps; region; department" to: "/Agents/FinalConsignee.csv" type: "csv" rewrite:true;
+			save "surface; localAverageCosts; localWarehousingCosts; averageCostsOfNeighbors; localVolumeNormalizedAverageCosts; localAverageNbStockShortagesLastSteps; region; department; lsp.costsPathStrategy; lsp.threshold; lsp.averageCosts; lsp.cumulateCosts; lsp.adoptedSelectingWarehouseStrategy; lsp.provider.port; lsp.nbCustomers; lsp.region; lsp.department" to: "/Agents/FinalConsignee.csv" type: "csv" rewrite:true;
 			ask FinalConsignee {
-				save [surface, localAverageCosts, localWarehousingCosts, averageCostsOfNeighbors, localVolumeNormalizedAverageCosts, localAverageNbStockShortagesLastSteps, region, department] to: "/Agents/FinalConsignee.csv" type: "csv" rewrite:false;
+				save [surface, localAverageCosts, localWarehousingCosts, averageCostsOfNeighbors, localVolumeNormalizedAverageCosts, localAverageNbStockShortagesLastSteps, region, department,	logisticsServiceProvider.costsPathStrategy, logisticsServiceProvider.threshold, logisticsServiceProvider.averageCosts, logisticsServiceProvider.cumulateCosts, logisticsServiceProvider.adoptedSelectingWarehouseStrategy, logisticsServiceProvider.provider.port, length(logisticsServiceProvider.customers), logisticsServiceProvider.region, logisticsServiceProvider.department] to: "/Agents/FinalConsignee.csv" type: "csv" rewrite:false;
 			}
 			write "================ END SAVE AGENTS - " + cycle;
 		}
