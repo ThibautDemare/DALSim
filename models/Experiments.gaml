@@ -53,6 +53,14 @@ global {
 			i <- i + 1;
 		}
 	}
+
+	action backupSim {
+		if(cycle mod 100 = 0 ){
+			write "================ START SAVE SIMULATION - " + cycle;
+			write "Save of simulation : " + save_simulation("backup_simu_"+cycle+".gsim");
+			write "================ END SAVE SIMULATION - " + cycle;
+		}
+	}
 }
 
 experiment 'Docker' type: gui {
@@ -63,6 +71,12 @@ experiment 'Docker' type: gui {
 	parameter "savedSteps" var: savedSteps <- [];
 	parameter "saveAgents" var: saveAgents <- false;
 	parameter "savedAgents" var: savedAgents <- [];
+
+	reflex reflexBackup {
+		ask world {
+			do backupSim;
+		}
+	}
 }
 
 experiment 'Docker from previous simulation' type: gui {
@@ -78,6 +92,12 @@ experiment 'Docker from previous simulation' type: gui {
 	action _init_ {
 		create simulation from: saved_simulation_file(pathPreviousSim);
 	}
+
+	reflex reflexBackup {
+		ask world {
+			do backupSim;
+		}
+	}
 }
 
 experiment 'Docker with traffic screenshots' type: gui {
@@ -88,6 +108,12 @@ experiment 'Docker with traffic screenshots' type: gui {
 	parameter "savedSteps" var: savedSteps <- [];
 	parameter "saveAgents" var: saveAgents <- false;
 	parameter "savedAgents" var: savedAgents <- [];
+
+	reflex reflexBackup {
+		ask world {
+			do backupSim;
+		}
+	}
 
 	output {
 		// The size of these two displays is due to the size of the calc I apply on the snapshots when I generate a video
