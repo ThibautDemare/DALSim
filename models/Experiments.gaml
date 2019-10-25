@@ -24,7 +24,7 @@ global {
 	int savedAgents <- -1;// Use by some experiments, if saveSimulation = true. It indicates when we should save the state of the agents.
 
 	reflex storeSimulation when: saveSimulation {
-		if(savedSteps > 0 and cycle mod savedSteps){
+		if(savedSteps > 0 and cycle mod savedSteps = 0){
 			write "================ START SAVE SIMULATION - " + cycle;
 			write "Save of simulation : " + save_simulation("/Backup/saveSimu_"+cycle+".gsim");
 			write "================ END SAVE SIMULATION - " + cycle;
@@ -32,7 +32,7 @@ global {
 	}
 
 	reflex storeAgent when: saveAgents {
-		if(savedAgents > 0 and cycle mod savedAgents){
+		if(savedAgents > 0 and cycle mod savedAgents = 0){
 			write "================ START SAVE  - " + cycle;
 			save "surface; localAverageCosts; localWarehousingCosts; averageCostsOfNeighbors; localVolumeNormalizedAverageCosts; localAverageNbStockShortagesLastSteps; region; department; lsp.costsPathStrategy; lsp.threshold; lsp.averageCosts; lsp.cumulateCosts; lsp.adoptedSelectingWarehouseStrategy; lsp.provider.port; lsp.nbCustomers; lsp.region; lsp.department" to: "/Agents/FinalConsignee_"+cycle+".csv" type: "csv" rewrite:true;
 			ask FinalConsignee {
@@ -56,9 +56,9 @@ experiment 'Docker' type: gui {
 	parameter "pathBD" var: pathBD <- "/bd/Used/";
 	parameter "CSVFolderPath" var: CSVFolderPath <- "/CSV/";
 	parameter "saveSimulation" var: saveSimulation <- false;
-	parameter "savedSteps" var: savedSteps <- [];
+	parameter "savedSteps" var: savedSteps <- -1;
 	parameter "saveAgents" var: saveAgents <- false;
-	parameter "savedAgents" var: savedAgents <- [];
+	parameter "savedAgents" var: savedAgents <- -1;
 
 	reflex reflexBackup {
 		ask world {
