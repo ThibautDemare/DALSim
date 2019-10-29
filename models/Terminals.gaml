@@ -13,18 +13,12 @@ species Terminal parent:Building{
 			draw shape + 2°px color: rgb(255, colorValue, 0) border:rgb(255, colorValue, 0);
 		}
 	}
-}
 
-species SecondaryTerminal parent:Terminal{
-	float handling_time_to_secondary;
-	float handling_time_from_secondary;
-	string col <- "red";
-
-	reflex manageSecondaryComingCommodities {
+	action manageComingCommodities(string mode, float handling_time){
 		int i <- 0;
 		loop while:i<length(comingCommodities) {
-			if(comingCommodities[i].currentNetwork = 'secondary' and
-				comingCommodities[i].incomingDate + handling_time_from_secondary#hour >= current_date
+			if(comingCommodities[i].currentNetwork = mode and
+				comingCommodities[i].incomingDate + handling_time#hour >= current_date
 			){
 				leavingCommodities <+ comingCommodities[i];
 				remove index:i from:comingCommodities;
@@ -33,6 +27,16 @@ species SecondaryTerminal parent:Terminal{
 				i <- i + 1;
 			}
 		} 
+	}
+}
+
+species SecondaryTerminal parent:Terminal{
+	float handling_time_to_secondary;
+	float handling_time_from_secondary;
+	string col <- "red";
+
+	reflex manageSecondaryComingCommodities {
+		do manageComingCommodities('secondary', handling_time_from_secondary);
 	}
 
 	float getHandlingTimeFrom(string nt){
@@ -49,18 +53,7 @@ species RiverTerminal parent:Terminal{
 	string col <- "red";
 	
 	reflex manageRiverComingCommodities {
-		int i <- 0;
-		loop while:i<length(comingCommodities) {
-			if(comingCommodities[i].currentNetwork = 'river' and
-				comingCommodities[i].incomingDate + handling_time_from_river#hour >= current_date
-			){
-				leavingCommodities <+ comingCommodities[i];
-				remove index:i from:comingCommodities;
-			}
-			else{
-				i <- i + 1;
-			}
-		}
+		do manageComingCommodities('river', handling_time_from_river);
 	}
 
 	float getHandlingTimeFrom(string nt){
@@ -82,48 +75,15 @@ species MaritimeRiverTerminal parent:Terminal {
 	string col <- "red";
 	
 	reflex manageMaritimeComingCommodities {
-		int i <- 0;
-		loop while:i<length(comingCommodities) {
-			if(comingCommodities[i].currentNetwork = 'maritime' and
-				comingCommodities[i].incomingDate + handling_time_from_maritime#hour >= current_date
-			){
-				leavingCommodities <+ comingCommodities[i];
-				remove index:i from:comingCommodities;
-			}
-			else{
-				i <- i + 1;
-			}
-		} 
+		do manageComingCommodities('maritime', handling_time_from_maritime);
 	}
 
 	reflex manageSecondaryComingCommodities {
-		int i <- 0;
-		loop while:i<length(comingCommodities) {
-			if(comingCommodities[i].currentNetwork = 'secondary' and
-				comingCommodities[i].incomingDate + handling_time_from_secondary#hour >= current_date
-			){
-				leavingCommodities <+ comingCommodities[i];
-				remove index:i from:comingCommodities;
-			}
-			else{
-				i <- i + 1;
-			}
-		} 
+		do manageComingCommodities('secondary', handling_time_from_secondary);
 	}
 
 	reflex manageRiverComingCommodities {
-		int i <- 0;
-		loop while:i<length(comingCommodities) {
-			if(comingCommodities[i].currentNetwork = 'river' and
-				comingCommodities[i].incomingDate + handling_time_from_river#hour >= current_date
-			){
-				leavingCommodities <+ comingCommodities[i];
-				remove index:i from:comingCommodities;
-			}
-			else{
-				i <- i + 1;
-			}
-		} 
+		do manageComingCommodities('river', handling_time_from_river);
 	}
 
 	float getHandlingTimeFrom(string nt){
