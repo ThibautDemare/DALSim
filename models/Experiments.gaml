@@ -17,19 +17,8 @@ global {
 	rgb divergingCol7 <- rgb("#FFC107");// yellow //rgb(160, 55, 100); // purple
 	rgb divergingCol8 <- rgb("#004D40");// green 
 
-	string pathPreviousSim <- "/saveSimu.gsim";
-	bool saveSimulation <- false; // Use by some experiments. It indicates if we should save the state of the simulation at the end.
-	int savedSteps <- -1;// Use by some experiments, if saveSimulation = true. It indicates when we should save the state of the simulation.
 	bool saveAgents <- false; // Use by some experiments. It indicates if we should save the state of the agents.
 	int savedAgents <- -1;// Use by some experiments, if saveSimulation = true. It indicates when we should save the state of the agents.
-
-	reflex storeSimulation when: saveSimulation {
-		if(savedSteps > 0 and cycle mod savedSteps = 0){
-			write "================ START SAVE SIMULATION - " + cycle;
-			write "Save of simulation : " + save_simulation("/Backup/saveSimu_"+cycle+".gsim");
-			write "================ END SAVE SIMULATION - " + cycle;
-		}
-	}
 
 	reflex storeAgent when: saveAgents {
 		if(savedAgents > 0 and cycle mod savedAgents = 0){
@@ -41,67 +30,22 @@ global {
 			write "================ END SAVE AGENTS - " + cycle;
 		}
 	}
-
-	action backupSim {
-		if(cycle mod 500 = 0 ){
-			write "================ START SAVE SIMULATION - " + cycle;
-			write "Save of simulation : " + save_simulation("/Backup/backup_simu_"+cycle+".gsim");
-			write "================ END SAVE SIMULATION - " + cycle;
-		}
-	}
 }
 
 experiment 'Docker' type: gui {
 	parameter "saver" var: saveObservations <- true;
 	parameter "pathBD" var: pathBD <- "/bd/Used/";
 	parameter "CSVFolderPath" var: CSVFolderPath <- "/CSV/";
-	parameter "saveSimulation" var: saveSimulation <- false;
-	parameter "savedSteps" var: savedSteps <- -1;
 	parameter "saveAgents" var: saveAgents <- false;
 	parameter "savedAgents" var: savedAgents <- -1;
-
-	reflex reflexBackup {
-		ask world {
-			do backupSim;
-		}
-	}
-}
-
-experiment 'Docker from previous simulation' type: gui {
-	parameter "saver" var: saveObservations <- true;
-	parameter "pathBD" var: pathBD <- "/bd/Used/";
-	parameter "CSVFolderPath" var: CSVFolderPath <- "/CSV/";
-	parameter "saveSimulation" var: saveSimulation <- false;
-	parameter "savedSteps" var: savedSteps <- [];
-	parameter "saveAgents" var: saveAgents <- false;
-	parameter "savedAgents" var: savedAgents <- [];
-	parameter "pathPreviousSim" var: pathPreviousSim <-  "/saveSimu.gsim";
-
-	action _init_ {
-		create simulation from: saved_simulation_file(pathPreviousSim);
-	}
-
-	reflex reflexBackup {
-		ask world {
-			do backupSim;
-		}
-	}
 }
 
 experiment 'Docker with traffic screenshots' type: gui {
 	parameter "saver" var: saveObservations <- true;
 	parameter "pathBD" var: pathBD <- "/bd/Used/";
 	parameter "CSVFolderPath" var: CSVFolderPath <- "/CSV/";
-	parameter "saveSimulation" var: saveSimulation <- false;
-	parameter "savedSteps" var: savedSteps <- [];
 	parameter "saveAgents" var: saveAgents <- false;
-	parameter "savedAgents" var: savedAgents <- [];
-
-	reflex reflexBackup {
-		ask world {
-			do backupSim;
-		}
-	}
+	parameter "savedAgents" var: savedAgents <- -1;
 
 	output {
 		// The size of these two displays is due to the size of the calc I apply on the snapshots when I generate a video
