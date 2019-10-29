@@ -11,7 +11,7 @@ species Transporter skills:Transporter {
 
 species RoadTransporter parent: Transporter {
 	string networkType <- "road";
-	float timeBetweenVehicles <- 1;
+	float timeBetweenVehicles <- 0.01667; // One departure every minute => so possibly 60 per hour
 	float maximalTransportedVolume <- 33;// 33 palettes par camion / 1 camion = 2 EVP soit 16.5 palettes par evp
 
 	/*
