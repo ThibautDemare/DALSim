@@ -925,7 +925,7 @@ global {
 		loop while: i < length(RegionObserver) and notfound {
 			if(RegionObserver[i].name = n){
 				sr <- RegionObserver[i];
-				save "step;" + n +" nbAntwerp;" + n +" nbHavre;"
+				save "step;" + n +" nbAntwerp;" + n +" nbHavre"
 					to: CSVFolderPath + date_simu_starts + "_share_port_origin_region_" + n + params  + ".csv" type: text rewrite: false;
 				notfound <- false;
 			}
