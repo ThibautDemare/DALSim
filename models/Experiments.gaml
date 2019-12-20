@@ -22,12 +22,10 @@ global {
 
 	reflex storeAgent when: saveAgents {
 		if(savedAgents > 0 and cycle mod savedAgents = 0){
-			write "================ START SAVE  - " + cycle;
-			save "surface; localAverageCosts; localWarehousingCosts; averageCostsOfNeighbors; localVolumeNormalizedAverageCosts; localAverageNbStockShortagesLastSteps; region; department; lsp.costsPathStrategy; lsp.threshold; lsp.averageCosts; lsp.cumulateCosts; lsp.adoptedSelectingWarehouseStrategy; lsp.provider.port; lsp.nbCustomers; lsp.region; lsp.department" to: "/Agents/FinalConsignee_"+cycle+".csv" type: "csv" rewrite:true;
+			save "surface,localAverageCosts,localWarehousingCosts,averageCostsOfNeighbors,localVolumeNormalizedAverageCosts,localAverageNbStockShortagesLastSteps,region,department,lsp.costsPathStrategy,lsp.threshold,lsp.averageCosts,lsp.cumulateCosts,lsp.adoptedSelectingWarehouseStrategy,lsp.provider.port,lsp.nbCustomers,lsp.region,lsp.department" to: "/Agents/FinalConsignee_"+cycle+".csv" type: "csv" rewrite:true;
 			ask FinalConsignee {
-				save [surface, localAverageCosts, localWarehousingCosts, averageCostsOfNeighbors, localVolumeNormalizedAverageCosts, localAverageNbStockShortagesLastSteps, region, department,	logisticsServiceProvider.costsPathStrategy, logisticsServiceProvider.threshold, logisticsServiceProvider.averageCosts, logisticsServiceProvider.cumulateCosts, logisticsServiceProvider.adoptedSelectingWarehouseStrategy, logisticsServiceProvider.provider.port, length(logisticsServiceProvider.customers), logisticsServiceProvider.region, logisticsServiceProvider.department] to: "/Agents/FinalConsignee_"+cycle+".csv" type: "csv" rewrite:false;
+				save "" + surface + "," + localAverageCosts + "," + localWarehousingCosts + "," + averageCostsOfNeighbors + "," + localVolumeNormalizedAverageCosts + "," + localAverageNbStockShortagesLastSteps + "," + region + "," + department + "," + logisticsServiceProvider.costsPathStrategy + "," + logisticsServiceProvider.threshold + "," + logisticsServiceProvider.averageCosts + "," + logisticsServiceProvider.cumulateCosts + "," + logisticsServiceProvider.adoptedSelectingWarehouseStrategy + "," + logisticsServiceProvider.provider.port + "," + length(logisticsServiceProvider.customers) + "," + logisticsServiceProvider.region + "," + logisticsServiceProvider.department to: "/Agents/FinalConsignee_"+cycle+".csv" type: text rewrite:false;
 			}
-			write "================ END SAVE AGENTS - " + cycle;
 		}
 	}
 }
